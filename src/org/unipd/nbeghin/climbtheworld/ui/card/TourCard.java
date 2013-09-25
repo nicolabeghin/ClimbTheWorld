@@ -2,6 +2,7 @@ package org.unipd.nbeghin.climbtheworld.ui.card;
 
 import org.unipd.nbeghin.climbtheworld.R;
 import org.unipd.nbeghin.climbtheworld.models.Building;
+import org.unipd.nbeghin.climbtheworld.models.Tour;
 
 import android.content.Context;
 import android.view.LayoutInflater;
@@ -10,20 +11,20 @@ import android.widget.TextView;
 
 import com.fima.cardsui.objects.Card;
 
-public class BuildingCard extends Card {
-	final Building	building;
+public class TourCard extends Card {
+	final Tour	tour;
 
-	public BuildingCard(Building building) {
-		super(building.getName());
-		this.building = building;
+	public TourCard(Tour tour) {
+		super(tour.getTitle());
+		this.tour = tour;
 	}
 
 	@Override
 	public View getCardContent(Context context) {
 		View view = LayoutInflater.from(context).inflate(R.layout.card_building_ex, null);
-		((TextView) view.findViewById(R.id.title)).setText(building.getName());
-		((TextView) view.findViewById(R.id.location)).setText(building.getLocation());
-		((TextView) view.findViewById(R.id.description)).setText(building.getUrl());
+		((TextView) view.findViewById(R.id.title)).setText(tour.getTitle());
+		((TextView) view.findViewById(R.id.num_buildings)).setText(tour.getNum_buildings());
+		((TextView) view.findViewById(R.id.description)).setText(tour.getDescription());
 		
 		return view;
 	}
