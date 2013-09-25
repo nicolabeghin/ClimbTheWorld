@@ -10,10 +10,11 @@ import org.unipd.nbeghin.climbtheworld.models.Tour;
 import org.unipd.nbeghin.climbtheworld.ui.card.BuildingCard;
 import org.unipd.nbeghin.climbtheworld.ui.card.TourCard;
 
-import android.app.Activity;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.v7.app.ActionBar;
+import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
 import android.view.Menu;
 import android.view.View;
@@ -21,13 +22,15 @@ import android.view.View;
 import com.fima.cardsui.views.CardUI;
 import com.j256.ormlite.dao.RuntimeExceptionDao;
 
-public class MainActivity extends Activity {
+public class MainActivity extends ActionBarActivity {
+	private static final String	APP_TITLE	= "Climb the world";
 	public static final String	AppName	= "ClimbTheWorld";
 	public CardUI				buildingCards;
 	public CardUI				toursCards;
 	private List<Building>		buildings;
 	private List<Climbing>		climbings;
 	private List<Tour>		tours;
+	private ActionBar ab;
 	
 	private class LoadBuildingsTask extends AsyncTask<Void, Void, Void> {
 		@Override
@@ -55,15 +58,19 @@ public class MainActivity extends Activity {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
+		ab = getSupportActionBar();
+        ab.setTitle(APP_TITLE);
+        ab.setHomeButtonEnabled(true);
 		buildingCards = (CardUI) findViewById(R.id.cardsviewBuildings);
 		buildingCards.setSwipeable(false);
 		loadDb();
+		new LoadBuildingsTask().execute();
 	}
 	
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		// Inflate the menu; this adds items to the action bar if it is present.
-		getMenuInflater().inflate(R.menu.main, menu);
+		getMenuInflater().inflate(R.menu.actionbar, menu);
 		return true;
 	}
 
