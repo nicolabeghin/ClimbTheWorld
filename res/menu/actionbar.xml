@@ -1,31 +1,20 @@
 <?xml version="1.0" encoding="utf-8"?>
-<menu xmlns:android="http://schemas.android.com/apk/res/android" 
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:climbtheworld="http://schemas.android.com/apk/res-auto" >
 
     <item
-        android:id="@+id/itemHome"
-        android:action="@+id/action_home"
-        android:icon="@android:drawable/ic_menu_myplaces"
-        android:title="Home" 
-        climbtheworld:showAsAction="ifRoom">
+        android:id="@+id/action_search"
+        android:icon="@drawable/ic_action_search"
+        android:title="Search"
+        climbtheworld:actionViewClass="android.support.v7.widget.SearchView"
+        climbtheworld:showAsAction="ifRoom|collapseActionView">
     </item>
-        <item
-        android:id="@+id/itemSearch"
-        android:action="@+id/action_search"
-        android:icon="@android:drawable/ic_input_get"
-        android:title="Search" 
-        climbtheworld:showAsAction="ifRoom">
-    </item>
-            <item
+    <item
         android:id="@+id/itemProfile"
         android:action="@+id/action_profile"
-        android:icon="@android:drawable/ic_menu_preferences"
-        android:title="Profile" 
+        android:icon="@drawable/ic_action_user"
+        android:title="Profile"
         climbtheworld:showAsAction="ifRoom">
     </item>
-        
-        
-    
-    
 
 </menu>

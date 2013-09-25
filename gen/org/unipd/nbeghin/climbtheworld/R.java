@@ -1160,12 +1160,14 @@ containing a value of this type.
         public static final int card_background=0x7f020058;
         public static final int card_background_shadow=0x7f020059;
         public static final int card_shadow=0x7f02005a;
-        public static final int ic_launcher=0x7f02005b;
-        public static final int selectable_background_cardbank=0x7f02005c;
-        public static final int top_shadow=0x7f02005d;
-        public static final int url1=0x7f02005e;
-        public static final int url2=0x7f02005f;
-        public static final int url3=0x7f020060;
+        public static final int ic_action_search=0x7f02005b;
+        public static final int ic_action_user=0x7f02005c;
+        public static final int ic_launcher=0x7f02005d;
+        public static final int selectable_background_cardbank=0x7f02005e;
+        public static final int top_shadow=0x7f02005f;
+        public static final int url1=0x7f020060;
+        public static final int url2=0x7f020061;
+        public static final int url3=0x7f020062;
     }
     public static final class id {
         public static final int ScrollView1=0x7f050049;
@@ -1177,15 +1179,14 @@ containing a value of this type.
         public static final int action_bar_subtitle=0x7f050021;
         public static final int action_bar_title=0x7f050020;
         public static final int action_context_bar=0x7f05001b;
-        public static final int action_home=0x7f050051;
         public static final int action_menu_divider=0x7f050016;
         public static final int action_menu_presenter=0x7f050017;
         public static final int action_mode_bar=0x7f05002f;
         public static final int action_mode_bar_stub=0x7f05002e;
         public static final int action_mode_close_button=0x7f050022;
-        public static final int action_profile=0x7f050055;
-        public static final int action_search=0x7f050053;
-        public static final int action_settings=0x7f050056;
+        public static final int action_profile=0x7f050052;
+        public static final int action_search=0x7f050050;
+        public static final int action_settings=0x7f050053;
         public static final int activity_chooser_view_content=0x7f050023;
         public static final int always=0x7f05000b;
         public static final int beginning=0x7f050011;
@@ -1208,9 +1209,7 @@ containing a value of this type.
         public static final int ifRoom=0x7f05000a;
         public static final int image=0x7f050025;
         public static final int imageView1=0x7f050045;
-        public static final int itemHome=0x7f050050;
-        public static final int itemProfile=0x7f050054;
-        public static final int itemSearch=0x7f050052;
+        public static final int itemProfile=0x7f050051;
         public static final int left_icon=0x7f050031;
         public static final int listMode=0x7f050001;
         public static final int listView=0x7f050047;
