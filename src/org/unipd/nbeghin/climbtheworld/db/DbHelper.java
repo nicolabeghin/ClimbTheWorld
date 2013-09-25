@@ -1,6 +1,8 @@
 package org.unipd.nbeghin.climbtheworld.db;
 
 import org.unipd.nbeghin.climbtheworld.models.Building;
+import org.unipd.nbeghin.climbtheworld.models.Climbing;
+import org.unipd.nbeghin.climbtheworld.models.Tour;
 
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
@@ -13,9 +15,9 @@ import com.j256.ormlite.support.ConnectionSource;
 public class DbHelper extends OrmLiteSqliteOpenHelper {
     public static final String DATABASE_NAME = "ClimbTheWorld";
     public static final int DATABASE_VERSION = 1;
-	// the DAO object we use to access the SimpleData table
-	private Dao<Building, Integer> simpleDao = null;
-	private RuntimeExceptionDao<Building, Integer> simpleRuntimeDao = null;
+	private RuntimeExceptionDao<Building, Integer> buildingRuntimeDao = null;
+	private RuntimeExceptionDao<Tour, Integer> tourRuntimeDao = null;
+	private RuntimeExceptionDao<Climbing, Integer> climbingRuntimeDao = null;
 	
     public DbHelper(Context context) {
     	super(context, DATABASE_NAME, null, DATABASE_VERSION);
@@ -31,15 +33,25 @@ public class DbHelper extends OrmLiteSqliteOpenHelper {
 		// TODO Auto-generated method stub
 	}
 
-	/**
-	 * Returns the RuntimeExceptionDao (Database Access Object) version of a Dao for our SimpleData class. It will
-	 * create it or just give the cached value. RuntimeExceptionDao only through RuntimeExceptions.
-	 */
 	public RuntimeExceptionDao<Building, Integer> getBuildingDao() {
-		if (simpleRuntimeDao == null) {
-			simpleRuntimeDao = getRuntimeExceptionDao(Building.class);
+		if (buildingRuntimeDao == null) {
+			buildingRuntimeDao = getRuntimeExceptionDao(Building.class);
 		}
-		return simpleRuntimeDao;
+		return buildingRuntimeDao;
+	}
+
+	public RuntimeExceptionDao<Tour, Integer> getTourDao() {
+		if (tourRuntimeDao == null) {
+			tourRuntimeDao = getRuntimeExceptionDao(Tour.class);
+		}
+		return tourRuntimeDao;
+	}
+	
+	public RuntimeExceptionDao<Climbing, Integer> getClimbingDao() {
+		if (climbingRuntimeDao == null) {
+			climbingRuntimeDao = getRuntimeExceptionDao(Climbing.class);
+		}
+		return climbingRuntimeDao;
 	}
 
 	/**
@@ -48,6 +60,8 @@ public class DbHelper extends OrmLiteSqliteOpenHelper {
 	@Override
 	public void close() {
 		super.close();
-		simpleRuntimeDao = null;
+		buildingRuntimeDao = null;
+		tourRuntimeDao = null;
+		climbingRuntimeDao = null;
 	}
 }

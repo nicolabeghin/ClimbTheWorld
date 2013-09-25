@@ -12,6 +12,41 @@ public class Tour {
 	@DatabaseField
 	private String	description;
 	@DatabaseField
-	private int	num_buildings;
+	private int		num_buildings;
+
 	Tour() {} // needed by ormlite
+
+	public int get_id() {
+		return _id;
+	}
+
+	public void set_id(int _id) {
+		this._id = _id;
+	}
+
+	public String getTitle() {
+		return title;
+	}
+
+	public void setTitle(String title) {
+		this.title = title;
+	}
+
+	public String getDescription() {
+		return description;
+	}
+
+	public void setDescription(String description) {
+		this.description = description;
+	}
+
+	public int getNum_buildings() {
+		return num_buildings;
+	}
+
+	public void setNum_buildings(int num_buildings) {
+		this.num_buildings = num_buildings;
+	}
+	
+	
 }

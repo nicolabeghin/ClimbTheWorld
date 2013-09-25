@@ -5,6 +5,7 @@ import java.util.List;
 import org.unipd.nbeghin.climbtheworld.db.DbHelper;
 import org.unipd.nbeghin.climbtheworld.db.PreExistingDbLoader;
 import org.unipd.nbeghin.climbtheworld.models.Building;
+import org.unipd.nbeghin.climbtheworld.models.Climbing;
 
 import android.app.Activity;
 import android.database.sqlite.SQLiteDatabase;
@@ -38,9 +39,12 @@ public class MainActivity extends Activity {
 		SQLiteDatabase db = preExistingDbLoader.getReadableDatabase();
 		db.close();
 		DbHelper dbHelper = new DbHelper(getApplicationContext());
-		RuntimeExceptionDao<Building, Integer> simpleDao = dbHelper.getBuildingDao();
-		// query for all of the data objects in the database
-		List<Building> list = simpleDao.queryForAll();
-		Log.i(AppName, "Ci sono "+list.size()+" buildings");
+		RuntimeExceptionDao<Building, Integer> buildingDao = dbHelper.getBuildingDao();
+		RuntimeExceptionDao<Climbing, Integer> climbingDao = dbHelper.getClimbingDao();
+		List<Building> buildings = buildingDao.queryForAll();
+		List<Climbing> climbings = climbingDao.queryForAll();
+		Log.i(AppName, buildings.size()+" buildings detected");
+		Log.i(AppName, climbings.size()+" climbings detected");
+		if (climbings.size()>0) System.out.println(climbings.get(0).getBuilding().getName());
 	}
 }
