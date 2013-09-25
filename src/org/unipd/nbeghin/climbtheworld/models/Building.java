@@ -12,12 +12,14 @@ public class Building {
 	@DatabaseField
 	private String	description;
 	@DatabaseField
+	private String	location;
+	@DatabaseField
 	private String	url;
 	@DatabaseField
 	private int		height;
 	@DatabaseField
 	private int		steps;
-	
+
 	Building() {} // needed by ormlite
 
 	public int get_id() {
@@ -30,6 +32,14 @@ public class Building {
 
 	public String getName() {
 		return name;
+	}
+
+	public String getLocation() {
+		return location;
+	}
+
+	public void setLocation(String location) {
+		this.location = location;
 	}
 
 	public void setName(String name) {
@@ -67,5 +77,4 @@ public class Building {
 	public void setSteps(int steps) {
 		this.steps = steps;
 	}
-	
 }
