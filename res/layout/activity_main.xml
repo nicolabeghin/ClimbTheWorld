@@ -1,19 +1,9 @@
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<android.support.v4.widget.DrawerLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/activity_main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:paddingBottom="@dimen/activity_vertical_margin"
-    android:paddingLeft="@dimen/activity_horizontal_margin"
-    android:paddingRight="@dimen/activity_horizontal_margin"
-    android:paddingTop="@dimen/activity_vertical_margin"
     tools:context=".MainActivity" >
-
-    <!-- <TextView -->
-    <!-- android:id="@+id/textView1" -->
-    <!-- android:layout_width="wrap_content" -->
-    <!-- android:layout_height="wrap_content" -->
-    <!-- android:text="@string/hello_world" /> -->
-
 
     <!-- <Button -->
     <!-- android:id="@+id/button1" -->
@@ -25,10 +15,26 @@
     <!-- android:onClick="onButton1Click" -->
     <!-- android:text="Button" /> -->
 
-    <com.fima.cardsui.views.CardUI
-        android:id="@+id/cardsviewBuildings"
+    <FrameLayout
+        android:id="@+id/content_frame"
         android:layout_width="match_parent"
         android:layout_height="match_parent" >
-    </com.fima.cardsui.views.CardUI>
 
-</RelativeLayout>
+        <com.fima.cardsui.views.CardUI
+            android:id="@+id/cardsviewBuildings"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" >
+        </com.fima.cardsui.views.CardUI>
+    </FrameLayout>
+
+    <ListView
+        android:id="@+id/left_drawer"
+        android:layout_width="320dp"
+        android:layout_height="match_parent"
+        android:layout_gravity="start"
+        android:background="#F3F3F4"
+        android:choiceMode="singleChoice"
+        android:divider="@android:color/transparent"
+        android:dividerHeight="0dp" />
+
+</android.support.v4.widget.DrawerLayout>
