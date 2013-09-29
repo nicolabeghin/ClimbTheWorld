@@ -34,7 +34,7 @@
         android:padding="8dp" >
 
         <ImageView
-            android:id="@+id/imageView1"
+            android:id="@+id/buildingPhoto"
             android:layout_width="154dp"
             android:layout_height="127dp"
             android:adjustViewBounds="true"

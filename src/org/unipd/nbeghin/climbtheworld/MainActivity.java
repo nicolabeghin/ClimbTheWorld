@@ -11,6 +11,7 @@ import org.unipd.nbeghin.climbtheworld.ui.card.BuildingCard;
 import org.unipd.nbeghin.climbtheworld.ui.card.TourCard;
 
 import android.annotation.SuppressLint;
+import android.content.Intent;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -21,6 +22,7 @@ import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
 import android.view.Menu;
 import android.view.View;
+import android.view.View.OnClickListener;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
@@ -29,11 +31,11 @@ import com.j256.ormlite.dao.RuntimeExceptionDao;
 
 @SuppressLint("NewApi")
 public class MainActivity extends ActionBarActivity {
-	private static final String		APP_TITLE	= "Climb the world";
-	public static final String		AppName		= "ClimbTheWorld";
+	private static final String		APP_TITLE				= "Climb the world";
+	public static final String		AppName					= "ClimbTheWorld";
 	public CardUI					buildingCards;
 	public CardUI					toursCards;
-	private List<Building>			buildings;
+	public static List<Building>			buildings;
 	private List<Climbing>			climbings;
 	private List<Tour>				tours;
 	private ActionBar				ab;
@@ -41,12 +43,25 @@ public class MainActivity extends ActionBarActivity {
 	private DrawerLayout			mDrawerLayout;
 	private ListView				mDrawerList;
 	private ActionBarDrawerToggle	mDrawerToggle;
+	public static final String		building_intent_object	= "org.unipd.nbeghin.climbtheworld.intents.object.building";
+	public static RuntimeExceptionDao<Building, Integer>	buildingDao;
+	public static RuntimeExceptionDao<Climbing, Integer>	climbingDao;
+	public static RuntimeExceptionDao<Tour, Integer>	tourDao;
 
 	private class LoadBuildingsTask extends AsyncTask<Void, Void, Void> {
 		@Override
 		protected Void doInBackground(Void... unused) {
-			for (Building building : buildings) {
-				buildingCards.addCard(new BuildingCard(building));
+			for (final Building building : buildings) {
+				BuildingCard buildingCard = new BuildingCard(building);
+				buildingCard.setOnClickListener(new OnClickListener() {
+					@Override
+					public void onClick(View v) {
+						Intent intent = new Intent(getApplicationContext(), ClimbActivity.class);
+						intent.putExtra(building_intent_object, building.get_id());
+						startActivity(intent);
+					}
+				});
+				buildingCards.addCard(buildingCard);
 			}
 			buildingCards.refresh();
 			return null;
@@ -95,9 +110,9 @@ public class MainActivity extends ActionBarActivity {
 		SQLiteDatabase db = preExistingDbLoader.getReadableDatabase();
 		db.close();
 		DbHelper dbHelper = new DbHelper(getApplicationContext());
-		RuntimeExceptionDao<Building, Integer> buildingDao = dbHelper.getBuildingDao();
-		RuntimeExceptionDao<Climbing, Integer> climbingDao = dbHelper.getClimbingDao();
-		RuntimeExceptionDao<Tour, Integer> tourDao = dbHelper.getTourDao();
+		buildingDao = dbHelper.getBuildingDao();
+		climbingDao = dbHelper.getClimbingDao();
+		tourDao = dbHelper.getTourDao();
 		buildings = buildingDao.queryForAll();
 		climbings = climbingDao.queryForAll();
 		tours = tourDao.queryForAll();

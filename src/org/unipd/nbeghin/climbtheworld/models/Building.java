@@ -1,10 +1,12 @@
 package org.unipd.nbeghin.climbtheworld.models;
 
+import java.io.Serializable;
+
 import com.j256.ormlite.field.DatabaseField;
 import com.j256.ormlite.table.DatabaseTable;
 
 @DatabaseTable(tableName = "buildings")
-public class Building {
+public class Building implements Serializable {
 	@DatabaseField(generatedId = true)
 	private int				_id;
 	@DatabaseField
