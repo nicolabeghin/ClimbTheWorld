@@ -14,6 +14,8 @@ public class Building {
 	@DatabaseField
 	private String	location;
 	@DatabaseField
+	private String	photo;
+	@DatabaseField
 	private String	url;
 	@DatabaseField
 	private int		height;
@@ -68,6 +70,14 @@ public class Building {
 
 	public void setHeight(int height) {
 		this.height = height;
+	}
+	
+	public String getPhoto() {
+		return photo;
+	}
+
+	public void setPhoto(String photo) {
+		this.photo = photo;
 	}
 
 	public int getSteps() {
