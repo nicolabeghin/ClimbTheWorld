@@ -11,7 +11,6 @@ import org.unipd.nbeghin.climbtheworld.ui.card.BuildingCard;
 import org.unipd.nbeghin.climbtheworld.ui.card.TourCard;
 
 import android.annotation.SuppressLint;
-import android.app.Activity;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -30,19 +29,19 @@ import com.j256.ormlite.dao.RuntimeExceptionDao;
 
 @SuppressLint("NewApi")
 public class MainActivity extends ActionBarActivity {
-	private static final String	APP_TITLE	= "Climb the world";
-	public static final String	AppName		= "ClimbTheWorld";
-	public CardUI				buildingCards;
-	public CardUI				toursCards;
-	private List<Building>		buildings;
-	private List<Climbing>		climbings;
-	private List<Tour>			tours;
-	private ActionBar			ab;
-	private String[]			mPlanetTitles;
-	private DrawerLayout		mDrawerLayout;
-	private ListView			mDrawerList;
-	private ActionBarDrawerToggle mDrawerToggle;
-	
+	private static final String		APP_TITLE	= "Climb the world";
+	public static final String		AppName		= "ClimbTheWorld";
+	public CardUI					buildingCards;
+	public CardUI					toursCards;
+	private List<Building>			buildings;
+	private List<Climbing>			climbings;
+	private List<Tour>				tours;
+	private ActionBar				ab;
+	private String[]				mPlanetTitles;
+	private DrawerLayout			mDrawerLayout;
+	private ListView				mDrawerList;
+	private ActionBarDrawerToggle	mDrawerToggle;
+
 	private class LoadBuildingsTask extends AsyncTask<Void, Void, Void> {
 		@Override
 		protected Void doInBackground(Void... unused) {
@@ -71,20 +70,16 @@ public class MainActivity extends ActionBarActivity {
 		setContentView(R.layout.activity_main);
 		ab = getSupportActionBar();
 		ab.setHomeButtonEnabled(false);
-        ab.setTitle(APP_TITLE);
-        
+		ab.setTitle(APP_TITLE);
 		mDrawerLayout = (DrawerLayout) findViewById(R.id.activity_main);
 		mDrawerList = (ListView) findViewById(R.id.left_drawer);
-		mPlanetTitles = new String[]{"test1", "test2"};
-		mDrawerList.setAdapter(new ArrayAdapter<String>(this, R.layout.drawer_list_item, mPlanetTitles));		
-        
+		mPlanetTitles = new String[] { "test1", "test2" };
+		mDrawerList.setAdapter(new ArrayAdapter<String>(this, R.layout.drawer_list_item, mPlanetTitles));
 		// set refs
 		buildingCards = (CardUI) findViewById(R.id.cardsviewBuildings);
 		buildingCards.setSwipeable(false);
-
 		// instance entities from db (to be moved inside AsyncTask)
 		loadDb();
-
 		new LoadBuildingsTask().execute();
 	}
 

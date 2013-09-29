@@ -6,21 +6,22 @@ import com.j256.ormlite.table.DatabaseTable;
 @DatabaseTable(tableName = "buildings")
 public class Building {
 	@DatabaseField(generatedId = true)
-	private int		_id;
+	private int				_id;
 	@DatabaseField
-	private String	name;
+	private String			name;
 	@DatabaseField
-	private String	description;
+	private String			description;
 	@DatabaseField
-	private String	location;
+	private String			location;
 	@DatabaseField
-	private String	photo;
+	private String			photo;
 	@DatabaseField
-	private String	url;
+	private String			url;
 	@DatabaseField
-	private int		height;
+	private int				height;
 	@DatabaseField
-	private int		steps;
+	private int				steps;
+	public static final int	average_step_height	= 17;	// in cm
 
 	Building() {} // needed by ormlite
 
@@ -71,7 +72,7 @@ public class Building {
 	public void setHeight(int height) {
 		this.height = height;
 	}
-	
+
 	public String getPhoto() {
 		return photo;
 	}
@@ -81,7 +82,7 @@ public class Building {
 	}
 
 	public int getSteps() {
-		return steps;
+		return this.height * 100 / average_step_height;
 	}
 
 	public void setSteps(int steps) {
