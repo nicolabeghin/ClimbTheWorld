@@ -3,6 +3,8 @@ package org.unipd.nbeghin.climbtheworld;
 import org.unipd.nbeghin.climbtheworld.listeners.AccelerometerSamplingRateDetect;
 import org.unipd.nbeghin.climbtheworld.models.Building;
 import org.unipd.nbeghin.climbtheworld.models.ClassifierCircularBuffer;
+import org.unipd.nbeghin.climbtheworld.services.SamplingClassifyService;
+import org.unipd.nbeghin.climbtheworld.services.SamplingRateDetectorService;
 import org.unipd.nbeghin.climbtheworld.util.SystemUiHider;
 
 import android.annotation.TargetApi;
@@ -13,7 +15,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.hardware.SensorManager;
-import android.opengl.Visibility;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
@@ -26,8 +27,8 @@ import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.ImageButton;
 import android.widget.ImageView;
-import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 /**
  * An example full-screen activity that shows and hides the system UI (i.e. status bar and navigation/system bar) with user interaction.
@@ -36,14 +37,11 @@ import android.widget.TextView;
  */
 public class ClimbActivity extends Activity {
 	public static final String		SAMPLING_TYPE					= "ACTION_SAMPLING";
-	public static final String		SAMPLING_TYPE_STAIR_UPSTAIRS	= "STAIR_UPSTAIRS";
-	public static final String		SAMPLING_TYPE_STAIR_DOWNSTAIRS	= "STAIR_DOWNSTAIRS";
 	public static final String		SAMPLING_TYPE_NON_STAIR			= "NON_STAIR";
 	public static final String		SAMPLING_DELAY					= "DELAY";
 	private boolean					samplingEnabled					= false;
 	private double					detectedSamplingRate			= 0;
 	private double					minimumSamplingRate				= 13;
-	private Intent					backgroundStoreSampler;
 	private Intent					backgroundClassifySampler;
 	private Intent					backgroundSamplingRateDetector;
 	private IntentFilter			classifierFilter				= new IntentFilter(ClassifierCircularBuffer.CLASSIFIER_ACTION);
@@ -72,21 +70,19 @@ public class ClimbActivity extends Activity {
 	 */
 	private SystemUiHider			mSystemUiHider;
 
-	public class ClassifierReceiver extends BroadcastReceiver {
-		@Override
-		public void onReceive(Context context, Intent intent) {
-			String result = intent.getExtras().getString(ClassifierCircularBuffer.CLASSIFIER_NOTIFICATION_STATUS);
-			Log.i(MainActivity.AppName, result);
-			if (result.equals("UPSTAIRS")) {
-				num_steps++;
-				((TextView) findViewById(R.id.lblNumSteps)).setText(Integer.toString(num_steps));
-			} else if (result.equals("DOWNSTAIRS")) {
-				num_steps--;
-				((TextView) findViewById(R.id.lblNumSteps)).setText(Integer.toString(num_steps));
-			}
-			((TextView) findViewById(R.id.lblClassifierOutput)).setText(result);
-		}
-	}
+    public class ClassifierReceiver extends BroadcastReceiver {
+
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            String result=intent.getExtras().getString(ClassifierCircularBuffer.CLASSIFIER_NOTIFICATION_STATUS);
+            Log.i(MainActivity.AppName, result);
+            if (result.equals("STAIR")) {
+                num_steps++;
+                ((TextView) findViewById(R.id.lblNumSteps)).setText(Integer.toString(num_steps));
+            }
+            ((TextView) findViewById(R.id.lblClassifierOutput)).setText(result);
+        }
+    }
 
 	public class SamplingRateDetectorReceiver extends BroadcastReceiver {
 		@Override
@@ -195,6 +191,11 @@ public class ClimbActivity extends Activity {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+		backgroundClassifySampler = new Intent(this, SamplingClassifyService.class); // instance (without starting) background classifier
+		backgroundSamplingRateDetector = new Intent(this, SamplingRateDetectorService.class); // instance (without starting) background sampling rate detected
+		backgroundSamplingRateDetector.putExtra(SAMPLING_DELAY, SensorManager.SENSOR_DELAY_NORMAL);
+		registerReceiver(sampleRateDetectorReceiver, samplingRateDetectorFilter);
+		startService(backgroundSamplingRateDetector); // start background service
 	}
 
 	@Override
@@ -265,17 +266,81 @@ public class ClimbActivity extends Activity {
 	}
 
 	public void onBtnStartClimbing(View v) {
+		if (detectedSamplingRate == 0 || detectedSamplingRate < minimumSamplingRate) {
+			Toast.makeText(getApplicationContext(), "Accelerometer calibration is not ready yet. Please wait", Toast.LENGTH_SHORT).show();
+			return;
+		}
 		if (samplingEnabled) {
+			stopClassify();
 			samplingEnabled = false;
 			((ImageButton) v).setImageResource(R.drawable.av_play);
 			findViewById(R.id.progressBarClimbing).startAnimation(AnimationUtils.loadAnimation(getApplicationContext(), R.anim.abc_fade_out));
 			findViewById(R.id.progressBarClimbing).setVisibility(View.INVISIBLE);
 		} else {
+			startClassifyService();
 			samplingEnabled = true;
 			((ImageButton) v).setImageResource(R.drawable.av_pause);
 			findViewById(R.id.lblReadyToClimb).setVisibility(View.GONE);
 			findViewById(R.id.progressBarClimbing).startAnimation(AnimationUtils.loadAnimation(getApplicationContext(), R.anim.abc_fade_in));
 			findViewById(R.id.progressBarClimbing).setVisibility(View.VISIBLE);
 		}
+	}
+
+	private void stopAllServices() {
+		try {
+			stopService(backgroundSamplingRateDetector);
+			unregisterReceiver(sampleRateDetectorReceiver);
+		} catch (Exception e) {
+			Log.e(MainActivity.AppName, "Unable to stop sampling rate detector service");
+			e.printStackTrace();
+		}
+		try {
+			stopService(backgroundClassifySampler);
+			unregisterReceiver(classifierReceiver);
+		} catch (Exception e) {
+			Log.e(MainActivity.AppName, "Unable to stop classifier service");
+			e.printStackTrace();
+		}
+	}
+
+	public void stopClassify() {
+		stopService(backgroundClassifySampler); // stop background server
+		samplingEnabled = false;
+		unregisterReceiver(classifierReceiver);
+		((TextView) findViewById(R.id.lblClassifierOutput)).setText("Classifier");
+	}
+
+	public void startClassifyService() {
+		startService(backgroundClassifySampler); // start background service
+		registerReceiver(classifierReceiver, classifierFilter);
+		num_steps = 0;
+		((TextView) findViewById(R.id.lblNumSteps)).setText(Integer.toString(num_steps));
+		samplingEnabled = true;
+	}
+
+	@Override
+	protected void onResume() {
+		Log.i(MainActivity.AppName, "onResume");
+		super.onResume();
+	}
+
+	@Override
+	protected void onPause() {
+		Log.i(MainActivity.AppName, "onPause");
+		super.onPause();
+	}
+
+	@Override
+	protected void onDestroy() {
+		Log.i(MainActivity.AppName, "onDestroy");
+		stopAllServices();
+		super.onDestroy();
+	}
+
+	@Override
+	public void onBackPressed() {
+		if (samplingEnabled == false) super.onBackPressed();
+		else
+			Toast.makeText(getApplicationContext(), "Sampling running - Stop it before exiting", Toast.LENGTH_SHORT).show();
 	}
 }
