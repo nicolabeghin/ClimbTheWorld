@@ -11,7 +11,7 @@
     </item>
     <item
         android:id="@+id/itemProfile"
-        android:action="@+id/action_profile"
+        android:action="@+id/lblClassifierOutput"
         android:icon="@drawable/ic_action_user"
         android:title="Profile"
         climbtheworld:showAsAction="ifRoom">

@@ -5,16 +5,11 @@
     android:background="#0099cc"
     tools:context=".ClimbActivity" >
 
-    <!--
-         The primary full-screen view. This can be replaced with whatever view
-         is needed to present your content, e.g. VideoView, SurfaceView,
-         TextureView, etc.
-    -->
-
     <ImageView
         android:id="@+id/buildingPhoto"
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
+        android:contentDescription="Building photo"
         android:scaleType="fitXY"
         android:src="@drawable/tour_eiffel" />
 
@@ -56,32 +51,55 @@
                 android:layout_weight="1"
                 android:gravity="bottom" >
 
-                <Button
-                    android:id="@+id/dummy_button"
+                <ImageButton
+                    android:id="@+id/btnStartClimbing"
                     style="?buttonBarButtonStyle"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:text="Start" />
-
-                <Button
-                    android:id="@+id/btnPauseClimbing"
-                    style="?buttonBarButtonStyle"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text="Pause" />
-                
-
+                    android:onClick="onBtnStartClimbing"
+                    android:src="@drawable/av_play" />
             </LinearLayout>
-
         </LinearLayout>
 
-        <ProgressBar
-            android:id="@+id/progressBar2"
-            android:layout_width="wrap_content"
+        <RelativeLayout
+            android:id="@+id/StatusPanelWrapper"
+            android:layout_width="fill_parent"
             android:layout_height="wrap_content"
-            android:layout_gravity="right" />
+            android:layout_gravity="right" >
+
+            <LinearLayout
+                android:id="@+id/StatusPanel"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:gravity="right"
+                android:orientation="vertical" >
+
+                <TextView
+                    android:id="@+id/lblHeight"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Height" />
+
+                <TextView
+                    android:id="@+id/lblNumSteps"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Steps" />
+
+                <TextView
+                    android:id="@+id/lblClassifierOutput"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Classifier" />
+
+                <TextView
+                    android:id="@+id/lblSamplingRate"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Sampling rate" />
+            </LinearLayout>
+        </RelativeLayout>
 
         <TextView
             android:id="@+id/lblBuildingName"
@@ -90,6 +108,12 @@
             android:layout_gravity="center_horizontal"
             android:layout_marginTop="10dp"
             android:text="Building name" />
+
+        <ProgressBar
+            android:id="@+id/progressBarClimbing"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:visibility="invisible" />
 
     </FrameLayout>
 
