@@ -1,8 +1,16 @@
 package org.unipd.nbeghin.climbtheworld;
 
+import java.text.DecimalFormat;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import org.unipd.nbeghin.climbtheworld.exceptions.ClimbingNotFound;
 import org.unipd.nbeghin.climbtheworld.listeners.AccelerometerSamplingRateDetect;
 import org.unipd.nbeghin.climbtheworld.models.Building;
 import org.unipd.nbeghin.climbtheworld.models.ClassifierCircularBuffer;
+import org.unipd.nbeghin.climbtheworld.models.Climbing;
 import org.unipd.nbeghin.climbtheworld.services.SamplingClassifyService;
 import org.unipd.nbeghin.climbtheworld.services.SamplingRateDetectorService;
 import org.unipd.nbeghin.climbtheworld.util.SystemUiHider;
@@ -36,53 +44,58 @@ import android.widget.Toast;
  * @see SystemUiHider
  */
 public class ClimbActivity extends Activity {
-	public static final String		SAMPLING_TYPE					= "ACTION_SAMPLING";
-	public static final String		SAMPLING_TYPE_NON_STAIR			= "NON_STAIR";
-	public static final String		SAMPLING_DELAY					= "DELAY";
-	private boolean					samplingEnabled					= false;
-	private double					detectedSamplingRate			= 0;
-	private double					minimumSamplingRate				= 13;
+	public static final String		SAMPLING_TYPE				= "ACTION_SAMPLING";
+	public static final String		SAMPLING_TYPE_NON_STAIR		= "NON_STAIR";
+	public static final String		SAMPLING_DELAY				= "DELAY";
+	private boolean					samplingEnabled				= false;
+	private double					detectedSamplingRate		= 0;
+	private double					minimumSamplingRate			= 13;
 	private Intent					backgroundClassifySampler;
 	private Intent					backgroundSamplingRateDetector;
-	private IntentFilter			classifierFilter				= new IntentFilter(ClassifierCircularBuffer.CLASSIFIER_ACTION);
-	private IntentFilter			samplingRateDetectorFilter		= new IntentFilter(AccelerometerSamplingRateDetect.SAMPLING_RATE_ACTION);
-	private BroadcastReceiver		classifierReceiver				= new ClassifierReceiver();
-	private BroadcastReceiver		sampleRateDetectorReceiver		= new SamplingRateDetectorReceiver();
-	private int						num_steps						= 0;
+	private IntentFilter			classifierFilter			= new IntentFilter(ClassifierCircularBuffer.CLASSIFIER_ACTION);
+	private IntentFilter			samplingRateDetectorFilter	= new IntentFilter(AccelerometerSamplingRateDetect.SAMPLING_RATE_ACTION);
+	private BroadcastReceiver		classifierReceiver			= new ClassifierReceiver();
+	private BroadcastReceiver		sampleRateDetectorReceiver	= new SamplingRateDetectorReceiver();
+	private int						num_steps					= 0;
+	private double					percentage					= 0.0;
+	private Building				building;
+	private Climbing				climbing;
+	
 	/**
 	 * Whether or not the system UI should be auto-hidden after {@link #AUTO_HIDE_DELAY_MILLIS} milliseconds.
 	 */
-	private static final boolean	AUTO_HIDE						= true;
+	private static final boolean	AUTO_HIDE					= true;
 	/**
 	 * If {@link #AUTO_HIDE} is set, the number of milliseconds to wait after user interaction before hiding the system UI.
 	 */
-	private static final int		AUTO_HIDE_DELAY_MILLIS			= 3000;
+	private static final int		AUTO_HIDE_DELAY_MILLIS		= 3000;
 	/**
 	 * If set, will toggle the system UI visibility upon interaction. Otherwise, will show the system UI visibility upon interaction.
 	 */
-	private static final boolean	TOGGLE_ON_CLICK					= true;
+	private static final boolean	TOGGLE_ON_CLICK				= true;
 	/**
 	 * The flags to pass to {@link SystemUiHider#getInstance}.
 	 */
-	private static final int		HIDER_FLAGS						= 0;
+	private static final int		HIDER_FLAGS					= 0;
 	/**
 	 * The instance of the {@link SystemUiHider} for this activity.
 	 */
 	private SystemUiHider			mSystemUiHider;
 
-    public class ClassifierReceiver extends BroadcastReceiver {
-
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            String result=intent.getExtras().getString(ClassifierCircularBuffer.CLASSIFIER_NOTIFICATION_STATUS);
-            Log.i(MainActivity.AppName, result);
-            if (result.equals("STAIR")) {
-                num_steps++;
-                ((TextView) findViewById(R.id.lblNumSteps)).setText(Integer.toString(num_steps));
-            }
-            ((TextView) findViewById(R.id.lblClassifierOutput)).setText(result);
-        }
-    }
+	public class ClassifierReceiver extends BroadcastReceiver {
+		@Override
+		public void onReceive(Context context, Intent intent) {
+			String result = intent.getExtras().getString(ClassifierCircularBuffer.CLASSIFIER_NOTIFICATION_STATUS);
+			if (result.equals("STAIR")) {
+				num_steps++;
+				percentage = (double)num_steps/(double)building.getSteps();
+//				((RelativeLayout)findViewById(R.id.PositionIndicatorLayout).getHeight();
+//				((ImageView)findViewById(R.id.imgPositionIndicator).setP
+				((TextView) findViewById(R.id.lblNumSteps)).setText(Integer.toString(num_steps)+" of "+Integer.toString(building.getSteps())+" ("+(new DecimalFormat("#.##")).format(percentage)+"%)");
+			}
+			((TextView) findViewById(R.id.lblClassifierOutput)).setText(result);
+		}
+	}
 
 	public class SamplingRateDetectorReceiver extends BroadcastReceiver {
 		@Override
@@ -95,6 +108,7 @@ public class ClimbActivity extends Activity {
 				backgroundClassifySampler.putExtra(SAMPLING_DELAY, backgroundSamplingRateDetector.getExtras().getInt(ClimbActivity.SAMPLING_DELAY));
 				unregisterReceiver(this);
 				stopService(backgroundSamplingRateDetector);
+				Toast.makeText(getApplicationContext(), "Start climbing some stairs!", Toast.LENGTH_LONG).show();
 			} else { // sampling rate not high enough: try to decrease the sampling delay
 				if (backgroundSamplingRateDetector.getExtras().getInt(ClimbActivity.SAMPLING_DELAY) != SensorManager.SENSOR_DELAY_GAME) {
 					Log.w(MainActivity.AppName, "Sampling rate not high enough: trying decreasing the sampling delay");
@@ -177,16 +191,10 @@ public class ClimbActivity extends Activity {
 		// MainActivity.buildings.get();
 		int building_id = getIntent().getIntExtra(MainActivity.building_intent_object, 0);
 		try {
+			// get building
 			if (building_id == 0) throw new Exception("ERROR: unable to get intent data");
-			Building building = MainActivity.buildingDao.queryForId(building_id);
-			int imageId = getApplicationContext().getResources().getIdentifier(building.getPhoto(), "drawable", getApplicationContext().getPackageName());
-			if (imageId > 0) ((ImageView) findViewById(R.id.buildingPhoto)).setImageResource(imageId);
-			Animation anim = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.abc_slide_in_top);
-			anim.setDuration(2500);
-			((TextView) findViewById(R.id.lblBuildingName)).setText(building.getName());
-			((TextView) findViewById(R.id.lblNumSteps)).setText(Integer.toString(building.getSteps()) + " steps");
-			((TextView) findViewById(R.id.lblHeight)).setText(Integer.toString(building.getHeight()) + "mt");
-			findViewById(R.id.lblReadyToClimb).startAnimation(anim);
+			building = MainActivity.buildingDao.queryForId(building_id);
+			setup_from_building();
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -196,6 +204,45 @@ public class ClimbActivity extends Activity {
 		backgroundSamplingRateDetector.putExtra(SAMPLING_DELAY, SensorManager.SENSOR_DELAY_NORMAL);
 		registerReceiver(sampleRateDetectorReceiver, samplingRateDetectorFilter);
 		startService(backgroundSamplingRateDetector); // start background service
+	}
+
+	private void setup_from_building() {
+		// get building photo photo resource
+		int imageId = getApplicationContext().getResources().getIdentifier(building.getPhoto(), "drawable", getApplicationContext().getPackageName());
+		if (imageId > 0) ((ImageView) findViewById(R.id.buildingPhoto)).setImageResource(imageId);
+		// set building info
+		((TextView) findViewById(R.id.lblBuildingName)).setText(building.getName());
+		((TextView) findViewById(R.id.lblNumSteps)).setText(Integer.toString(building.getSteps()) + " steps");
+		((TextView) findViewById(R.id.lblHeight)).setText(Integer.toString(building.getHeight()) + "mt");
+		try { // get previous climbing
+			loadPreviousClimbing();
+		} catch (ClimbingNotFound e) {
+			Log.i(MainActivity.AppName, "No previous climbing found");
+			climbing = new Climbing();
+			climbing.setBuilding(building);
+			climbing.setCompleted(0);
+			climbing.setCompleted_steps(0);
+			climbing.setCreated(new Date().getTime());
+			climbing.setModified(new Date().getTime());
+			MainActivity.climbingDao.create(climbing);
+			Log.i(MainActivity.AppName, "Created new climbing #"+climbing.get_id());
+		}
+		// animate "ready to climb" text
+		Animation anim = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.abc_slide_in_top);
+		anim.setDuration(2500);
+		findViewById(R.id.lblReadyToClimb).startAnimation(anim);
+	}
+
+	private void loadPreviousClimbing() throws ClimbingNotFound {
+		Map<String, Object> conditions = new HashMap<String, Object>();
+		conditions.put("building_id", building.get_id());
+		List<Climbing> climbings = MainActivity.climbingDao.queryForFieldValues(conditions);
+		if (climbings.isEmpty()) throw new ClimbingNotFound();
+		climbing = climbings.get(0);
+		num_steps = climbing.getCompleted_steps();
+		percentage = climbing.getPercentage();
+		((TextView) findViewById(R.id.lblNumSteps)).setText(Integer.toString(num_steps)+" of "+Integer.toString(building.getSteps())+" ("+(new DecimalFormat("#.##")).format(percentage)+"%)");
+		Log.i(MainActivity.AppName, "Loaded existing climbing (#"+climbing.get_id()+")");
 	}
 
 	@Override
@@ -308,13 +355,19 @@ public class ClimbActivity extends Activity {
 		samplingEnabled = false;
 		unregisterReceiver(classifierReceiver);
 		((TextView) findViewById(R.id.lblClassifierOutput)).setText("Classifier");
+		
+		// update db
+		climbing.setModified(new Date().getTime());
+		climbing.setCompleted_steps(num_steps);
+		climbing.setPercentage(percentage);
+		climbing.setRemaining_steps(building.getSteps()-num_steps);
+		MainActivity.climbingDao.update(climbing);
+		Log.i(MainActivity.AppName, "Updated climbing #"+climbing.get_id());
 	}
 
 	public void startClassifyService() {
 		startService(backgroundClassifySampler); // start background service
 		registerReceiver(classifierReceiver, classifierFilter);
-		num_steps = 0;
-		((TextView) findViewById(R.id.lblNumSteps)).setText(Integer.toString(num_steps));
 		samplingEnabled = true;
 	}
 

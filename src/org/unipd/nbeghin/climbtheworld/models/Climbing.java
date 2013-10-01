@@ -14,7 +14,7 @@ public class Climbing {
 	@DatabaseField
 	private int		remaining_steps;
 	@DatabaseField
-	private float	percentage;
+	private double	percentage;
 	@DatabaseField
 	private long	created;
 	@DatabaseField
@@ -22,7 +22,7 @@ public class Climbing {
 	@DatabaseField
 	private long	completed;
 
-	Climbing() {} // needed by ormlite
+	public Climbing() {} // needed by ormlite
 
 	public int get_id() {
 		return _id;
@@ -56,12 +56,12 @@ public class Climbing {
 		this.remaining_steps = remaining_steps;
 	}
 
-	public float getPercentage() {
+	public double getPercentage() {
 		return percentage;
 	}
 
-	public void setPercentage(float percentage) {
-		this.percentage = percentage;
+	public void setPercentage(double percentage2) {
+		this.percentage = percentage2;
 	}
 
 	public long getCreated() {

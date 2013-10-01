@@ -119,7 +119,6 @@ public class MainActivity extends ActionBarActivity {
 		Log.i(AppName, buildings.size() + " buildings detected");
 		Log.i(AppName, climbings.size() + " climbings detected");
 		Log.i(AppName, tours.size() + " tours detected");
-		if (climbings.size() > 0) System.out.println(climbings.get(0).getBuilding().getName());
 	}
 
 	public void onButton1Click(View v) {

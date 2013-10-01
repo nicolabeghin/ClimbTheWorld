@@ -13,6 +13,22 @@
         android:scaleType="fitXY"
         android:src="@drawable/tour_eiffel" />
 
+    <LinearLayout
+        android:id="@+id/PositionIndicatorLayout"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:orientation="vertical" >
+
+        <SeekBar
+            android:id="@+id/seekBar1"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:indeterminate="false"
+            android:rotation="270"
+            android:thumb="@drawable/navigation_next_item" />
+
+    </LinearLayout>
+
     <TextView
         android:id="@+id/lblReadyToClimb"
         android:layout_width="match_parent"
@@ -103,6 +119,12 @@
             </LinearLayout>
         </RelativeLayout>
 
+        <ProgressBar
+            android:id="@+id/progressBarClimbing"
+            android:layout_width="wrap_content"
+            android:layout_height="fill_parent"
+            android:visibility="invisible" />
+
         <TextView
             android:id="@+id/lblBuildingName"
             android:layout_width="wrap_content"
@@ -110,13 +132,6 @@
             android:layout_gravity="center_horizontal"
             android:layout_marginTop="10dp"
             android:text="Building name" />
-
-        <ProgressBar
-            android:id="@+id/progressBarClimbing"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:visibility="invisible" />
-
     </FrameLayout>
 
 </FrameLayout>
