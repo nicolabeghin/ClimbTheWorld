@@ -30,6 +30,19 @@
          android:fitsSystemWindows.
     -->
 
+    <RelativeLayout
+        android:id="@+id/PositionWrapper"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginBottom="50dp" >
+
+        <android.widget.VerticalSeekBar
+            android:id="@+id/seekBarPosition"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+             />
+    </RelativeLayout>
+
     <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -100,13 +113,6 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Sampling rate" />
-
-                <SeekBar
-                    android:id="@+id/seekBarPositionIndicator"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:thumb="@drawable/navigation_next_item" />
-
             </LinearLayout>
         </RelativeLayout>
 
@@ -123,7 +129,6 @@
             android:layout_gravity="center_horizontal"
             android:layout_marginTop="10dp"
             android:text="Building name" />
-
     </FrameLayout>
 
 </FrameLayout>

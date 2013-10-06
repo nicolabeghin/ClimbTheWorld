@@ -41,6 +41,15 @@ public class VerticalSeekBar extends SeekBar {
         super.onDraw(c);
     }
 
+    /* nbeghin: added onSizeChanged to solve thumb image not updated
+     * @see android.widget.ProgressBar#setProgress(int)
+     */
+    @Override
+    public synchronized void setProgress (int progress) {
+    	super.setProgress(progress);
+    	onSizeChanged(getWidth(), getHeight(), 0, 0);
+    }
+    
     @Override
     public boolean onTouchEvent(MotionEvent event) {
         if (!isEnabled()) {
@@ -54,7 +63,6 @@ public class VerticalSeekBar extends SeekBar {
             	int i=0;
             	i=getMax() - (int) (getMax() * event.getY() / getHeight());
                 setProgress(i);
-                Log.i("Progress",getProgress()+"");
                 onSizeChanged(getWidth(), getHeight(), 0, 0);
                 break;
 

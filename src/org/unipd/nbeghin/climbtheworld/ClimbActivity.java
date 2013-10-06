@@ -36,8 +36,10 @@ import android.view.animation.AnimationUtils;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.SeekBar;
+import android.widget.SeekBar.OnSeekBarChangeListener;
 import android.widget.TextView;
 import android.widget.Toast;
+import android.widget.VerticalSeekBar;
 
 /**
  * An example full-screen activity that shows and hides the system UI (i.e. status bar and navigation/system bar) with user interaction.
@@ -61,7 +63,7 @@ public class ClimbActivity extends Activity {
 	private double					percentage					= 0.0;
 	private Building				building;
 	private Climbing				climbing;
-	private SeekBar					seekbarIndicator;
+	private VerticalSeekBar			seekbarIndicator;
 	/**
 	 * Whether or not the system UI should be auto-hidden after {@link #AUTO_HIDE_DELAY_MILLIS} milliseconds.
 	 */
@@ -88,16 +90,30 @@ public class ClimbActivity extends Activity {
 		public void onReceive(Context context, Intent intent) {
 			String result = intent.getExtras().getString(ClassifierCircularBuffer.CLASSIFIER_NOTIFICATION_STATUS);
 			if (result.equals("STAIR")) {
-				num_steps++;
+//				num_steps++;
+				num_steps+=100; // to be removed
 				seekbarIndicator.setProgress(num_steps);
 				percentage = (double) num_steps / (double) building.getSteps();
-				((TextView) findViewById(R.id.lblNumSteps)).setText(Integer.toString(num_steps) + " of " + Integer.toString(building.getSteps()) + " ("
-						+ (new DecimalFormat("#.##")).format(percentage) + "%)");
+				updateStats();
+				if (num_steps>= building.getSteps()) {
+					num_steps=building.getSteps(); // ensure it did not exceed the number of steps
+					stopClassify();
+					Toast.makeText(getApplicationContext(), "YOU DID IT!", Toast.LENGTH_LONG).show();
+					findViewById(R.id.btnStartClimbing).setEnabled(false);
+//					AlertDialog.Builder builder = new AlertDialog.Builder(getApplicationContext());
+//					builder.setMessage("Mission completed! You successfully climbed "+building.getSteps()+" steps ("+building.getHeight()+"m) of "+building.getName()+"!").setTitle("MISSION ACCOMPLISHED!");
+//					builder.create().show();					
+				}
 			}
 			((TextView) findViewById(R.id.lblClassifierOutput)).setText(result);
 		}
 	}
 
+	private void updateStats() {
+		((TextView) findViewById(R.id.lblNumSteps)).setText(Integer.toString(num_steps) + " of " + Integer.toString(building.getSteps()) + " ("
+				+ (new DecimalFormat("#.##")).format(percentage*100.00) + "%)");
+	}
+	
 	public class SamplingRateDetectorReceiver extends BroadcastReceiver {
 		@Override
 		public void onReceive(Context context, Intent intent) {
@@ -190,7 +206,23 @@ public class ClimbActivity extends Activity {
 		// while interacting with the UI.
 		findViewById(R.id.btnStartClimbing).setOnTouchListener(mDelayHideTouchListener);
 		// app-specific logic
-		seekbarIndicator = (SeekBar) findViewById(R.id.seekBarPositionIndicator);
+		seekbarIndicator = (VerticalSeekBar) findViewById(R.id.seekBarPosition);
+		seekbarIndicator.setOnSeekBarChangeListener(new OnSeekBarChangeListener() {
+			@Override
+			public void onStopTrackingTouch(SeekBar seekBar) {
+				// TODO Auto-generated method stub
+			}
+			
+			@Override
+			public void onStartTrackingTouch(SeekBar seekBar) {
+				// TODO Auto-generated method stub
+			}
+			
+			@Override
+			public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+				// TODO Auto-generated method stub
+			}
+		});
 		int building_id = getIntent().getIntExtra(MainActivity.building_intent_object, 0);
 		try {
 			// get building
@@ -247,8 +279,7 @@ public class ClimbActivity extends Activity {
 		percentage = climbing.getPercentage();
 		seekbarIndicator.setMax(building.getSteps());
 		seekbarIndicator.setProgress(climbing.getCompleted_steps());
-		((TextView) findViewById(R.id.lblNumSteps))
-				.setText(Integer.toString(num_steps) + " of " + Integer.toString(building.getSteps()) + " (" + (new DecimalFormat("#.##")).format(percentage) + "%)");
+		updateStats();
 		Log.i(MainActivity.AppName, "Loaded existing climbing (#" + climbing.get_id() + ")");
 	}
 
@@ -326,17 +357,8 @@ public class ClimbActivity extends Activity {
 		}
 		if (samplingEnabled) {
 			stopClassify();
-			samplingEnabled = false;
-			((ImageButton) v).setImageResource(R.drawable.av_play);
-			findViewById(R.id.progressBarClimbing).startAnimation(AnimationUtils.loadAnimation(getApplicationContext(), R.anim.abc_fade_out));
-			findViewById(R.id.progressBarClimbing).setVisibility(View.INVISIBLE);
 		} else {
 			startClassifyService();
-			samplingEnabled = true;
-			((ImageButton) v).setImageResource(R.drawable.av_pause);
-			findViewById(R.id.lblReadyToClimb).setVisibility(View.GONE);
-			findViewById(R.id.progressBarClimbing).startAnimation(AnimationUtils.loadAnimation(getApplicationContext(), R.anim.abc_fade_in));
-			findViewById(R.id.progressBarClimbing).setVisibility(View.VISIBLE);
 		}
 	}
 
@@ -367,12 +389,20 @@ public class ClimbActivity extends Activity {
 		climbing.setRemaining_steps(building.getSteps() - num_steps);
 		MainActivity.climbingDao.update(climbing);
 		Log.i(MainActivity.AppName, "Updated climbing #" + climbing.get_id());
+		samplingEnabled = false;
+		((ImageButton) findViewById(R.id.btnStartClimbing)).setImageResource(R.drawable.av_play);
+		findViewById(R.id.progressBarClimbing).startAnimation(AnimationUtils.loadAnimation(getApplicationContext(), R.anim.abc_fade_out));
+		findViewById(R.id.progressBarClimbing).setVisibility(View.INVISIBLE);
 	}
 
 	public void startClassifyService() {
 		startService(backgroundClassifySampler); // start background service
 		registerReceiver(classifierReceiver, classifierFilter);
 		samplingEnabled = true;
+		((ImageButton) findViewById(R.id.btnStartClimbing)).setImageResource(R.drawable.av_pause);
+		findViewById(R.id.lblReadyToClimb).setVisibility(View.GONE);
+		findViewById(R.id.progressBarClimbing).startAnimation(AnimationUtils.loadAnimation(getApplicationContext(), R.anim.abc_fade_in));
+		findViewById(R.id.progressBarClimbing).setVisibility(View.VISIBLE);
 	}
 
 	@Override
