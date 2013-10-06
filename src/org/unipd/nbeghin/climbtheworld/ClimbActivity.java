@@ -35,6 +35,7 @@ import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -60,6 +61,7 @@ public class ClimbActivity extends Activity {
 	private double					percentage					= 0.0;
 	private Building				building;
 	private Climbing				climbing;
+	private SeekBar seekbarIndicator;
 	
 	/**
 	 * Whether or not the system UI should be auto-hidden after {@link #AUTO_HIDE_DELAY_MILLIS} milliseconds.
@@ -88,6 +90,7 @@ public class ClimbActivity extends Activity {
 			String result = intent.getExtras().getString(ClassifierCircularBuffer.CLASSIFIER_NOTIFICATION_STATUS);
 			if (result.equals("STAIR")) {
 				num_steps++;
+				seekbarIndicator.setProgress(num_steps);
 				percentage = (double)num_steps/(double)building.getSteps();
 //				((RelativeLayout)findViewById(R.id.PositionIndicatorLayout).getHeight();
 //				((ImageView)findViewById(R.id.imgPositionIndicator).setP
@@ -202,6 +205,7 @@ public class ClimbActivity extends Activity {
 		backgroundClassifySampler = new Intent(this, SamplingClassifyService.class); // instance (without starting) background classifier
 		backgroundSamplingRateDetector = new Intent(this, SamplingRateDetectorService.class); // instance (without starting) background sampling rate detected
 		backgroundSamplingRateDetector.putExtra(SAMPLING_DELAY, SensorManager.SENSOR_DELAY_NORMAL);
+		seekbarIndicator=(SeekBar)findViewById(R.id.seekBarPositionIndicator);
 		registerReceiver(sampleRateDetectorReceiver, samplingRateDetectorFilter);
 		startService(backgroundSamplingRateDetector); // start background service
 	}
@@ -224,6 +228,8 @@ public class ClimbActivity extends Activity {
 			climbing.setCompleted_steps(0);
 			climbing.setCreated(new Date().getTime());
 			climbing.setModified(new Date().getTime());
+			seekbarIndicator.setMax(building.getSteps());
+			seekbarIndicator.setProgress(climbing.getCompleted_steps());
 			MainActivity.climbingDao.create(climbing);
 			Log.i(MainActivity.AppName, "Created new climbing #"+climbing.get_id());
 		}
@@ -241,6 +247,8 @@ public class ClimbActivity extends Activity {
 		climbing = climbings.get(0);
 		num_steps = climbing.getCompleted_steps();
 		percentage = climbing.getPercentage();
+		seekbarIndicator.setMax(building.getSteps());
+		seekbarIndicator.setProgress(climbing.getCompleted_steps());
 		((TextView) findViewById(R.id.lblNumSteps)).setText(Integer.toString(num_steps)+" of "+Integer.toString(building.getSteps())+" ("+(new DecimalFormat("#.##")).format(percentage)+"%)");
 		Log.i(MainActivity.AppName, "Loaded existing climbing (#"+climbing.get_id()+")");
 	}
