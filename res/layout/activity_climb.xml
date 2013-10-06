@@ -30,6 +30,18 @@
          android:fitsSystemWindows.
     -->
 
+    <TextView
+        android:id="@+id/lblWin"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:gravity="center"
+        android:keepScreenOn="true"
+        android:text="YOU DID IT!"
+        android:textColor="#ff2600"
+        android:textSize="50sp"
+        android:textStyle="bold"
+        android:visibility="invisible" />
+
     <RelativeLayout
         android:id="@+id/PositionWrapper"
         android:layout_width="match_parent"
@@ -40,7 +52,56 @@
             android:id="@+id/seekBarPosition"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
-             />
+            android:thumb="@drawable/navigation_next_item" />
+
+        <LinearLayout
+            android:id="@+id/StatusPanel"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:gravity="right"
+            android:orientation="vertical" >
+
+            <ProgressBar
+                android:id="@+id/progressBarClimbing"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:visibility="invisible" />
+
+            <TextView
+                android:id="@+id/lblHeight"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@color/black_overlay"
+                android:text="Height"
+                android:textColor="#fff" />
+
+            <TextView
+                android:id="@+id/lblNumSteps"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@color/black_overlay"
+                android:text="Steps"
+                android:textColor="#fff" />
+
+            <TextView
+                android:id="@+id/lblClassifierOutput"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Classifier" />
+
+            <TextView
+                android:id="@+id/lblSamplingRateDetected"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Sampling rate" />
+        </LinearLayout>
+
+        <RelativeLayout
+            android:id="@+id/StatusPanelWrapper"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content" >
+        </RelativeLayout>
     </RelativeLayout>
 
     <FrameLayout
@@ -75,60 +136,15 @@
             </LinearLayout>
         </LinearLayout>
 
-        <RelativeLayout
-            android:id="@+id/StatusPanelWrapper"
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:layout_gravity="right" >
-
-            <LinearLayout
-                android:id="@+id/StatusPanel"
-                android:layout_width="fill_parent"
-                android:layout_height="wrap_content"
-                android:gravity="right"
-                android:orientation="vertical" >
-
-                <TextView
-                    android:id="@+id/lblHeight"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Height"
-                    android:textColor="#fff" />
-
-                <TextView
-                    android:id="@+id/lblNumSteps"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Steps"
-                    android:textColor="#fff" />
-
-                <TextView
-                    android:id="@+id/lblClassifierOutput"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Classifier" />
-
-                <TextView
-                    android:id="@+id/lblSamplingRate"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Sampling rate" />
-            </LinearLayout>
-        </RelativeLayout>
-
-        <ProgressBar
-            android:id="@+id/progressBarClimbing"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:visibility="invisible" />
-
         <TextView
             android:id="@+id/lblBuildingName"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal"
             android:layout_marginTop="10dp"
-            android:text="Building name" />
+            android:text="Building name (location)"
+            android:textColor="#fff"
+            android:textSize="18sp" />
     </FrameLayout>
 
 </FrameLayout>

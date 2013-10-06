@@ -22,6 +22,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.SharedPreferences;
 import android.hardware.SensorManager;
 import android.os.Build;
 import android.os.Bundle;
@@ -90,19 +91,24 @@ public class ClimbActivity extends Activity {
 		public void onReceive(Context context, Intent intent) {
 			String result = intent.getExtras().getString(ClassifierCircularBuffer.CLASSIFIER_NOTIFICATION_STATUS);
 			if (result.equals("STAIR")) {
-//				num_steps++;
-				num_steps+=100; // to be removed
+				// num_steps++;
+				num_steps += 100; // to be removed
 				seekbarIndicator.setProgress(num_steps);
 				percentage = (double) num_steps / (double) building.getSteps();
+				boolean win = (num_steps >= building.getSteps());
+				if (win) {
+					num_steps = building.getSteps(); // ensure it did not exceed the number of steps (when multiple steps-at-once are detected)
+					percentage = 100.00;
+				}
 				updateStats();
-				if (num_steps>= building.getSteps()) {
-					num_steps=building.getSteps(); // ensure it did not exceed the number of steps
+				if (win) {
 					stopClassify();
-					Toast.makeText(getApplicationContext(), "YOU DID IT!", Toast.LENGTH_LONG).show();
+					// animate "ready to climb" text
+					Toast.makeText(getApplicationContext(), "You successfully climbed " + building.getSteps() + " steps (" + building.getHeight() + "m) of " + building.getName() + "!",
+							Toast.LENGTH_LONG).show();
+					findViewById(R.id.lblWin).setVisibility(View.VISIBLE);
+					findViewById(R.id.lblWin).startAnimation(AnimationUtils.loadAnimation(getApplicationContext(), R.anim.blink));
 					findViewById(R.id.btnStartClimbing).setEnabled(false);
-//					AlertDialog.Builder builder = new AlertDialog.Builder(getApplicationContext());
-//					builder.setMessage("Mission completed! You successfully climbed "+building.getSteps()+" steps ("+building.getHeight()+"m) of "+building.getName()+"!").setTitle("MISSION ACCOMPLISHED!");
-//					builder.create().show();					
 				}
 			}
 			((TextView) findViewById(R.id.lblClassifierOutput)).setText(result);
@@ -111,21 +117,29 @@ public class ClimbActivity extends Activity {
 
 	private void updateStats() {
 		((TextView) findViewById(R.id.lblNumSteps)).setText(Integer.toString(num_steps) + " of " + Integer.toString(building.getSteps()) + " ("
-				+ (new DecimalFormat("#.##")).format(percentage*100.00) + "%)");
+				+ (new DecimalFormat("#.##")).format(percentage * 100.00) + "%)");
 	}
-	
+
+	private void setupByDetectedSamplingRate() {
+		((TextView) findViewById(R.id.lblSamplingRateDetected)).setText((int) detectedSamplingRate + " Hz");
+		backgroundClassifySampler.putExtra(AccelerometerSamplingRateDetect.SAMPLING_RATE, detectedSamplingRate);
+		backgroundClassifySampler.putExtra(SAMPLING_DELAY, backgroundSamplingRateDetector.getExtras().getInt(ClimbActivity.SAMPLING_DELAY));
+		Toast.makeText(getApplicationContext(), "Start climbing some stairs!", Toast.LENGTH_LONG).show();
+	}
+
 	public class SamplingRateDetectorReceiver extends BroadcastReceiver {
 		@Override
 		public void onReceive(Context context, Intent intent) {
 			detectedSamplingRate = intent.getExtras().getDouble(AccelerometerSamplingRateDetect.SAMPLING_RATE);
-			Log.i(MainActivity.AppName, Double.toString(detectedSamplingRate));
+			Log.i(MainActivity.AppName, "Detected sampling rate: " + Double.toString(detectedSamplingRate) + "Hz");
 			if (detectedSamplingRate >= minimumSamplingRate) { // sampling rate high enough
-				((TextView) findViewById(R.id.lblSamplingRate)).setText((int) detectedSamplingRate + " Hz");
-				backgroundClassifySampler.putExtra(AccelerometerSamplingRateDetect.SAMPLING_RATE, detectedSamplingRate);
-				backgroundClassifySampler.putExtra(SAMPLING_DELAY, backgroundSamplingRateDetector.getExtras().getInt(ClimbActivity.SAMPLING_DELAY));
-				unregisterReceiver(this);
+				SharedPreferences settings = getSharedPreferences(MainActivity.settings_file, 0);
+				SharedPreferences.Editor editor = settings.edit();
+				editor.putFloat(MainActivity.settings_detected_sampling_rate, (float) detectedSamplingRate);
+				Log.i(MainActivity.AppName, "Stored detected sampling rate");
 				stopService(backgroundSamplingRateDetector);
-				Toast.makeText(getApplicationContext(), "Start climbing some stairs!", Toast.LENGTH_LONG).show();
+				unregisterReceiver(this);
+				setupByDetectedSamplingRate();
 			} else { // sampling rate not high enough: try to decrease the sampling delay
 				if (backgroundSamplingRateDetector.getExtras().getInt(ClimbActivity.SAMPLING_DELAY) != SensorManager.SENSOR_DELAY_GAME) {
 					Log.w(MainActivity.AppName, "Sampling rate not high enough: trying decreasing the sampling delay");
@@ -136,12 +150,11 @@ public class ClimbActivity extends Activity {
 					Log.e(MainActivity.AppName, "Sampling rate not high enough for this application");
 					unregisterReceiver(this);
 					stopService(backgroundSamplingRateDetector);
-					((TextView) findViewById(R.id.lblSamplingRate)).setText("TOO LOW: " + (int) detectedSamplingRate + " Hz");
+					((TextView) findViewById(R.id.lblSamplingRateDetected)).setText("TOO LOW: " + (int) detectedSamplingRate + " Hz");
 					AlertDialog.Builder alert = new AlertDialog.Builder(getApplicationContext());
 					alert.setTitle("Sampling rate not high enough");
 					alert.setMessage("Your accelerometer is not fast enough for this application. Make sure to use at least " + minimumSamplingRate + " Hz");
 					alert.show();
-					// Toast.makeText(getApplicationContext(), "Your accelerometer is not fast enough for this application (detected a frequency of "+detectedSamplingRate+"Hz)", Toast.LENGTH_LONG).show();
 				}
 			}
 		}
@@ -212,12 +225,12 @@ public class ClimbActivity extends Activity {
 			public void onStopTrackingTouch(SeekBar seekBar) {
 				// TODO Auto-generated method stub
 			}
-			
+
 			@Override
 			public void onStartTrackingTouch(SeekBar seekBar) {
 				// TODO Auto-generated method stub
 			}
-			
+
 			@Override
 			public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
 				// TODO Auto-generated method stub
@@ -234,10 +247,17 @@ public class ClimbActivity extends Activity {
 			e.printStackTrace();
 		}
 		backgroundClassifySampler = new Intent(this, SamplingClassifyService.class); // instance (without starting) background classifier
-		backgroundSamplingRateDetector = new Intent(this, SamplingRateDetectorService.class); // instance (without starting) background sampling rate detected
-		backgroundSamplingRateDetector.putExtra(SAMPLING_DELAY, SensorManager.SENSOR_DELAY_NORMAL);
-		registerReceiver(sampleRateDetectorReceiver, samplingRateDetectorFilter);
-		startService(backgroundSamplingRateDetector); // start background service
+		SharedPreferences settings = getSharedPreferences(MainActivity.settings_file, 0);
+		detectedSamplingRate = settings.getFloat(MainActivity.settings_detected_sampling_rate, 0.00f);
+		if (detectedSamplingRate < minimumSamplingRate) { // start sampling rate detector
+			Log.i(MainActivity.AppName, "Previous detected sampling rate of " + Double.toString(detectedSamplingRate) + "Hz");
+			backgroundSamplingRateDetector = new Intent(this, SamplingRateDetectorService.class); // instance (without starting) background sampling rate detected
+			backgroundSamplingRateDetector.putExtra(SAMPLING_DELAY, SensorManager.SENSOR_DELAY_NORMAL);
+			registerReceiver(sampleRateDetectorReceiver, samplingRateDetectorFilter);
+			startService(backgroundSamplingRateDetector); // start background service
+		} else {
+			setupByDetectedSamplingRate();
+		}
 	}
 
 	private void setup_from_building() {
@@ -245,7 +265,7 @@ public class ClimbActivity extends Activity {
 		int imageId = getApplicationContext().getResources().getIdentifier(building.getPhoto(), "drawable", getApplicationContext().getPackageName());
 		if (imageId > 0) ((ImageView) findViewById(R.id.buildingPhoto)).setImageResource(imageId);
 		// set building info
-		((TextView) findViewById(R.id.lblBuildingName)).setText(building.getName());
+		((TextView) findViewById(R.id.lblBuildingName)).setText(building.getName() + " (" + building.getLocation() + ")");
 		((TextView) findViewById(R.id.lblNumSteps)).setText(Integer.toString(building.getSteps()) + " steps");
 		((TextView) findViewById(R.id.lblHeight)).setText(Integer.toString(building.getHeight()) + "mt");
 		try { // get previous climbing
@@ -281,6 +301,9 @@ public class ClimbActivity extends Activity {
 		seekbarIndicator.setProgress(climbing.getCompleted_steps());
 		updateStats();
 		Log.i(MainActivity.AppName, "Loaded existing climbing (#" + climbing.get_id() + ")");
+		if (percentage >= 100) {
+			findViewById(R.id.btnStartClimbing).setVisibility(View.INVISIBLE);
+		}
 	}
 
 	@Override
