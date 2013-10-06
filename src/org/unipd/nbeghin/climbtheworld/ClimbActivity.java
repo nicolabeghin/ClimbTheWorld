@@ -61,8 +61,7 @@ public class ClimbActivity extends Activity {
 	private double					percentage					= 0.0;
 	private Building				building;
 	private Climbing				climbing;
-	private SeekBar seekbarIndicator;
-	
+	private SeekBar					seekbarIndicator;
 	/**
 	 * Whether or not the system UI should be auto-hidden after {@link #AUTO_HIDE_DELAY_MILLIS} milliseconds.
 	 */
@@ -91,10 +90,9 @@ public class ClimbActivity extends Activity {
 			if (result.equals("STAIR")) {
 				num_steps++;
 				seekbarIndicator.setProgress(num_steps);
-				percentage = (double)num_steps/(double)building.getSteps();
-//				((RelativeLayout)findViewById(R.id.PositionIndicatorLayout).getHeight();
-//				((ImageView)findViewById(R.id.imgPositionIndicator).setP
-				((TextView) findViewById(R.id.lblNumSteps)).setText(Integer.toString(num_steps)+" of "+Integer.toString(building.getSteps())+" ("+(new DecimalFormat("#.##")).format(percentage)+"%)");
+				percentage = (double) num_steps / (double) building.getSteps();
+				((TextView) findViewById(R.id.lblNumSteps)).setText(Integer.toString(num_steps) + " of " + Integer.toString(building.getSteps()) + " ("
+						+ (new DecimalFormat("#.##")).format(percentage) + "%)");
 			}
 			((TextView) findViewById(R.id.lblClassifierOutput)).setText(result);
 		}
@@ -191,7 +189,8 @@ public class ClimbActivity extends Activity {
 		// operations to prevent the jarring behavior of controls going away
 		// while interacting with the UI.
 		findViewById(R.id.btnStartClimbing).setOnTouchListener(mDelayHideTouchListener);
-		// MainActivity.buildings.get();
+		// app-specific logic
+		seekbarIndicator = (SeekBar) findViewById(R.id.seekBarPositionIndicator);
 		int building_id = getIntent().getIntExtra(MainActivity.building_intent_object, 0);
 		try {
 			// get building
@@ -205,7 +204,6 @@ public class ClimbActivity extends Activity {
 		backgroundClassifySampler = new Intent(this, SamplingClassifyService.class); // instance (without starting) background classifier
 		backgroundSamplingRateDetector = new Intent(this, SamplingRateDetectorService.class); // instance (without starting) background sampling rate detected
 		backgroundSamplingRateDetector.putExtra(SAMPLING_DELAY, SensorManager.SENSOR_DELAY_NORMAL);
-		seekbarIndicator=(SeekBar)findViewById(R.id.seekBarPositionIndicator);
 		registerReceiver(sampleRateDetectorReceiver, samplingRateDetectorFilter);
 		startService(backgroundSamplingRateDetector); // start background service
 	}
@@ -231,7 +229,7 @@ public class ClimbActivity extends Activity {
 			seekbarIndicator.setMax(building.getSteps());
 			seekbarIndicator.setProgress(climbing.getCompleted_steps());
 			MainActivity.climbingDao.create(climbing);
-			Log.i(MainActivity.AppName, "Created new climbing #"+climbing.get_id());
+			Log.i(MainActivity.AppName, "Created new climbing #" + climbing.get_id());
 		}
 		// animate "ready to climb" text
 		Animation anim = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.abc_slide_in_top);
@@ -249,8 +247,9 @@ public class ClimbActivity extends Activity {
 		percentage = climbing.getPercentage();
 		seekbarIndicator.setMax(building.getSteps());
 		seekbarIndicator.setProgress(climbing.getCompleted_steps());
-		((TextView) findViewById(R.id.lblNumSteps)).setText(Integer.toString(num_steps)+" of "+Integer.toString(building.getSteps())+" ("+(new DecimalFormat("#.##")).format(percentage)+"%)");
-		Log.i(MainActivity.AppName, "Loaded existing climbing (#"+climbing.get_id()+")");
+		((TextView) findViewById(R.id.lblNumSteps))
+				.setText(Integer.toString(num_steps) + " of " + Integer.toString(building.getSteps()) + " (" + (new DecimalFormat("#.##")).format(percentage) + "%)");
+		Log.i(MainActivity.AppName, "Loaded existing climbing (#" + climbing.get_id() + ")");
 	}
 
 	@Override
@@ -343,18 +342,16 @@ public class ClimbActivity extends Activity {
 
 	private void stopAllServices() {
 		try {
-			stopService(backgroundSamplingRateDetector);
 			unregisterReceiver(sampleRateDetectorReceiver);
+			stopService(backgroundSamplingRateDetector);
 		} catch (Exception e) {
-			Log.e(MainActivity.AppName, "Unable to stop sampling rate detector service");
-			e.printStackTrace();
+			Log.e(MainActivity.AppName, "Sampling rate service not running or unable to stop");
 		}
 		try {
-			stopService(backgroundClassifySampler);
 			unregisterReceiver(classifierReceiver);
+			stopService(backgroundClassifySampler);
 		} catch (Exception e) {
-			Log.e(MainActivity.AppName, "Unable to stop classifier service");
-			e.printStackTrace();
+			Log.e(MainActivity.AppName, "Classifier service not running or unable to stop");
 		}
 	}
 
@@ -363,14 +360,13 @@ public class ClimbActivity extends Activity {
 		samplingEnabled = false;
 		unregisterReceiver(classifierReceiver);
 		((TextView) findViewById(R.id.lblClassifierOutput)).setText("Classifier");
-		
 		// update db
 		climbing.setModified(new Date().getTime());
 		climbing.setCompleted_steps(num_steps);
 		climbing.setPercentage(percentage);
-		climbing.setRemaining_steps(building.getSteps()-num_steps);
+		climbing.setRemaining_steps(building.getSteps() - num_steps);
 		MainActivity.climbingDao.update(climbing);
-		Log.i(MainActivity.AppName, "Updated climbing #"+climbing.get_id());
+		Log.i(MainActivity.AppName, "Updated climbing #" + climbing.get_id());
 	}
 
 	public void startClassifyService() {
