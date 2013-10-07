@@ -1,25 +1,26 @@
 package org.unipd.nbeghin.climbtheworld;
 
 import java.util.List;
+import java.util.Vector;
 
 import org.unipd.nbeghin.climbtheworld.db.DbHelper;
 import org.unipd.nbeghin.climbtheworld.db.PreExistingDbLoader;
+import org.unipd.nbeghin.climbtheworld.fragments.BuildingsFragment;
+import org.unipd.nbeghin.climbtheworld.fragments.ToursFragment;
 import org.unipd.nbeghin.climbtheworld.models.Building;
 import org.unipd.nbeghin.climbtheworld.models.Climbing;
 import org.unipd.nbeghin.climbtheworld.models.Tour;
-import org.unipd.nbeghin.climbtheworld.ui.card.BuildingCard;
+import org.unipd.nbeghin.climbtheworld.util.PagerAdapter;
 
 import android.annotation.SuppressLint;
-import android.content.Intent;
 import android.database.sqlite.SQLiteDatabase;
-import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.v4.app.Fragment;
+import android.support.v4.view.ViewPager;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
 import android.view.Menu;
-import android.view.View;
-import android.view.View.OnClickListener;
 
 import com.fima.cardsui.views.CardUI;
 import com.j256.ormlite.dao.RuntimeExceptionDao;
@@ -28,63 +29,47 @@ import com.j256.ormlite.dao.RuntimeExceptionDao;
 public class MainActivity extends ActionBarActivity {
 	private static final String								APP_TITLE						= "Climb the world";
 	public static final String								AppName							= "ClimbTheWorld";
-	public CardUI											buildingCards;
 	public CardUI											toursCards;
 	public static List<Building>							buildings;
 	private List<Climbing>									climbings;
-	private List<Tour>										tours;
+	public static List<Tour>								tours;
 	private ActionBar										ab;
-	public static final String								building_intent_object			= "org.unipd.nbeghin.climbtheworld.intents.object.building";
 	public static RuntimeExceptionDao<Building, Integer>	buildingDao;
 	public static RuntimeExceptionDao<Climbing, Integer>	climbingDao;
 	public static RuntimeExceptionDao<Tour, Integer>		tourDao;
 	public static final String								settings_file					= "ClimbTheWorldPreferences";
 	public static final String								settings_detected_sampling_rate	= "samplingRate";
+	private List<Fragment>									fragments						= new Vector<Fragment>();
+	private PagerAdapter									mPagerAdapter;
+	public static final String								building_intent_object			= "org.unipd.nbeghin.climbtheworld.intents.object.building";
+	// view pager
+	private ViewPager										mPager;
 
-	private class LoadBuildingsTask extends AsyncTask<Void, Void, Void> {
-		@Override
-		protected Void doInBackground(Void... unused) {
-			for (final Building building : buildings) {
-				BuildingCard buildingCard = new BuildingCard(building);
-				buildingCard.setOnClickListener(new OnClickListener() {
-					@Override
-					public void onClick(View v) {
-						Intent intent = new Intent(getApplicationContext(), ClimbActivity.class);
-						intent.putExtra(building_intent_object, building.get_id());
-						startActivity(intent);
-					}
-				});
-				buildingCards.addCard(buildingCard);
-			}
-			buildingCards.refresh();
-			return null;
-		}
-	}
-
-//	private class LoadToursTask extends AsyncTask<Void, Void, Void> {
-//		@Override
-//		protected Void doInBackground(Void... unused) {
-//			for (Tour tour : tours) {
-//				toursCards.addCard(new TourCard(tour));
-//			}
-//			toursCards.refresh();
-//			return null;
-//		}
-//	}
-
+	// private class LoadToursTask extends AsyncTask<Void, Void, Void> {
+	// @Override
+	// protected Void doInBackground(Void... unused) {
+	// for (Tour tour : tours) {
+	// toursCards.addCard(new TourCard(tour));
+	// }
+	// toursCards.refresh();
+	// return null;
+	// }
+	// }
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
-		ab = getSupportActionBar();
-		ab.setHomeButtonEnabled(false);
-		ab.setTitle(APP_TITLE);
-		// set refs
-		buildingCards = (CardUI) findViewById(R.id.cardsviewBuildings);
-		buildingCards.setSwipeable(false);
+		// ab = getSupportActionBar();
+		// ab.setHomeButtonEnabled(false);
+		// ab.setTitle(APP_TITLE);
 		// instance entities from db (to be moved inside AsyncTask)
 		loadDb();
-		new LoadBuildingsTask().execute();
+		// loading fragments
+		fragments.add(Fragment.instantiate(this, BuildingsFragment.class.getName()));
+		fragments.add(Fragment.instantiate(this, ToursFragment.class.getName()));
+		mPagerAdapter = new PagerAdapter(super.getSupportFragmentManager(), fragments);
+		mPager = (ViewPager) super.findViewById(R.id.pager);
+		mPager.setAdapter(this.mPagerAdapter);
 	}
 
 	@Override
