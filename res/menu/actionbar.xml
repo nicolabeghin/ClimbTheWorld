@@ -14,7 +14,7 @@
         android:action="@+id/lblClassifierOutput"
         android:icon="@drawable/ic_action_user"
         android:title="Profile"
-        climbtheworld:showAsAction="ifRoom">
+        climbtheworld:showAsAction="ifRoom" android:onClick="onShowActionProfile">
     </item>
 
 </menu>

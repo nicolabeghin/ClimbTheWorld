@@ -1,15 +1,18 @@
 package org.unipd.nbeghin.climbtheworld.fragments;
 
+import org.unipd.nbeghin.climbtheworld.ClimbActivity;
 import org.unipd.nbeghin.climbtheworld.MainActivity;
 import org.unipd.nbeghin.climbtheworld.R;
 import org.unipd.nbeghin.climbtheworld.models.Tour;
 import org.unipd.nbeghin.climbtheworld.ui.card.TourCard;
 
+import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 
 import com.fima.cardsui.views.CardUI;
@@ -23,14 +26,14 @@ public class ToursFragment extends Fragment {
 		protected Void doInBackground(Void... unused) {
 			for (final Tour tour : MainActivity.tours) {
 				TourCard tourCard = new TourCard(tour);
-//				buildingCard.setOnClickListener(new OnClickListener() {
-//					@Override
-//					public void onClick(View v) {
-//						Intent intent = new Intent(getActivity().getApplicationContext(), ClimbActivity.class);
-//						intent.putExtra(building_intent_object, building.get_id());
-//						startActivity(intent);
-//					}
-//				});
+				tourCard.setOnClickListener(new OnClickListener() {
+					@Override
+					public void onClick(View v) {
+						Intent intent = new Intent(getActivity().getApplicationContext(), ClimbActivity.class);
+						intent.putExtra(building_intent_object, tour.get_id());
+						startActivity(intent);
+					}
+				});
 				toursCards.addCard(tourCard);
 			}
 			toursCards.refresh();

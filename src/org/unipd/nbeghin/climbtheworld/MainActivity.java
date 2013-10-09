@@ -13,6 +13,7 @@ import org.unipd.nbeghin.climbtheworld.models.Tour;
 import org.unipd.nbeghin.climbtheworld.util.PagerAdapter;
 
 import android.annotation.SuppressLint;
+import android.content.Intent;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -21,6 +22,7 @@ import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
 import android.view.Menu;
+import android.view.MenuItem;
 
 import com.fima.cardsui.views.CardUI;
 import com.j256.ormlite.dao.RuntimeExceptionDao;
@@ -93,5 +95,10 @@ public class MainActivity extends ActionBarActivity {
 		Log.i(AppName, buildings.size() + " buildings detected");
 		Log.i(AppName, climbings.size() + " climbings detected");
 		Log.i(AppName, tours.size() + " tours detected");
+	}
+
+	public void onShowActionProfile(MenuItem v) {
+		Intent intent = new Intent(getApplicationContext(), ProfileActivity.class);
+		startActivity(intent);
 	}
 }
