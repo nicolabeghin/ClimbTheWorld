@@ -51,6 +51,14 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="org.unipd.nbeghin.climbtheworld.MainActivity" />
         </activity>
+        <activity
+            android:name="org.unipd.nbeghin.climbtheworld.SettingsActivity"
+            android:label="@string/title_activity_settings"
+            android:parentActivityName="org.unipd.nbeghin.climbtheworld.MainActivity" >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="org.unipd.nbeghin.climbtheworld.MainActivity" />
+        </activity>
     </application>
 
 </manifest>

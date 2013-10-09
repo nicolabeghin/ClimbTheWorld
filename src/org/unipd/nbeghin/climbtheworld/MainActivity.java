@@ -101,4 +101,9 @@ public class MainActivity extends ActionBarActivity {
 		Intent intent = new Intent(getApplicationContext(), ProfileActivity.class);
 		startActivity(intent);
 	}
+	
+	public void onShowSettings(MenuItem v) {
+		Intent intent = new Intent(getApplicationContext(), SettingsActivity.class);
+		startActivity(intent);
+	}
 }

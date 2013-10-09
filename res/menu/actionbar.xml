@@ -11,10 +11,15 @@
     </item>
     <item
         android:id="@+id/itemProfile"
-        android:action="@+id/lblClassifierOutput"
         android:icon="@drawable/ic_action_user"
         android:title="Profile"
         climbtheworld:showAsAction="ifRoom" android:onClick="onShowActionProfile">
+    </item>
+        <item
+        android:id="@+id/itemSettings"
+        android:icon="@drawable/action_settings"
+        android:title="Settings"
+        climbtheworld:showAsAction="never" android:onClick="onShowSettings">
     </item>
 
 </menu>
