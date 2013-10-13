@@ -1,10 +1,8 @@
 package org.unipd.nbeghin.climbtheworld;
 
 import java.text.DecimalFormat;
+import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 import org.unipd.nbeghin.climbtheworld.exceptions.ClimbingNotFound;
 import org.unipd.nbeghin.climbtheworld.listeners.AccelerometerSamplingRateDetect;
@@ -53,8 +51,8 @@ public class ClimbActivity extends Activity {
 	public static final String		SAMPLING_TYPE_NON_STAIR		= "NON_STAIR";
 	public static final String		SAMPLING_DELAY				= "DELAY";
 	private boolean					samplingEnabled				= false;
-	private static double					detectedSamplingRate		= 0;
-	private static int 					samplingDelay;
+	private static double			detectedSamplingRate		= 0;
+	private static int				samplingDelay;
 	private double					minimumSamplingRate			= 13;
 	private Intent					backgroundClassifySampler;
 	private Intent					backgroundSamplingRateDetector;
@@ -67,6 +65,8 @@ public class ClimbActivity extends Activity {
 	private Building				building;
 	private Climbing				climbing;
 	private VerticalSeekBar			seekbarIndicator;
+	private int vstep_for_rstep = 1;
+	
 	/**
 	 * Whether or not the system UI should be auto-hidden after {@link #AUTO_HIDE_DELAY_MILLIS} milliseconds.
 	 */
@@ -91,14 +91,14 @@ public class ClimbActivity extends Activity {
 	public static double getDetectedSamplingRate() {
 		return detectedSamplingRate;
 	}
-	
+
 	public class ClassifierReceiver extends BroadcastReceiver {
 		@Override
 		public void onReceive(Context context, Intent intent) {
 			String result = intent.getExtras().getString(ClassifierCircularBuffer.CLASSIFIER_NOTIFICATION_STATUS);
 			if (result.equals("STAIR")) {
 				// num_steps++;
-				num_steps += 100; // to be removed
+				num_steps += vstep_for_rstep; // to be removed
 				seekbarIndicator.setProgress(num_steps);
 				percentage = (double) num_steps / (double) building.getSteps();
 				boolean win = (num_steps >= building.getSteps());
@@ -125,16 +125,15 @@ public class ClimbActivity extends Activity {
 		@Override
 		public void onReceive(Context context, Intent intent) {
 			detectedSamplingRate = intent.getExtras().getDouble(AccelerometerSamplingRateDetect.SAMPLING_RATE);
-			samplingDelay = intent.getExtras().getInt(SAMPLING_DELAY);
+			samplingDelay = backgroundSamplingRateDetector.getExtras().getInt(SAMPLING_DELAY);
 			Log.i(MainActivity.AppName, "Detected sampling rate: " + Double.toString(detectedSamplingRate) + "Hz");
 			if (detectedSamplingRate >= minimumSamplingRate) { // sampling rate high enough
-//				getSharedPreferences(name, mode)
-//				SharedPreferences settings = getSharedPreferences(MainActivity.settings_file, 0);
-				SharedPreferences.Editor editor=PreferenceManager.getDefaultSharedPreferences(getApplicationContext()).edit();
+				SharedPreferences.Editor editor = PreferenceManager.getDefaultSharedPreferences(getApplicationContext()).edit();
 				editor.putFloat("detectedSamplingRate", (float) detectedSamplingRate); // store detected sampling rate
 				editor.putInt("sensor_delay", samplingDelay); // store used sampling delay
 				editor.apply();
-				Log.i(MainActivity.AppName, "Stored detected sampling rate");
+				Log.i(MainActivity.AppName, "Stored detected sampling rate of "+detectedSamplingRate+"Hz");
+				Log.i(MainActivity.AppName, "Stored sampling delay of "+samplingDelay);
 				stopService(backgroundSamplingRateDetector);
 				unregisterReceiver(this);
 				setupByDetectedSamplingRate();
@@ -166,7 +165,9 @@ public class ClimbActivity extends Activity {
 	private void setupByDetectedSamplingRate() {
 		backgroundClassifySampler.putExtra(AccelerometerSamplingRateDetect.SAMPLING_RATE, detectedSamplingRate);
 		backgroundClassifySampler.putExtra(SAMPLING_DELAY, samplingDelay);
-		Toast.makeText(getApplicationContext(), "Start climbing some stairs!", Toast.LENGTH_LONG).show();
+//		if (climbing.getPercentage() < 100) {
+//			Toast.makeText(getApplicationContext(), "Start climbing some stairs!", Toast.LENGTH_LONG).show();
+//		}
 	}
 
 	@Override
@@ -247,28 +248,35 @@ public class ClimbActivity extends Activity {
 		});
 		int building_id = getIntent().getIntExtra(MainActivity.building_intent_object, 0);
 		try {
-			// get building
+			// get building ID from intent
 			if (building_id == 0) throw new Exception("ERROR: unable to get intent data");
 			building = MainActivity.buildingDao.queryForId(building_id);
-			setup_from_building();
+			setup_from_building(); // load building info
+
+			// setup background classifier
+			backgroundClassifySampler = new Intent(this, SamplingClassifyService.class); // instance (without starting) background classifier
+
+			// check for pre-detected sampling rate
+			SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+			detectedSamplingRate = settings.getFloat("detectedSamplingRate", 0.00f);
+			samplingDelay = settings.getInt("sensor_delay", -1);
+			Log.i(MainActivity.AppName, "Previous detected sampling rate of " + Double.toString(detectedSamplingRate) + "Hz");
+			// sampling rate not detected or lower than the minimum one
+			if (samplingDelay == -1 || detectedSamplingRate < minimumSamplingRate) { // start sampling rate detector
+				Log.w(MainActivity.AppName, "Sampling rate not previously detected or too low. Detecting a new one");
+				backgroundSamplingRateDetector = new Intent(this, SamplingRateDetectorService.class); // instance (without starting) background sampling rate detected
+				backgroundSamplingRateDetector.putExtra(SAMPLING_DELAY, SensorManager.SENSOR_DELAY_NORMAL);
+				registerReceiver(sampleRateDetectorReceiver, samplingRateDetectorFilter);
+				startService(backgroundSamplingRateDetector); // start background service
+			} else {
+				Log.i(MainActivity.AppName, "Using the previously detected sampling rate");
+				setupByDetectedSamplingRate();
+			}
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		backgroundClassifySampler = new Intent(this, SamplingClassifyService.class); // instance (without starting) background classifier
-		SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
-		detectedSamplingRate = settings.getFloat("detectedSamplingRate", 0.00f);
-		samplingDelay = settings.getInt("sensor_delay", 0);
-		Log.i(MainActivity.AppName, "Previous detected sampling rate of " + Double.toString(detectedSamplingRate) + "Hz");
-		if (samplingDelay == 0 || detectedSamplingRate < minimumSamplingRate) { // start sampling rate detector
-			backgroundSamplingRateDetector = new Intent(this, SamplingRateDetectorService.class); // instance (without starting) background sampling rate detected
-			backgroundSamplingRateDetector.putExtra(SAMPLING_DELAY, SensorManager.SENSOR_DELAY_NORMAL);
-			registerReceiver(sampleRateDetectorReceiver, samplingRateDetectorFilter);
-			startService(backgroundSamplingRateDetector); // start background service
-		} else {
-			Log.i(MainActivity.AppName, "Using the previously detected sampling rate");
-			setupByDetectedSamplingRate();
-		}
+
 	}
 
 	private void setup_from_building() {
@@ -301,11 +309,8 @@ public class ClimbActivity extends Activity {
 	}
 
 	private void loadPreviousClimbing() throws ClimbingNotFound {
-		Map<String, Object> conditions = new HashMap<String, Object>();
-		conditions.put("building_id", building.get_id());
-		List<Climbing> climbings = MainActivity.climbingDao.queryForFieldValues(conditions);
-		if (climbings.isEmpty()) throw new ClimbingNotFound();
-		climbing = climbings.get(0);
+		climbing = MainActivity.getClimbingForBuilding(building.get_id());
+		if (climbing == null) throw new ClimbingNotFound();
 		num_steps = climbing.getCompleted_steps();
 		percentage = climbing.getPercentage();
 		seekbarIndicator.setMax(building.getSteps());
@@ -314,6 +319,8 @@ public class ClimbActivity extends Activity {
 		Log.i(MainActivity.AppName, "Loaded existing climbing (#" + climbing.get_id() + ")");
 		if (percentage >= 100) {
 			findViewById(R.id.btnStartClimbing).setVisibility(View.INVISIBLE);
+			SimpleDateFormat sdf=new SimpleDateFormat("yyyy.MM.dd");
+			((TextView)findViewById(R.id.lblReadyToClimb)).setText("ALREADY CLIMBED ON "+sdf.format(new Date(climbing.getCompleted())));
 		}
 	}
 
@@ -415,7 +422,6 @@ public class ClimbActivity extends Activity {
 		stopService(backgroundClassifySampler); // stop background server
 		samplingEnabled = false;
 		unregisterReceiver(classifierReceiver);
-		((TextView) findViewById(R.id.lblClassifierOutput)).setText("Classifier");
 		// update db
 		climbing.setModified(new Date().getTime());
 		climbing.setCompleted_steps(num_steps);
@@ -430,6 +436,9 @@ public class ClimbActivity extends Activity {
 	}
 
 	public void startClassifyService() {
+		SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+		vstep_for_rstep=Integer.parseInt(settings.getString("vstep_for_rstep", "1"));
+		Log.i(MainActivity.AppName, "Using "+vstep_for_rstep+" steps for each real step");
 		startService(backgroundClassifySampler); // start background service
 		registerReceiver(classifierReceiver, classifierFilter);
 		samplingEnabled = true;

@@ -11,6 +11,7 @@ public class BuildingTour {
 	private Building	building;
 	@DatabaseField(canBeNull = false, foreign = true, foreignAutoRefresh = true)
 	private Tour		tour;
+	private int			order;
 
 	BuildingTour() {} // needed by ormlite
 
@@ -37,6 +38,12 @@ public class BuildingTour {
 	public void setTour(Tour tour) {
 		this.tour = tour;
 	}
-	
-	
+
+	public int getOrder() {
+		return order;
+	}
+
+	public void setOrder(int order) {
+		this.order = order;
+	}
 }

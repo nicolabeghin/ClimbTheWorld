@@ -1,10 +1,13 @@
 package org.unipd.nbeghin.climbtheworld;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Vector;
 
 import org.unipd.nbeghin.climbtheworld.db.DbHelper;
 import org.unipd.nbeghin.climbtheworld.db.PreExistingDbLoader;
+import org.unipd.nbeghin.climbtheworld.fragments.BuildingsForTourFragment;
 import org.unipd.nbeghin.climbtheworld.fragments.BuildingsFragment;
 import org.unipd.nbeghin.climbtheworld.fragments.ToursFragment;
 import org.unipd.nbeghin.climbtheworld.models.Building;
@@ -14,6 +17,7 @@ import org.unipd.nbeghin.climbtheworld.models.Tour;
 import org.unipd.nbeghin.climbtheworld.util.PagerAdapter;
 
 import android.annotation.SuppressLint;
+import android.content.Context;
 import android.content.Intent;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
@@ -47,7 +51,8 @@ public class MainActivity extends ActionBarActivity {
 	private PagerAdapter										mPagerAdapter;
 	public static final String									building_intent_object			= "org.unipd.nbeghin.climbtheworld.intents.object.building";
 	private ViewPager											mPager;
-
+	private static Context sContext;
+	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -63,8 +68,13 @@ public class MainActivity extends ActionBarActivity {
 		mPagerAdapter = new PagerAdapter(super.getSupportFragmentManager(), fragments);
 		mPager = (ViewPager) super.findViewById(R.id.pager);
 		mPager.setAdapter(this.mPagerAdapter);
+		sContext = getApplicationContext();
 	}
 
+	public static Context getContext() {
+		return sContext;
+	}
+	
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		// Inflate the menu; this adds items to the action bar if it is present.
@@ -72,6 +82,14 @@ public class MainActivity extends ActionBarActivity {
 		return true;
 	}
 
+	public static Climbing getClimbingForBuilding(int building_id) {
+		Map<String, Object> conditions=new HashMap<String, Object> ();
+		conditions.put("building_id", building_id);
+		List<Climbing> climbings=climbingDao.queryForFieldValuesArgs(conditions);
+		if (climbings.size()==0) return null;
+		return climbings.get(0);
+	}
+	
 	private void loadDb() {
 		PreExistingDbLoader preExistingDbLoader = new PreExistingDbLoader(getApplicationContext());
 		SQLiteDatabase db = preExistingDbLoader.getReadableDatabase();
@@ -81,12 +99,11 @@ public class MainActivity extends ActionBarActivity {
 		climbingDao = dbHelper.getClimbingDao();
 		tourDao = dbHelper.getTourDao();
 		buildingTourDao = dbHelper.getBuildingTourDao();
-		buildings = buildingDao.queryForAll();
+//		buildings = buildingDao.queryForAll();
 		climbings = climbingDao.queryForAll();
-		tours = tourDao.queryForAll();
-		Log.i(AppName, buildings.size() + " buildings detected");
-		Log.i(AppName, climbings.size() + " climbings detected");
-		Log.i(AppName, tours.size() + " tours detected");
+		refreshBuildings();
+		refreshTours();
+//		tours = tourDao.queryForAll();
 	}
 
 	public void onShowActionProfile(MenuItem v) {
@@ -98,4 +115,30 @@ public class MainActivity extends ActionBarActivity {
 		Intent intent = new Intent(getApplicationContext(), SettingsActivity.class);
 		startActivity(intent);
 	}
+	
+	public static void refreshBuildings() {
+		buildings=buildingDao.queryForAll();
+	}
+	
+	public static void refreshTours() {
+		tours=tourDao.queryForAll();
+	}
+	
+	public static void refresh() {
+		refreshBuildings();
+		refreshTours();
+	}
+	
+	@Override
+	protected void onResume() {
+		Log.i(MainActivity.AppName, "onResume MainActivity");
+		super.onResume();
+	}
+
+	@Override
+	protected void onPause() {
+		Log.i(MainActivity.AppName, "onPause MainActivity");
+		super.onPause();
+	}
+
 }

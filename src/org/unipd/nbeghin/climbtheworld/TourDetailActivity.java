@@ -1,11 +1,15 @@
 package org.unipd.nbeghin.climbtheworld;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.unipd.nbeghin.climbtheworld.comparator.BuildingTourComparator;
 import org.unipd.nbeghin.climbtheworld.fragments.BuildingsForTourFragment;
 import org.unipd.nbeghin.climbtheworld.fragments.ToursFragment;
+import org.unipd.nbeghin.climbtheworld.models.Building;
 import org.unipd.nbeghin.climbtheworld.models.BuildingTour;
 import org.unipd.nbeghin.climbtheworld.models.Tour;
 
@@ -27,14 +31,17 @@ public class TourDetailActivity extends FragmentActivity {
 
 		if (tour_id>0) {
 			Log.i(MainActivity.AppName, "Loading buildings for tour "+tour_id);
-			Tour tour = MainActivity.tourDao.queryForId(tour_id);
 			Map<String, Object> conditions=new HashMap<String, Object> ();
 			conditions.put("tour_id", tour_id);
-			List<BuildingTour> buildings=MainActivity.buildingTourDao.queryForFieldValuesArgs(conditions);
-			for(BuildingTour buildingTour: buildings) {
-				Log.i(MainActivity.AppName, buildingTour.getBuilding().getName());
-			}
+			List<BuildingTour> buildingTours=MainActivity.buildingTourDao.queryForFieldValuesArgs(conditions);
+			Log.i(MainActivity.AppName, "Detected "+buildingTours.size()+" building for tour #"+tour_id);
+			Collections.sort(buildingTours, new BuildingTourComparator());
 			BuildingsForTourFragment fragment=(BuildingsForTourFragment) getSupportFragmentManager().findFragmentById(R.id.fragmentBuildingsForTour);
+			List<Building> buildings=new ArrayList<Building>();
+			for(BuildingTour buildingTour: buildingTours) {
+				buildings.add(buildingTour.getBuilding());
+			}
+			fragment.loadBuildings(buildings);
 		} else {
 			Log.e(MainActivity.AppName, "No tour ID detected");
 		}
