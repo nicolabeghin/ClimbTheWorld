@@ -1,35 +1,56 @@
-<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android" >
-
-    <CheckBoxPreference
-        android:defaultValue="true"
-        android:key="example_checkbox"
-        android:summary="@string/pref_description_social_recommendations"
-        android:title="@string/pref_title_social_recommendations" />
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+    android:title="General" >
 
     <!-- NOTE: EditTextPreference accepts EditText attributes. -->
     <!-- NOTE: EditTextPreference's summary should be set to its value by the activity code. -->
     <EditTextPreference
         android:capitalize="words"
-        android:defaultValue="@string/pref_default_display_name"
+        android:defaultValue="No profile set yet"
         android:inputType="textCapWords"
-        android:key="example_text"
+        android:key="profile_name"
         android:maxLines="1"
+        android:icon="@drawable/social_person"
         android:selectAllOnFocus="true"
         android:singleLine="true"
-        android:title="@string/pref_title_display_name" />
+        android:title="Profile" />
 
-    <!--
-         NOTE: Hide buttons to simplify the UI. Users can touch outside the dialog to
-         dismiss it.
-    -->
-    <!-- NOTE: ListPreference's summary should be set to its value by the activity code. -->
+    <PreferenceCategory android:title="User settings" >
+    </PreferenceCategory>
+
+    <EditTextPreference
+        android:dialogMessage="Please enter your height (in cm)"
+        android:dialogTitle="Your height"
+        android:key="userHeight"
+        android:maxLines="1"
+        android:numeric="integer"
+        android:summary="Your height (in cm)"
+        android:title="Your height" />
+    <EditTextPreference
+        android:dialogMessage="Please enter your weight (in kg)"
+        android:dialogTitle="Your weight"
+        android:key="userWeight"
+        android:maxLines="1"
+        android:numeric="integer"
+        android:summary="Your weight (in kg)"
+        android:title="Your weight" />
+
+    <PreferenceCategory android:title="Climbing settings" >
+    </PreferenceCategory>
+
     <ListPreference
-        android:defaultValue="-1"
-        android:entries="@array/pref_example_list_titles"
-        android:entryValues="@array/pref_example_list_values"
-        android:key="example_list"
+        android:defaultValue="1"
+        android:entries="@array/vstep_for_rstep_titles"
+        android:entryValues="@array/vstep_for_rstep_values"
+        android:key="vstep_for_rstep"
         android:negativeButtonText="@null"
         android:positiveButtonText="@null"
-        android:title="@string/pref_title_add_friends_to_messages" />
+        android:summary="How many steps for each real one"
+        android:title="Step cheating" />
+
+    <Preference
+        android:key="detectedSamplingRate"
+        android:summary="Detected sampling rate"
+        android:title="Sampling rate" />
+    <ListPreference android:dialogTitle="Step height" android:title="Step height" android:entries="@array/steps_height_titles" android:key="stepHeight" android:entryValues="@array/steps_height_values" android:summary="Step height" android:defaultValue="17"/>
 
 </PreferenceScreen>

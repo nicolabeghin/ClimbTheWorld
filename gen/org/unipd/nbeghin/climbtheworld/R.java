@@ -30,10 +30,10 @@ public final class R {
         public static final int zoom_out=0x7f040012;
     }
     public static final class array {
-        public static final int pref_example_list_titles=0x7f0d0000;
-        public static final int pref_example_list_values=0x7f0d0001;
-        public static final int pref_sync_frequency_titles=0x7f0d0002;
-        public static final int pref_sync_frequency_values=0x7f0d0003;
+        public static final int steps_height_titles=0x7f0d0002;
+        public static final int steps_height_values=0x7f0d0003;
+        public static final int vstep_for_rstep_titles=0x7f0d0000;
+        public static final int vstep_for_rstep_values=0x7f0d0001;
     }
     public static final class attr {
         /**  Custom divider drawable to use for elements in the action bar. 
@@ -1431,27 +1431,6 @@ containing a value of this type.
         public static final int hello_world=0x7f0b000f;
         public static final int ns_menu_close=0x7f0b0011;
         public static final int ns_menu_open=0x7f0b0010;
-        public static final int pref_default_display_name=0x7f0b001b;
-        public static final int pref_description_social_recommendations=0x7f0b0019;
-        /**  Example settings for Data & Sync 
-         */
-        public static final int pref_header_data_sync=0x7f0b001d;
-        /**  Strings related to Settings 
- Example General settings 
-         */
-        public static final int pref_header_general=0x7f0b0017;
-        /**  Example settings for Notifications 
-         */
-        public static final int pref_header_notifications=0x7f0b0020;
-        public static final int pref_ringtone_silent=0x7f0b0023;
-        public static final int pref_title_add_friends_to_messages=0x7f0b001c;
-        public static final int pref_title_display_name=0x7f0b001a;
-        public static final int pref_title_new_message_notifications=0x7f0b0021;
-        public static final int pref_title_ringtone=0x7f0b0022;
-        public static final int pref_title_social_recommendations=0x7f0b0018;
-        public static final int pref_title_sync_frequency=0x7f0b001e;
-        public static final int pref_title_system_sync_settings=0x7f0b001f;
-        public static final int pref_title_vibrate=0x7f0b0024;
         public static final int title_activity_climb=0x7f0b0012;
         public static final int title_activity_profile=0x7f0b0015;
         public static final int title_activity_settings=0x7f0b0016;
@@ -1692,10 +1671,7 @@ containing a value of this type.
         public static final int Widget_AppCompat_Spinner_DropDown_ActionBar=0x7f0c0022;
     }
     public static final class xml {
-        public static final int pref_data_sync=0x7f050000;
-        public static final int pref_general=0x7f050001;
-        public static final int pref_headers=0x7f050002;
-        public static final int pref_notification=0x7f050003;
+        public static final int pref_general=0x7f050000;
     }
     public static final class styleable {
         /**  ============================================ 

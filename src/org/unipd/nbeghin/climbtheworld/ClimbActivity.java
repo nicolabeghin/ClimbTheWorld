@@ -27,6 +27,7 @@ import android.hardware.SensorManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
+import android.preference.PreferenceManager;
 import android.support.v4.app.NavUtils;
 import android.util.Log;
 import android.view.MenuItem;
@@ -52,7 +53,8 @@ public class ClimbActivity extends Activity {
 	public static final String		SAMPLING_TYPE_NON_STAIR		= "NON_STAIR";
 	public static final String		SAMPLING_DELAY				= "DELAY";
 	private boolean					samplingEnabled				= false;
-	private double					detectedSamplingRate		= 0;
+	private static double					detectedSamplingRate		= 0;
+	private static int 					samplingDelay;
 	private double					minimumSamplingRate			= 13;
 	private Intent					backgroundClassifySampler;
 	private Intent					backgroundSamplingRateDetector;
@@ -86,6 +88,10 @@ public class ClimbActivity extends Activity {
 	 */
 	private SystemUiHider			mSystemUiHider;
 
+	public static double getDetectedSamplingRate() {
+		return detectedSamplingRate;
+	}
+	
 	public class ClassifierReceiver extends BroadcastReceiver {
 		@Override
 		public void onReceive(Context context, Intent intent) {
@@ -115,27 +121,19 @@ public class ClimbActivity extends Activity {
 		}
 	}
 
-	private void updateStats() {
-		((TextView) findViewById(R.id.lblNumSteps)).setText(Integer.toString(num_steps) + " of " + Integer.toString(building.getSteps()) + " ("
-				+ (new DecimalFormat("#.##")).format(percentage * 100.00) + "%)");
-	}
-
-	private void setupByDetectedSamplingRate() {
-		((TextView) findViewById(R.id.lblSamplingRateDetected)).setText((int) detectedSamplingRate + " Hz");
-		backgroundClassifySampler.putExtra(AccelerometerSamplingRateDetect.SAMPLING_RATE, detectedSamplingRate);
-		backgroundClassifySampler.putExtra(SAMPLING_DELAY, backgroundSamplingRateDetector.getExtras().getInt(ClimbActivity.SAMPLING_DELAY));
-		Toast.makeText(getApplicationContext(), "Start climbing some stairs!", Toast.LENGTH_LONG).show();
-	}
-
 	public class SamplingRateDetectorReceiver extends BroadcastReceiver {
 		@Override
 		public void onReceive(Context context, Intent intent) {
 			detectedSamplingRate = intent.getExtras().getDouble(AccelerometerSamplingRateDetect.SAMPLING_RATE);
+			samplingDelay = intent.getExtras().getInt(SAMPLING_DELAY);
 			Log.i(MainActivity.AppName, "Detected sampling rate: " + Double.toString(detectedSamplingRate) + "Hz");
 			if (detectedSamplingRate >= minimumSamplingRate) { // sampling rate high enough
-				SharedPreferences settings = getSharedPreferences(MainActivity.settings_file, 0);
-				SharedPreferences.Editor editor = settings.edit();
-				editor.putFloat(MainActivity.settings_detected_sampling_rate, (float) detectedSamplingRate);
+//				getSharedPreferences(name, mode)
+//				SharedPreferences settings = getSharedPreferences(MainActivity.settings_file, 0);
+				SharedPreferences.Editor editor=PreferenceManager.getDefaultSharedPreferences(getApplicationContext()).edit();
+				editor.putFloat("detectedSamplingRate", (float) detectedSamplingRate); // store detected sampling rate
+				editor.putInt("sensor_delay", samplingDelay); // store used sampling delay
+				editor.apply();
 				Log.i(MainActivity.AppName, "Stored detected sampling rate");
 				stopService(backgroundSamplingRateDetector);
 				unregisterReceiver(this);
@@ -158,6 +156,17 @@ public class ClimbActivity extends Activity {
 				}
 			}
 		}
+	}
+
+	private void updateStats() {
+		((TextView) findViewById(R.id.lblNumSteps)).setText(Integer.toString(num_steps) + " of " + Integer.toString(building.getSteps()) + " ("
+				+ (new DecimalFormat("#.##")).format(percentage * 100.00) + "%)");
+	}
+
+	private void setupByDetectedSamplingRate() {
+		backgroundClassifySampler.putExtra(AccelerometerSamplingRateDetect.SAMPLING_RATE, detectedSamplingRate);
+		backgroundClassifySampler.putExtra(SAMPLING_DELAY, samplingDelay);
+		Toast.makeText(getApplicationContext(), "Start climbing some stairs!", Toast.LENGTH_LONG).show();
 	}
 
 	@Override
@@ -247,15 +256,17 @@ public class ClimbActivity extends Activity {
 			e.printStackTrace();
 		}
 		backgroundClassifySampler = new Intent(this, SamplingClassifyService.class); // instance (without starting) background classifier
-		SharedPreferences settings = getSharedPreferences(MainActivity.settings_file, 0);
-		detectedSamplingRate = settings.getFloat(MainActivity.settings_detected_sampling_rate, 0.00f);
-		if (detectedSamplingRate < minimumSamplingRate) { // start sampling rate detector
-			Log.i(MainActivity.AppName, "Previous detected sampling rate of " + Double.toString(detectedSamplingRate) + "Hz");
+		SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+		detectedSamplingRate = settings.getFloat("detectedSamplingRate", 0.00f);
+		samplingDelay = settings.getInt("sensor_delay", 0);
+		Log.i(MainActivity.AppName, "Previous detected sampling rate of " + Double.toString(detectedSamplingRate) + "Hz");
+		if (samplingDelay == 0 || detectedSamplingRate < minimumSamplingRate) { // start sampling rate detector
 			backgroundSamplingRateDetector = new Intent(this, SamplingRateDetectorService.class); // instance (without starting) background sampling rate detected
 			backgroundSamplingRateDetector.putExtra(SAMPLING_DELAY, SensorManager.SENSOR_DELAY_NORMAL);
 			registerReceiver(sampleRateDetectorReceiver, samplingRateDetectorFilter);
 			startService(backgroundSamplingRateDetector); // start background service
 		} else {
+			Log.i(MainActivity.AppName, "Using the previously detected sampling rate");
 			setupByDetectedSamplingRate();
 		}
 	}
