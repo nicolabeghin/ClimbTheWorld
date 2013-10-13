@@ -8,6 +8,7 @@ import org.unipd.nbeghin.climbtheworld.db.PreExistingDbLoader;
 import org.unipd.nbeghin.climbtheworld.fragments.BuildingsFragment;
 import org.unipd.nbeghin.climbtheworld.fragments.ToursFragment;
 import org.unipd.nbeghin.climbtheworld.models.Building;
+import org.unipd.nbeghin.climbtheworld.models.BuildingTour;
 import org.unipd.nbeghin.climbtheworld.models.Climbing;
 import org.unipd.nbeghin.climbtheworld.models.Tour;
 import org.unipd.nbeghin.climbtheworld.util.PagerAdapter;
@@ -29,34 +30,24 @@ import com.j256.ormlite.dao.RuntimeExceptionDao;
 
 @SuppressLint("NewApi")
 public class MainActivity extends ActionBarActivity {
-	private static final String								APP_TITLE						= "Climb the world";
-	public static final String								AppName							= "ClimbTheWorld";
-	public CardUI											toursCards;
-	public static List<Building>							buildings;
-	private List<Climbing>									climbings;
-	public static List<Tour>								tours;
-	private ActionBar										ab;
-	public static RuntimeExceptionDao<Building, Integer>	buildingDao;
-	public static RuntimeExceptionDao<Climbing, Integer>	climbingDao;
-	public static RuntimeExceptionDao<Tour, Integer>		tourDao;
-	public static final String								settings_file					= "ClimbTheWorldPreferences";
-	public static final String								settings_detected_sampling_rate	= "samplingRate";
-	private List<Fragment>									fragments						= new Vector<Fragment>();
-	private PagerAdapter									mPagerAdapter;
-	public static final String								building_intent_object			= "org.unipd.nbeghin.climbtheworld.intents.object.building";
-	// view pager
-	private ViewPager										mPager;
+	private static final String									APP_TITLE						= "Climb the world";
+	public static final String									AppName							= "ClimbTheWorld";
+	public CardUI												toursCards;
+	public static List<Building>								buildings;
+	private List<Climbing>										climbings;
+	public static List<Tour>									tours;
+	private ActionBar											ab;
+	public static RuntimeExceptionDao<Building, Integer>		buildingDao;
+	public static RuntimeExceptionDao<Climbing, Integer>		climbingDao;
+	public static RuntimeExceptionDao<Tour, Integer>			tourDao;
+	public static RuntimeExceptionDao<BuildingTour, Integer>	buildingTourDao;
+	public static final String									settings_file					= "ClimbTheWorldPreferences";
+	public static final String									settings_detected_sampling_rate	= "samplingRate";
+	private List<Fragment>										fragments						= new Vector<Fragment>();
+	private PagerAdapter										mPagerAdapter;
+	public static final String									building_intent_object			= "org.unipd.nbeghin.climbtheworld.intents.object.building";
+	private ViewPager											mPager;
 
-	// private class LoadToursTask extends AsyncTask<Void, Void, Void> {
-	// @Override
-	// protected Void doInBackground(Void... unused) {
-	// for (Tour tour : tours) {
-	// toursCards.addCard(new TourCard(tour));
-	// }
-	// toursCards.refresh();
-	// return null;
-	// }
-	// }
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -89,6 +80,7 @@ public class MainActivity extends ActionBarActivity {
 		buildingDao = dbHelper.getBuildingDao();
 		climbingDao = dbHelper.getClimbingDao();
 		tourDao = dbHelper.getTourDao();
+		buildingTourDao = dbHelper.getBuildingTourDao();
 		buildings = buildingDao.queryForAll();
 		climbings = climbingDao.queryForAll();
 		tours = tourDao.queryForAll();
@@ -101,7 +93,7 @@ public class MainActivity extends ActionBarActivity {
 		Intent intent = new Intent(getApplicationContext(), ProfileActivity.class);
 		startActivity(intent);
 	}
-	
+
 	public void onShowSettings(MenuItem v) {
 		Intent intent = new Intent(getApplicationContext(), SettingsActivity.class);
 		startActivity(intent);

@@ -1,6 +1,7 @@
 package org.unipd.nbeghin.climbtheworld.db;
 
 import org.unipd.nbeghin.climbtheworld.models.Building;
+import org.unipd.nbeghin.climbtheworld.models.BuildingTour;
 import org.unipd.nbeghin.climbtheworld.models.Climbing;
 import org.unipd.nbeghin.climbtheworld.models.Tour;
 
@@ -8,7 +9,6 @@ import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 
 import com.j256.ormlite.android.apptools.OrmLiteSqliteOpenHelper;
-import com.j256.ormlite.dao.Dao;
 import com.j256.ormlite.dao.RuntimeExceptionDao;
 import com.j256.ormlite.support.ConnectionSource;
 
@@ -18,6 +18,7 @@ public class DbHelper extends OrmLiteSqliteOpenHelper {
 	private RuntimeExceptionDao<Building, Integer> buildingRuntimeDao = null;
 	private RuntimeExceptionDao<Tour, Integer> tourRuntimeDao = null;
 	private RuntimeExceptionDao<Climbing, Integer> climbingRuntimeDao = null;
+	private RuntimeExceptionDao<BuildingTour, Integer> buildingTourRuntimeDao = null;
 	
     public DbHelper(Context context) {
     	super(context, DATABASE_NAME, null, DATABASE_VERSION);
@@ -45,6 +46,13 @@ public class DbHelper extends OrmLiteSqliteOpenHelper {
 			tourRuntimeDao = getRuntimeExceptionDao(Tour.class);
 		}
 		return tourRuntimeDao;
+	}
+	
+	public RuntimeExceptionDao<BuildingTour, Integer> getBuildingTourDao() {
+		if (buildingTourRuntimeDao == null) {
+			buildingTourRuntimeDao = getRuntimeExceptionDao(BuildingTour.class);
+		}
+		return buildingTourRuntimeDao;
 	}
 	
 	public RuntimeExceptionDao<Climbing, Integer> getClimbingDao() {

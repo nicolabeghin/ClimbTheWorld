@@ -10,5 +10,6 @@
     <string name="dummy_button">Dummy Button</string>
     <string name="dummy_content">DUMMY\nCONTENT</string>
     <string name="title_activity_profile">ProfileActivity</string>
+    <string name="title_activity_tour_detail">TourDetailActivity</string>
 
 </resources>

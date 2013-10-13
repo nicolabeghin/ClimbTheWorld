@@ -24,7 +24,7 @@
         android:maxLines="1"
         android:numeric="integer"
         android:summary="Your height (in cm)"
-        android:title="Your height" />
+        android:title="Your height" android:defaultValue="190"/>
     <EditTextPreference
         android:dialogMessage="Please enter your weight (in kg)"
         android:dialogTitle="Your weight"
@@ -32,7 +32,7 @@
         android:maxLines="1"
         android:numeric="integer"
         android:summary="Your weight (in kg)"
-        android:title="Your weight" />
+        android:title="Your weight" android:defaultValue="80"/>
 
     <PreferenceCategory android:title="Climbing settings" >
     </PreferenceCategory>
