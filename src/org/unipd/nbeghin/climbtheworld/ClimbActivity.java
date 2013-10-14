@@ -65,8 +65,7 @@ public class ClimbActivity extends Activity {
 	private Building				building;
 	private Climbing				climbing;
 	private VerticalSeekBar			seekbarIndicator;
-	private int vstep_for_rstep = 1;
-	
+	private int						vstep_for_rstep				= 1;
 	/**
 	 * Whether or not the system UI should be auto-hidden after {@link #AUTO_HIDE_DELAY_MILLIS} milliseconds.
 	 */
@@ -132,8 +131,8 @@ public class ClimbActivity extends Activity {
 				editor.putFloat("detectedSamplingRate", (float) detectedSamplingRate); // store detected sampling rate
 				editor.putInt("sensor_delay", samplingDelay); // store used sampling delay
 				editor.apply();
-				Log.i(MainActivity.AppName, "Stored detected sampling rate of "+detectedSamplingRate+"Hz");
-				Log.i(MainActivity.AppName, "Stored sampling delay of "+samplingDelay);
+				Log.i(MainActivity.AppName, "Stored detected sampling rate of " + detectedSamplingRate + "Hz");
+				Log.i(MainActivity.AppName, "Stored sampling delay of " + samplingDelay);
 				stopService(backgroundSamplingRateDetector);
 				unregisterReceiver(this);
 				setupByDetectedSamplingRate();
@@ -165,9 +164,9 @@ public class ClimbActivity extends Activity {
 	private void setupByDetectedSamplingRate() {
 		backgroundClassifySampler.putExtra(AccelerometerSamplingRateDetect.SAMPLING_RATE, detectedSamplingRate);
 		backgroundClassifySampler.putExtra(SAMPLING_DELAY, samplingDelay);
-//		if (climbing.getPercentage() < 100) {
-//			Toast.makeText(getApplicationContext(), "Start climbing some stairs!", Toast.LENGTH_LONG).show();
-//		}
+		// if (climbing.getPercentage() < 100) {
+		// Toast.makeText(getApplicationContext(), "Start climbing some stairs!", Toast.LENGTH_LONG).show();
+		// }
 	}
 
 	@Override
@@ -252,10 +251,8 @@ public class ClimbActivity extends Activity {
 			if (building_id == 0) throw new Exception("ERROR: unable to get intent data");
 			building = MainActivity.buildingDao.queryForId(building_id);
 			setup_from_building(); // load building info
-
 			// setup background classifier
 			backgroundClassifySampler = new Intent(this, SamplingClassifyService.class); // instance (without starting) background classifier
-
 			// check for pre-detected sampling rate
 			SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
 			detectedSamplingRate = settings.getFloat("detectedSamplingRate", 0.00f);
@@ -276,7 +273,6 @@ public class ClimbActivity extends Activity {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-
 	}
 
 	private void setup_from_building() {
@@ -319,8 +315,8 @@ public class ClimbActivity extends Activity {
 		Log.i(MainActivity.AppName, "Loaded existing climbing (#" + climbing.get_id() + ")");
 		if (percentage >= 100) {
 			findViewById(R.id.btnStartClimbing).setVisibility(View.INVISIBLE);
-			SimpleDateFormat sdf=new SimpleDateFormat("yyyy.MM.dd");
-			((TextView)findViewById(R.id.lblReadyToClimb)).setText("ALREADY CLIMBED ON "+sdf.format(new Date(climbing.getCompleted())));
+			SimpleDateFormat sdf = new SimpleDateFormat("yyyy.MM.dd");
+			((TextView) findViewById(R.id.lblReadyToClimb)).setText("ALREADY CLIMBED ON " + sdf.format(new Date(climbing.getCompleted())));
 		}
 	}
 
@@ -437,8 +433,22 @@ public class ClimbActivity extends Activity {
 
 	public void startClassifyService() {
 		SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
-		vstep_for_rstep=Integer.parseInt(settings.getString("vstep_for_rstep", "1"));
-		Log.i(MainActivity.AppName, "Using "+vstep_for_rstep+" steps for each real step");
+		int difficulty = Integer.parseInt(settings.getString("difficulty", "10"));
+		switch (difficulty) {
+			case 100: // easy
+				Log.i(MainActivity.AppName, "Selected difficulty: EASY");
+				vstep_for_rstep=100;
+				break;
+			case 1: // hard
+				Log.i(MainActivity.AppName, "Selected difficulty: HARD");
+				vstep_for_rstep=1;
+				break;
+			default: // normal and default
+				Log.i(MainActivity.AppName, "Selected difficulty: NORMAL");
+				vstep_for_rstep=10;
+				break;
+		}
+		Log.i(MainActivity.AppName, "Using " + vstep_for_rstep + " steps for each real step");
 		startService(backgroundClassifySampler); // start background service
 		registerReceiver(classifierReceiver, classifierFilter);
 		samplingEnabled = true;

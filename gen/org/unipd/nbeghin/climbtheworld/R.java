@@ -30,6 +30,8 @@ public final class R {
         public static final int zoom_out=0x7f040012;
     }
     public static final class array {
+        public static final int difficulty_titles=0x7f0d0004;
+        public static final int difficulty_values=0x7f0d0005;
         public static final int steps_height_titles=0x7f0d0002;
         public static final int steps_height_values=0x7f0d0003;
         public static final int vstep_for_rstep_titles=0x7f0d0000;

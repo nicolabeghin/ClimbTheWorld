@@ -37,20 +37,29 @@
     <PreferenceCategory android:title="Climbing settings" >
     </PreferenceCategory>
 
+<!--     <ListPreference -->
+<!--         android:defaultValue="1" -->
+<!--         android:entries="@array/vstep_for_rstep_titles" -->
+<!--         android:entryValues="@array/vstep_for_rstep_values" -->
+<!--         android:key="vstep_for_rstep" -->
+<!--         android:negativeButtonText="@null" -->
+<!--         android:positiveButtonText="@null" -->
+<!--         android:summary="How many steps for each real one" -->
+<!--         android:title="Step cheating" /> -->
     <ListPreference
-        android:defaultValue="1"
-        android:entries="@array/vstep_for_rstep_titles"
-        android:entryValues="@array/vstep_for_rstep_values"
-        android:key="vstep_for_rstep"
+        android:defaultValue="10"
+        android:entries="@array/difficulty_titles"
+        android:entryValues="@array/difficulty_values"
+        android:key="difficulty"
         android:negativeButtonText="@null"
         android:positiveButtonText="@null"
-        android:summary="How many steps for each real one"
-        android:title="Step cheating" />
-
-    <Preference
-        android:key="detectedSamplingRate"
-        android:summary="Detected sampling rate"
-        android:title="Sampling rate" />
-    <ListPreference android:dialogTitle="Step height" android:title="Step height" android:entries="@array/steps_height_titles" android:key="stepHeight" android:entryValues="@array/steps_height_values" android:summary="Step height" android:defaultValue="17"/>
+        android:summary="Difficulty"
+        android:title="Level" />
+    
+<!--     <Preference -->
+<!--         android:key="detectedSamplingRate" -->
+<!--         android:summary="Detected sampling rate" -->
+<!--         android:title="Sampling rate" /> -->
+<!--     <ListPreference android:dialogTitle="Step height" android:title="Step height" android:entries="@array/steps_height_titles" android:key="stepHeight" android:entryValues="@array/steps_height_values" android:summary="Step height" android:defaultValue="17"/> -->
 
 </PreferenceScreen>
