@@ -4,6 +4,10 @@
     android:versionCode="1"
     android:versionName="1.0" >
 
+    <uses-permission android:name="android.permission.INTERNET" />
+    <!-- Include next permission if you want to allow UIL to cache images on SD card -->
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+
     <uses-sdk
         android:minSdkVersion="10"
         android:targetSdkVersion="17" />
@@ -66,6 +70,14 @@
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="org.unipd.nbeghin.climbtheworld.MainActivity" />
+        </activity>
+        <activity
+            android:name="org.unipd.nbeghin.climbtheworld.GalleryActivity"
+            android:label="@string/title_activity_gallery"
+            android:parentActivityName="org.unipd.nbeghin.climbtheworld.ClimbActivity" >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="org.unipd.nbeghin.climbtheworld.ClimbActivity" />
         </activity>
     </application>
 

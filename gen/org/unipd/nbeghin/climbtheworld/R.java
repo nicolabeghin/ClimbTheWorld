@@ -30,6 +30,8 @@ public final class R {
         public static final int zoom_out=0x7f040012;
     }
     public static final class array {
+        /**  1 real step = 1 game step 
+         */
         public static final int difficulty_titles=0x7f0d0004;
         public static final int difficulty_values=0x7f0d0005;
         public static final int steps_height_titles=0x7f0d0002;
@@ -1367,33 +1369,35 @@ containing a value of this type.
         public static final int abc_search_dropdown_item_icons_2line=0x7f030016;
         public static final int abc_search_view=0x7f030017;
         public static final int activity_climb=0x7f030018;
-        public static final int activity_main=0x7f030019;
-        public static final int activity_profile=0x7f03001a;
-        public static final int activity_tour_detail=0x7f03001b;
-        public static final int card_building_ex=0x7f03001c;
-        public static final int card_building_for_tour_ex=0x7f03001d;
-        public static final int card_ex=0x7f03001e;
-        public static final int card_picture=0x7f03001f;
-        public static final int card_tour_ex=0x7f030020;
-        public static final int cards_view=0x7f030021;
-        public static final int cards_view_multicolumn=0x7f030022;
-        public static final int fragment_buildings=0x7f030023;
-        public static final int fragment_buildings_for_tour=0x7f030024;
-        public static final int fragment_tours=0x7f030025;
-        public static final int header=0x7f030026;
-        public static final int item_card=0x7f030027;
-        public static final int item_card_empty=0x7f030028;
-        public static final int item_card_empty_first=0x7f030029;
-        public static final int item_card_empty_last=0x7f03002a;
-        public static final int item_stack=0x7f03002b;
-        public static final int stat_item=0x7f03002c;
-        public static final int support_simple_spinner_dropdown_item=0x7f03002d;
+        public static final int activity_gallery=0x7f030019;
+        public static final int activity_main=0x7f03001a;
+        public static final int activity_profile=0x7f03001b;
+        public static final int activity_tour_detail=0x7f03001c;
+        public static final int card_building_ex=0x7f03001d;
+        public static final int card_building_for_tour_ex=0x7f03001e;
+        public static final int card_ex=0x7f03001f;
+        public static final int card_picture=0x7f030020;
+        public static final int card_tour_ex=0x7f030021;
+        public static final int cards_view=0x7f030022;
+        public static final int cards_view_multicolumn=0x7f030023;
+        public static final int fragment_buildings=0x7f030024;
+        public static final int fragment_buildings_for_tour=0x7f030025;
+        public static final int fragment_tours=0x7f030026;
+        public static final int header=0x7f030027;
+        public static final int item_card=0x7f030028;
+        public static final int item_card_empty=0x7f030029;
+        public static final int item_card_empty_first=0x7f03002a;
+        public static final int item_card_empty_last=0x7f03002b;
+        public static final int item_stack=0x7f03002c;
+        public static final int stat_item=0x7f03002d;
+        public static final int support_simple_spinner_dropdown_item=0x7f03002e;
     }
     public static final class menu {
         public static final int actionbar=0x7f0e0000;
-        public static final int main=0x7f0e0001;
-        public static final int profile=0x7f0e0002;
-        public static final int tour_detail=0x7f0e0003;
+        public static final int gallery=0x7f0e0001;
+        public static final int main=0x7f0e0002;
+        public static final int profile=0x7f0e0003;
+        public static final int tour_detail=0x7f0e0004;
     }
     public static final class string {
         /**  Content description for the action bar "home" affordance. [CHAR LIMIT=NONE] 
@@ -1444,8 +1448,9 @@ containing a value of this type.
         public static final int ns_menu_close=0x7f0b0011;
         public static final int ns_menu_open=0x7f0b0010;
         public static final int title_activity_climb=0x7f0b0012;
+        public static final int title_activity_gallery=0x7f0b0017;
         public static final int title_activity_profile=0x7f0b0015;
-        public static final int title_activity_settings=0x7f0b0017;
+        public static final int title_activity_settings=0x7f0b0018;
         public static final int title_activity_tour_detail=0x7f0b0016;
     }
     public static final class style {

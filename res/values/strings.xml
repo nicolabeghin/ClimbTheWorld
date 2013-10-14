@@ -11,5 +11,6 @@
     <string name="dummy_content">DUMMY\nCONTENT</string>
     <string name="title_activity_profile">ProfileActivity</string>
     <string name="title_activity_tour_detail">TourDetailActivity</string>
+    <string name="title_activity_gallery">GalleryActivity</string>
 
 </resources>
