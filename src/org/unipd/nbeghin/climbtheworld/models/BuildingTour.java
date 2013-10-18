@@ -3,6 +3,10 @@ package org.unipd.nbeghin.climbtheworld.models;
 import com.j256.ormlite.field.DatabaseField;
 import com.j256.ormlite.table.DatabaseTable;
 
+/**
+ * Association model: links buildings to tours (HABTM)
+ *
+ */
 @DatabaseTable(tableName = "buildings_tours")
 public class BuildingTour {
 	@DatabaseField(generatedId = true)

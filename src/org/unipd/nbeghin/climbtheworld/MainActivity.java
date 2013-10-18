@@ -32,24 +32,27 @@ import android.view.MenuItem;
 import com.fima.cardsui.views.CardUI;
 import com.j256.ormlite.dao.RuntimeExceptionDao;
 
+/**
+ * Main activity
+ *
+ */
 @SuppressLint("NewApi")
 public class MainActivity extends ActionBarActivity {
 	private static final String									APP_TITLE						= "Climb the world";
 	public static final String									AppName							= "ClimbTheWorld";
-	public CardUI												toursCards;
 	public static List<Building>								buildings;
-	private List<Climbing>										climbings;
-	public static List<Tour>									tours;
-	private ActionBar											ab;
-	public static RuntimeExceptionDao<Building, Integer>		buildingDao;
-	public static RuntimeExceptionDao<Climbing, Integer>		climbingDao;
-	public static RuntimeExceptionDao<Tour, Integer>			tourDao;
-	public static RuntimeExceptionDao<BuildingTour, Integer>	buildingTourDao;
+	private List<Climbing>										climbings; // list of loaded climbings
+	public static List<Tour>									tours; // list of loaded tours
+	private ActionBar											ab; // reference to action bar
+	public static RuntimeExceptionDao<Building, Integer>		buildingDao; // DAO for buildings
+	public static RuntimeExceptionDao<Climbing, Integer>		climbingDao; // DAO for climbings
+	public static RuntimeExceptionDao<Tour, Integer>			tourDao; // DAO for tours
+	public static RuntimeExceptionDao<BuildingTour, Integer>	buildingTourDao; // DAO for building_tours
 	public static final String									settings_file					= "ClimbTheWorldPreferences";
 	public static final String									settings_detected_sampling_rate	= "samplingRate";
-	private List<Fragment>										fragments						= new Vector<Fragment>();
-	private PagerAdapter										mPagerAdapter;
-	public static final String									building_intent_object			= "org.unipd.nbeghin.climbtheworld.intents.object.building";
+	private List<Fragment>										fragments						= new Vector<Fragment>(); // list of fragments to be loaded
+	private PagerAdapter										mPagerAdapter; // page adapter for ViewPager
+	public static final String									building_intent_object			= "org.unipd.nbeghin.climbtheworld.intents.object.building"; // intent key for sending building id
 	private ViewPager											mPager;
 	private static Context sContext;
 	
@@ -61,16 +64,19 @@ public class MainActivity extends ActionBarActivity {
 		// ab.setHomeButtonEnabled(false);
 		// ab.setTitle(APP_TITLE);
 		// instance entities from db (to be moved inside AsyncTask)
-		loadDb();
+		loadDb(); // instance db connection
 		// loading fragments
-		fragments.add(Fragment.instantiate(this, BuildingsFragment.class.getName()));
-		fragments.add(Fragment.instantiate(this, ToursFragment.class.getName()));
+		fragments.add(Fragment.instantiate(this, BuildingsFragment.class.getName())); // instance building fragments
+		fragments.add(Fragment.instantiate(this, ToursFragment.class.getName())); // instance tours fragments
 		mPagerAdapter = new PagerAdapter(super.getSupportFragmentManager(), fragments);
 		mPager = (ViewPager) super.findViewById(R.id.pager);
 		mPager.setAdapter(this.mPagerAdapter);
 		sContext = getApplicationContext();
 	}
 
+	/**
+	 * Helper method to access application context
+	 */
 	public static Context getContext() {
 		return sContext;
 	}
@@ -82,28 +88,36 @@ public class MainActivity extends ActionBarActivity {
 		return true;
 	}
 
+	/**
+	 * Check and return if a climbing exists for given building
+	 * Returns null if no climbing exists yet
+	 * 
+	 * @param building_id building ID
+	 * @return Climbing
+	 */
 	public static Climbing getClimbingForBuilding(int building_id) {
 		Map<String, Object> conditions=new HashMap<String, Object> ();
-		conditions.put("building_id", building_id);
+		conditions.put("building_id", building_id); // filter for building ID
 		List<Climbing> climbings=climbingDao.queryForFieldValuesArgs(conditions);
 		if (climbings.size()==0) return null;
 		return climbings.get(0);
 	}
 	
+	/**
+	 * Load db and setup DAOs
+	 * NB: extracts DB from assets/databases/ClimbTheWorld.zip
+	 */
 	private void loadDb() {
-		PreExistingDbLoader preExistingDbLoader = new PreExistingDbLoader(getApplicationContext());
+		PreExistingDbLoader preExistingDbLoader = new PreExistingDbLoader(getApplicationContext()); // extract db from zip
 		SQLiteDatabase db = preExistingDbLoader.getReadableDatabase();
-		db.close();
-		DbHelper dbHelper = new DbHelper(getApplicationContext());
-		buildingDao = dbHelper.getBuildingDao();
-		climbingDao = dbHelper.getClimbingDao();
-		tourDao = dbHelper.getTourDao();
-		buildingTourDao = dbHelper.getBuildingTourDao();
-//		buildings = buildingDao.queryForAll();
-		climbings = climbingDao.queryForAll();
-		refreshBuildings();
-		refreshTours();
-//		tours = tourDao.queryForAll();
+		db.close(); // close connection to extracted db
+		DbHelper dbHelper = new DbHelper(getApplicationContext()); // instance new db connection to now-standard db
+		buildingDao = dbHelper.getBuildingDao(); // create building DAO
+		climbingDao = dbHelper.getClimbingDao(); // create climbing DAO
+		tourDao = dbHelper.getTourDao(); // create tour DAO
+		buildingTourDao = dbHelper.getBuildingTourDao(); // create building tour DAO
+		climbings = climbingDao.queryForAll(); // loads all climbings
+		refresh(); // loads all buildings and tours
 	}
 
 	public void onShowActionProfile(MenuItem v) {
@@ -116,14 +130,23 @@ public class MainActivity extends ActionBarActivity {
 		startActivity(intent);
 	}
 	
+	/**
+	 * Reload all buildings
+	 */
 	public static void refreshBuildings() {
 		buildings=buildingDao.queryForAll();
 	}
 	
+	/**
+	 * Reload all tours
+	 */
 	public static void refreshTours() {
 		tours=tourDao.queryForAll();
 	}
 	
+	/**
+	 * Reload buildings and tours
+	 */
 	public static void refresh() {
 		refreshBuildings();
 		refreshTours();

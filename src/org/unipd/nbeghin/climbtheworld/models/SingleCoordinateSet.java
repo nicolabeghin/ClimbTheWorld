@@ -5,6 +5,10 @@ import java.util.Collections;
 import java.util.List;
 import org.unipd.nbeghin.climbtheworld.comparator.CoupleTimeDataComparator;
 
+/**
+ * A model representing the coordinates on a single axis
+ * 
+ */
 public class SingleCoordinateSet {
 	private List<DataTime>	values;
 	private String			title;
@@ -43,6 +47,9 @@ public class SingleCoordinateSet {
 		return Collections.min(this.values, new CoupleTimeDataComparator()).getValue();
 	}
 
+	/**
+	 * Normalize on a single axis (this one)
+	 */
 	public void normalize() {
 		DataTime max = Collections.max(this.values, new CoupleTimeDataComparator());
 		DataTime min = Collections.min(this.values, new CoupleTimeDataComparator());
@@ -55,6 +62,11 @@ public class SingleCoordinateSet {
 		}
 	}
 
+	/**
+	 * Normalize on all given axes
+	 * 
+	 * @param values List of set of samples of single coordinates
+	 */
 	public void normalize(List<SingleCoordinateSet> values) {
 		ArrayList<Double> maxmin = new ArrayList<Double>();
 		for (int i = 0; i < values.size(); i++) {

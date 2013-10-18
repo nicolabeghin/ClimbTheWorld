@@ -17,6 +17,10 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.View.OnClickListener;
 
+/**
+ * Show a list of buildings
+ *
+ */
 public class BuildingsFragment extends Fragment {
 	public static final String	building_intent_object	= "org.unipd.nbeghin.climbtheworld.intents.object.building";
 	public CardUI				buildingCards;

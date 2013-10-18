@@ -42,30 +42,29 @@ import android.widget.Toast;
 import android.widget.VerticalSeekBar;
 
 /**
- * An example full-screen activity that shows and hides the system UI (i.e. status bar and navigation/system bar) with user interaction.
+ * Climbing activity: shows a given building and starts classifier. At start it calculates the sampling rate of the device it's run from (only once, after that it just saves the value in standard Android preferences)
  * 
- * @see SystemUiHider
  */
 public class ClimbActivity extends Activity {
-	public static final String		SAMPLING_TYPE				= "ACTION_SAMPLING";
-	public static final String		SAMPLING_TYPE_NON_STAIR		= "NON_STAIR";
-	public static final String		SAMPLING_DELAY				= "DELAY";
-	private boolean					samplingEnabled				= false;
-	private static double			detectedSamplingRate		= 0;
-	private static int				samplingDelay;
-	private double					minimumSamplingRate			= 13;
-	private Intent					backgroundClassifySampler;
-	private Intent					backgroundSamplingRateDetector;
-	private IntentFilter			classifierFilter			= new IntentFilter(ClassifierCircularBuffer.CLASSIFIER_ACTION);
-	private IntentFilter			samplingRateDetectorFilter	= new IntentFilter(AccelerometerSamplingRateDetect.SAMPLING_RATE_ACTION);
-	private BroadcastReceiver		classifierReceiver			= new ClassifierReceiver();
-	private BroadcastReceiver		sampleRateDetectorReceiver	= new SamplingRateDetectorReceiver();
-	private int						num_steps					= 0;
-	private double					percentage					= 0.0;
-	private Building				building;
-	private Climbing				climbing;
-	private VerticalSeekBar			seekbarIndicator;
-	private int						vstep_for_rstep				= 1;
+	public static final String		SAMPLING_TYPE				= "ACTION_SAMPLING";														// intent's action
+	public static final String		SAMPLING_TYPE_NON_STAIR		= "NON_STAIR";																// classifier's output
+	public static final String		SAMPLING_DELAY				= "DELAY";																	// intent's action
+	private boolean					samplingEnabled				= false;																	// sentinel if sampling is running
+	private static double			detectedSamplingRate		= 0;																		// detected sampling rate (after sampling rate detector)
+	private static int				samplingDelay;																							// current sampling delay (SensorManager)
+	private double					minimumSamplingRate			= 13;																		// minimum sampling rate for using this app
+	private Intent					backgroundClassifySampler;																				// classifier background service intent
+	private Intent					backgroundSamplingRateDetector;																		// sampling rate detector service intent
+	private IntentFilter			classifierFilter			= new IntentFilter(ClassifierCircularBuffer.CLASSIFIER_ACTION);			// intent filter (for BroadcastReceiver)
+	private IntentFilter			samplingRateDetectorFilter	= new IntentFilter(AccelerometerSamplingRateDetect.SAMPLING_RATE_ACTION);	// intent filter (for BroadcastReceiver)
+	private BroadcastReceiver		classifierReceiver			= new ClassifierReceiver();												// implementation of BroadcastReceiver for classifier service
+	private BroadcastReceiver		sampleRateDetectorReceiver	= new SamplingRateDetectorReceiver();										// implementation of BroadcastReceiver for sampling rate detector
+	private int						num_steps					= 0;																		// number of currently detected steps
+	private double					percentage					= 0.0;																		// current progress percentage
+	private Building				building;																								// current building
+	private Climbing				climbing;																								// current climbing
+	private VerticalSeekBar			seekbarIndicator;																						// reference to vertical seekbar
+	private int						vstep_for_rstep				= 1; // number of virtual step for each real step
 	/**
 	 * Whether or not the system UI should be auto-hidden after {@link #AUTO_HIDE_DELAY_MILLIS} milliseconds.
 	 */
@@ -87,65 +86,72 @@ public class ClimbActivity extends Activity {
 	 */
 	private SystemUiHider			mSystemUiHider;
 
-	public static double getDetectedSamplingRate() {
-		return detectedSamplingRate;
-	}
+//	public static double getDetectedSamplingRate() {
+//		return detectedSamplingRate;
+//	}
 
+	
+	/**
+	 * Handles classifier service intents (STAIR/NON_STAIR)
+	 *
+	 */
 	public class ClassifierReceiver extends BroadcastReceiver {
 		@Override
 		public void onReceive(Context context, Intent intent) {
 			String result = intent.getExtras().getString(ClassifierCircularBuffer.CLASSIFIER_NOTIFICATION_STATUS);
 			if (result.equals("STAIR")) {
-				// num_steps++;
-				num_steps += vstep_for_rstep; // to be removed
-				seekbarIndicator.setProgress(num_steps);
-				percentage = (double) num_steps / (double) building.getSteps();
-				boolean win = (num_steps >= building.getSteps());
+				num_steps += vstep_for_rstep; // increase the number of steps
+				seekbarIndicator.setProgress(num_steps); // increase the seekbar progress
+				percentage = (double) num_steps / (double) building.getSteps(); // increase the progress percentage
+				boolean win = (num_steps >= building.getSteps()); // user wins?
 				if (win) {
 					num_steps = building.getSteps(); // ensure it did not exceed the number of steps (when multiple steps-at-once are detected)
 					percentage = 100.00;
 				}
-				updateStats();
+				updateStats(); // update the view of current stats
 				if (win) {
-					stopClassify();
-					// animate "ready to climb" text
+					stopClassify(); // stop classifier service service
 					Toast.makeText(getApplicationContext(), "You successfully climbed " + building.getSteps() + " steps (" + building.getHeight() + "m) of " + building.getName() + "!",
-							Toast.LENGTH_LONG).show();
-					findViewById(R.id.lblWin).setVisibility(View.VISIBLE);
+							Toast.LENGTH_LONG).show(); // show completion text
+					findViewById(R.id.lblWin).setVisibility(View.VISIBLE); // load and animate completed climbing test
 					findViewById(R.id.lblWin).startAnimation(AnimationUtils.loadAnimation(getApplicationContext(), R.anim.blink));
 					findViewById(R.id.btnStartClimbing).setEnabled(false);
 				}
 			}
-			((TextView) findViewById(R.id.lblClassifierOutput)).setText(result);
+			((TextView) findViewById(R.id.lblClassifierOutput)).setText(result); // debug: show currently detected classifier output
 		}
 	}
 
+	/**
+	 * Handles sampling rate detector service intents (STAIR/NON_STAIR)
+	 *
+	 */
 	public class SamplingRateDetectorReceiver extends BroadcastReceiver {
 		@Override
 		public void onReceive(Context context, Intent intent) {
-			detectedSamplingRate = intent.getExtras().getDouble(AccelerometerSamplingRateDetect.SAMPLING_RATE);
-			samplingDelay = backgroundSamplingRateDetector.getExtras().getInt(SAMPLING_DELAY);
+			detectedSamplingRate = intent.getExtras().getDouble(AccelerometerSamplingRateDetect.SAMPLING_RATE); // get detected sampling rate from received intent
+			samplingDelay = backgroundSamplingRateDetector.getExtras().getInt(SAMPLING_DELAY); // get used sampling delay from received intent
 			Log.i(MainActivity.AppName, "Detected sampling rate: " + Double.toString(detectedSamplingRate) + "Hz");
 			if (detectedSamplingRate >= minimumSamplingRate) { // sampling rate high enough
-				SharedPreferences.Editor editor = PreferenceManager.getDefaultSharedPreferences(getApplicationContext()).edit();
+				SharedPreferences.Editor editor = PreferenceManager.getDefaultSharedPreferences(getApplicationContext()).edit(); // get refence to android preferences
 				editor.putFloat("detectedSamplingRate", (float) detectedSamplingRate); // store detected sampling rate
 				editor.putInt("sensor_delay", samplingDelay); // store used sampling delay
-				editor.apply();
+				editor.apply(); // commit preferences
 				Log.i(MainActivity.AppName, "Stored detected sampling rate of " + detectedSamplingRate + "Hz");
 				Log.i(MainActivity.AppName, "Stored sampling delay of " + samplingDelay);
-				stopService(backgroundSamplingRateDetector);
-				unregisterReceiver(this);
-				setupByDetectedSamplingRate();
+				stopService(backgroundSamplingRateDetector); // stop sampling rate detector service
+				unregisterReceiver(this); // unregister listener
+				setupByDetectedSamplingRate(); // setup app with detected sampling rate
 			} else { // sampling rate not high enough: try to decrease the sampling delay
-				if (backgroundSamplingRateDetector.getExtras().getInt(ClimbActivity.SAMPLING_DELAY) != SensorManager.SENSOR_DELAY_GAME) {
-					Log.w(MainActivity.AppName, "Sampling rate not high enough: trying decreasing the sampling delay");
-					stopService(backgroundSamplingRateDetector);
-					backgroundSamplingRateDetector.putExtra(SAMPLING_DELAY, SensorManager.SENSOR_DELAY_GAME);
-					startService(backgroundSamplingRateDetector);
+				if (backgroundSamplingRateDetector.getExtras().getInt(ClimbActivity.SAMPLING_DELAY) != SensorManager.SENSOR_DELAY_GAME) { // decrease sampling delay in order to increase sampling rate
+					Log.w(MainActivity.AppName, "Sampling rate not high enough: trying to decrease the sampling delay");
+					stopService(backgroundSamplingRateDetector); // stop previous sampling rate detector service
+					backgroundSamplingRateDetector.putExtra(SAMPLING_DELAY, SensorManager.SENSOR_DELAY_GAME); // set new sampling delay (lower than the previous one)
+					startService(backgroundSamplingRateDetector); // start new sampling rate detector service
 				} else { // unable to determine a sampling rate high enough for our purposes: stop
 					Log.e(MainActivity.AppName, "Sampling rate not high enough for this application");
-					unregisterReceiver(this);
-					stopService(backgroundSamplingRateDetector);
+					unregisterReceiver(this); // unregister listener
+					stopService(backgroundSamplingRateDetector); // stop sampling rate detector service
 					((TextView) findViewById(R.id.lblSamplingRateDetected)).setText("TOO LOW: " + (int) detectedSamplingRate + " Hz");
 					AlertDialog.Builder alert = new AlertDialog.Builder(getApplicationContext());
 					alert.setTitle("Sampling rate not high enough");
@@ -156,11 +162,18 @@ public class ClimbActivity extends Activity {
 		}
 	}
 
+	/**
+	 * Update the stat panel
+	 */
 	private void updateStats() {
 		((TextView) findViewById(R.id.lblNumSteps)).setText(Integer.toString(num_steps) + " of " + Integer.toString(building.getSteps()) + " ("
 				+ (new DecimalFormat("#.##")).format(percentage * 100.00) + "%)");
 	}
 
+
+	/**
+	 * Setup the activity with a given sampling rate and sampling delay
+	 */
 	private void setupByDetectedSamplingRate() {
 		backgroundClassifySampler.putExtra(AccelerometerSamplingRateDetect.SAMPLING_RATE, detectedSamplingRate);
 		backgroundClassifySampler.putExtra(SAMPLING_DELAY, samplingDelay);
@@ -228,7 +241,7 @@ public class ClimbActivity extends Activity {
 		// while interacting with the UI.
 		findViewById(R.id.btnStartClimbing).setOnTouchListener(mDelayHideTouchListener);
 		// app-specific logic
-		seekbarIndicator = (VerticalSeekBar) findViewById(R.id.seekBarPosition);
+		seekbarIndicator = (VerticalSeekBar) findViewById(R.id.seekBarPosition); // get reference to vertical seekbar (only once for performance-related reasons)
 		seekbarIndicator.setOnSeekBarChangeListener(new OnSeekBarChangeListener() {
 			@Override
 			public void onStopTrackingTouch(SeekBar seekBar) {
@@ -245,49 +258,49 @@ public class ClimbActivity extends Activity {
 				// TODO Auto-generated method stub
 			}
 		});
-		int building_id = getIntent().getIntExtra(MainActivity.building_intent_object, 0);
+		int building_id = getIntent().getIntExtra(MainActivity.building_intent_object, 0); // get building id from received intent
 		try {
 			// get building ID from intent
-			if (building_id == 0) throw new Exception("ERROR: unable to get intent data");
-			building = MainActivity.buildingDao.queryForId(building_id);
+			if (building_id == 0) throw new Exception("ERROR: unable to get intent data"); // no building id found in received intent
+			building = MainActivity.buildingDao.queryForId(building_id); // query db to get asked building
 			setup_from_building(); // load building info
-			// setup background classifier
 			backgroundClassifySampler = new Intent(this, SamplingClassifyService.class); // instance (without starting) background classifier
 			// check for pre-detected sampling rate
-			SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
-			detectedSamplingRate = settings.getFloat("detectedSamplingRate", 0.00f);
-			samplingDelay = settings.getInt("sensor_delay", -1);
+			SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(getApplicationContext()); // reference to android preferences
+			detectedSamplingRate = settings.getFloat("detectedSamplingRate", 0.00f); // load previously detected sampling rate
+			samplingDelay = settings.getInt("sensor_delay", -1); // load previously detected sampling delay
 			Log.i(MainActivity.AppName, "Previous detected sampling rate of " + Double.toString(detectedSamplingRate) + "Hz");
 			// sampling rate not detected or lower than the minimum one
 			if (samplingDelay == -1 || detectedSamplingRate < minimumSamplingRate) { // start sampling rate detector
 				Log.w(MainActivity.AppName, "Sampling rate not previously detected or too low. Detecting a new one");
 				backgroundSamplingRateDetector = new Intent(this, SamplingRateDetectorService.class); // instance (without starting) background sampling rate detected
-				backgroundSamplingRateDetector.putExtra(SAMPLING_DELAY, SensorManager.SENSOR_DELAY_NORMAL);
-				registerReceiver(sampleRateDetectorReceiver, samplingRateDetectorFilter);
+				backgroundSamplingRateDetector.putExtra(SAMPLING_DELAY, SensorManager.SENSOR_DELAY_NORMAL); // set default sampling delay
+				registerReceiver(sampleRateDetectorReceiver, samplingRateDetectorFilter); // register listener for background sampling rate detector
 				startService(backgroundSamplingRateDetector); // start background service
 			} else {
 				Log.i(MainActivity.AppName, "Using the previously detected sampling rate");
-				setupByDetectedSamplingRate();
+				setupByDetectedSamplingRate(); // setup activity with given sampling rate
 			}
 		} catch (Exception e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
 
-	private void setup_from_building() {
-		// get building photo photo resource
-		int imageId = getApplicationContext().getResources().getIdentifier(building.getPhoto(), "drawable", getApplicationContext().getPackageName());
+	/**
+	 * Setup view with a given building and create/load an associated climbing
+	 */
+	private void setup_from_building() {	
+		int imageId = getApplicationContext().getResources().getIdentifier(building.getPhoto(), "drawable", getApplicationContext().getPackageName()); // get building's photo resource ID
 		if (imageId > 0) ((ImageView) findViewById(R.id.buildingPhoto)).setImageResource(imageId);
 		// set building info
-		((TextView) findViewById(R.id.lblBuildingName)).setText(building.getName() + " (" + building.getLocation() + ")");
-		((TextView) findViewById(R.id.lblNumSteps)).setText(Integer.toString(building.getSteps()) + " steps");
-		((TextView) findViewById(R.id.lblHeight)).setText(Integer.toString(building.getHeight()) + "mt");
-		try { // get previous climbing
+		((TextView) findViewById(R.id.lblBuildingName)).setText(building.getName() + " (" + building.getLocation() + ")"); // building's location
+		((TextView) findViewById(R.id.lblNumSteps)).setText(Integer.toString(building.getSteps()) + " steps"); // building's steps
+		((TextView) findViewById(R.id.lblHeight)).setText(Integer.toString(building.getHeight()) + "mt"); // building's height (in mt)
+		try { // get previous climbing for this building
 			loadPreviousClimbing();
 		} catch (ClimbingNotFound e) {
 			Log.i(MainActivity.AppName, "No previous climbing found");
-			climbing = new Climbing();
+			climbing = new Climbing(); // create a new empty climbing for this building
 			climbing.setBuilding(building);
 			climbing.setCompleted(0);
 			climbing.setCompleted_steps(0);
@@ -304,16 +317,21 @@ public class ClimbActivity extends Activity {
 		findViewById(R.id.lblReadyToClimb).startAnimation(anim);
 	}
 
+	/**
+	 * Check (and load) if a climbing exists for the given building
+	 * 
+	 * @throws ClimbingNotFound
+	 */
 	private void loadPreviousClimbing() throws ClimbingNotFound {
 		climbing = MainActivity.getClimbingForBuilding(building.get_id());
-		if (climbing == null) throw new ClimbingNotFound();
+		if (climbing == null) throw new ClimbingNotFound(); // no climbing found
 		num_steps = climbing.getCompleted_steps();
 		percentage = climbing.getPercentage();
 		seekbarIndicator.setMax(building.getSteps());
 		seekbarIndicator.setProgress(climbing.getCompleted_steps());
 		updateStats();
 		Log.i(MainActivity.AppName, "Loaded existing climbing (#" + climbing.get_id() + ")");
-		if (percentage >= 100) {
+		if (percentage >= 100) { // building already climbed
 			findViewById(R.id.btnStartClimbing).setVisibility(View.INVISIBLE);
 			SimpleDateFormat sdf = new SimpleDateFormat("yyyy.MM.dd");
 			((TextView) findViewById(R.id.lblReadyToClimb)).setText("ALREADY CLIMBED ON " + sdf.format(new Date(climbing.getCompleted())));
@@ -387,18 +405,27 @@ public class ClimbActivity extends Activity {
 		mHideHandler.postDelayed(mHideRunnable, delayMillis);
 	}
 
+	
+	/**
+	 * onClick listener for starting/stopping classifier
+	 * 
+	 * @param v
+	 */
 	public void onBtnStartClimbing(View v) {
-		if (detectedSamplingRate == 0 || detectedSamplingRate < minimumSamplingRate) {
+		if (detectedSamplingRate == 0 || detectedSamplingRate < minimumSamplingRate) { // sampling rate detection still in progress
 			Toast.makeText(getApplicationContext(), "Accelerometer calibration is not ready yet. Please wait", Toast.LENGTH_SHORT).show();
 			return;
 		}
-		if (samplingEnabled) {
+		if (samplingEnabled) { // if sampling is enabled stop the classifier
 			stopClassify();
-		} else {
+		} else {  // if sampling is not enabled stop the classifier
 			startClassifyService();
 		}
 	}
 
+	/**
+	 * Make sure that all background services are stopped
+	 */
 	private void stopAllServices() {
 		try {
 			unregisterReceiver(sampleRateDetectorReceiver);
@@ -414,45 +441,50 @@ public class ClimbActivity extends Activity {
 		}
 	}
 
+	/**
+	 * Stop background classifier service
+	 */
 	public void stopClassify() {
-		stopService(backgroundClassifySampler); // stop background server
+		stopService(backgroundClassifySampler); // stop background service
 		samplingEnabled = false;
-		unregisterReceiver(classifierReceiver);
+		unregisterReceiver(classifierReceiver); // unregister listener
 		// update db
-		climbing.setModified(new Date().getTime());
-		climbing.setCompleted_steps(num_steps);
-		climbing.setPercentage(percentage);
-		climbing.setRemaining_steps(building.getSteps() - num_steps);
-		MainActivity.climbingDao.update(climbing);
+		climbing.setModified(new Date().getTime()); // update climbing last edit date
+		climbing.setCompleted_steps(num_steps); // update completed steps
+		climbing.setPercentage(percentage); // update progress percentage
+		climbing.setRemaining_steps(building.getSteps() - num_steps); // update remaining steps
+		MainActivity.climbingDao.update(climbing); // save to db
 		Log.i(MainActivity.AppName, "Updated climbing #" + climbing.get_id());
-		samplingEnabled = false;
-		((ImageButton) findViewById(R.id.btnStartClimbing)).setImageResource(R.drawable.av_play);
-		findViewById(R.id.progressBarClimbing).startAnimation(AnimationUtils.loadAnimation(getApplicationContext(), R.anim.abc_fade_out));
+		((ImageButton) findViewById(R.id.btnStartClimbing)).setImageResource(R.drawable.av_play); // set button icon to play again
+		findViewById(R.id.progressBarClimbing).startAnimation(AnimationUtils.loadAnimation(getApplicationContext(), R.anim.abc_fade_out)); // hide  progress bar
 		findViewById(R.id.progressBarClimbing).setVisibility(View.INVISIBLE);
 	}
 
+	/**
+	 * Start background classifier service
+	 */
 	public void startClassifyService() {
-		SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
-		int difficulty = Integer.parseInt(settings.getString("difficulty", "10"));
-		switch (difficulty) {
+		SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(getApplicationContext()); // get reference to android preferences
+		int difficulty = Integer.parseInt(settings.getString("difficulty", "10")); // get difficulty from preferences
+		switch (difficulty) { // set several parameters related to difficulty
 			case 100: // easy
 				Log.i(MainActivity.AppName, "Selected difficulty: EASY");
-				vstep_for_rstep=100;
+				vstep_for_rstep = 100;
 				break;
 			case 1: // hard
 				Log.i(MainActivity.AppName, "Selected difficulty: HARD");
-				vstep_for_rstep=1;
+				vstep_for_rstep = 1;
 				break;
 			default: // normal and default
 				Log.i(MainActivity.AppName, "Selected difficulty: NORMAL");
-				vstep_for_rstep=10;
+				vstep_for_rstep = 10;
 				break;
 		}
 		Log.i(MainActivity.AppName, "Using " + vstep_for_rstep + " steps for each real step");
 		startService(backgroundClassifySampler); // start background service
-		registerReceiver(classifierReceiver, classifierFilter);
+		registerReceiver(classifierReceiver, classifierFilter); // register listener
 		samplingEnabled = true;
-		((ImageButton) findViewById(R.id.btnStartClimbing)).setImageResource(R.drawable.av_pause);
+		((ImageButton) findViewById(R.id.btnStartClimbing)).setImageResource(R.drawable.av_pause); // set button image to stop service
 		findViewById(R.id.lblReadyToClimb).setVisibility(View.GONE);
 		findViewById(R.id.progressBarClimbing).startAnimation(AnimationUtils.loadAnimation(getApplicationContext(), R.anim.abc_fade_in));
 		findViewById(R.id.progressBarClimbing).setVisibility(View.VISIBLE);
@@ -473,14 +505,15 @@ public class ClimbActivity extends Activity {
 	@Override
 	protected void onDestroy() {
 		Log.i(MainActivity.AppName, "onDestroy");
-		stopAllServices();
+		stopAllServices(); // make sure to stop all background services
 		super.onDestroy();
 	}
 
 	@Override
 	public void onBackPressed() {
 		if (samplingEnabled == false) super.onBackPressed();
-		else
-			Toast.makeText(getApplicationContext(), "Sampling running - Stop it before exiting", Toast.LENGTH_SHORT).show();
+		else { // disable back button if sampling is enabled
+			Toast.makeText(getApplicationContext(), "Sampling running - Stop it before exiting", Toast.LENGTH_SHORT).show();			
+		}
 	}
 }

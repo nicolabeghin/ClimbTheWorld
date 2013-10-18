@@ -10,6 +10,10 @@ import android.widget.TextView;
 
 import com.fima.cardsui.objects.Card;
 
+/**
+ * CardsUI card for a single tour
+ *
+ */
 public class TourCard extends Card {
 	final Tour	tour;
 

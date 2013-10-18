@@ -7,6 +7,8 @@ import android.util.Log;
 import android.view.MotionEvent;
 
 /**
+ * Custom android widget: vertical seekbar
+ * 
  * @url https://github.com/AndroSelva/Vertical-SeekBar-Android/
  *
  */

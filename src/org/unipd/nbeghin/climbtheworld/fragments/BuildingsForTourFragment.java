@@ -17,6 +17,10 @@ import android.view.ViewGroup;
 
 import com.fima.cardsui.views.CardUI;
 
+/**
+ * Show a list of buildings for a given tour
+ *
+ */
 public class BuildingsForTourFragment extends Fragment {
 	public static final String	building_intent_object	= "org.unipd.nbeghin.climbtheworld.intents.object.building";
 	public CardUI				buildingCards;
@@ -28,7 +32,7 @@ public class BuildingsForTourFragment extends Fragment {
 			BuildingForTourCard buildingCard = new BuildingForTourCard(building, i);
 			buildingCard.setOnClickListener(new OnClickListener() {
 				@Override
-				public void onClick(View v) {
+				public void onClick(View v) { // start climbing for a given building
 					Intent intent = new Intent(getActivity().getApplicationContext(), ClimbActivity.class);
 					intent.putExtra(building_intent_object, building.get_id());
 					startActivity(intent);

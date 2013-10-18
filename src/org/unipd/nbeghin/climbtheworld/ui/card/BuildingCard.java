@@ -17,6 +17,10 @@ import android.widget.TextView;
 
 import com.fima.cardsui.objects.Card;
 
+/**
+ * CardsUI card for a single building
+ *
+ */
 public class BuildingCard extends Card {
 	final Building	building;
 

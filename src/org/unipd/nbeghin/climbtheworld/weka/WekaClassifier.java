@@ -1,8 +1,18 @@
 package org.unipd.nbeghin.climbtheworld.weka;
 
+/**
+ * J48 classifier
+ * NB: extracted from Weka model
+ *
+ */
 public class WekaClassifier {
 	private static String[]	classifications	= new String[] { "NONSTAIR", "STAIR" };
 
+	/**
+	 * @param i Classifier numeric output
+	 * @return String A string explicitly stating the classifier output
+	 * @throws Exception
+	 */
 	public static String explicit_classify(Object[] i) throws Exception {
 		return classifications[(int) classify(i)];
 	}

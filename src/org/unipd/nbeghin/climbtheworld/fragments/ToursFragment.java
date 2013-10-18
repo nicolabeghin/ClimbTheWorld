@@ -17,6 +17,10 @@ import android.view.ViewGroup;
 
 import com.fima.cardsui.views.CardUI;
 
+/**
+ * Show a list of tours
+ *
+ */
 public class ToursFragment extends Fragment {
 	public static final String	tour_intent_object	= "org.unipd.nbeghin.climbtheworld.intents.object.tour";
 	public CardUI				toursCards;

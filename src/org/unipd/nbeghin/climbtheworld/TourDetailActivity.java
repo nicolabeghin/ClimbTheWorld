@@ -22,30 +22,33 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 
+/**
+ * List all buildings associated to a given tour
+ *
+ */
 public class TourDetailActivity extends FragmentActivity {
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		int tour_id=getIntent().getIntExtra(ToursFragment.tour_intent_object, 0);
+		int tour_id=getIntent().getIntExtra(ToursFragment.tour_intent_object, 0); // get tour id from received intent
 		setContentView(R.layout.activity_tour_detail);
 
 		if (tour_id>0) {
 			Log.i(MainActivity.AppName, "Loading buildings for tour "+tour_id);
 			Map<String, Object> conditions=new HashMap<String, Object> ();
 			conditions.put("tour_id", tour_id);
-			List<BuildingTour> buildingTours=MainActivity.buildingTourDao.queryForFieldValuesArgs(conditions);
+			List<BuildingTour> buildingTours=MainActivity.buildingTourDao.queryForFieldValuesArgs(conditions); // get all buildings associated to a tour
 			Log.i(MainActivity.AppName, "Detected "+buildingTours.size()+" building for tour #"+tour_id);
-			Collections.sort(buildingTours, new BuildingTourComparator());
-			BuildingsForTourFragment fragment=(BuildingsForTourFragment) getSupportFragmentManager().findFragmentById(R.id.fragmentBuildingsForTour);
+			Collections.sort(buildingTours, new BuildingTourComparator()); // sort by building order
+			BuildingsForTourFragment fragment=(BuildingsForTourFragment) getSupportFragmentManager().findFragmentById(R.id.fragmentBuildingsForTour); // load fragment
 			List<Building> buildings=new ArrayList<Building>();
 			for(BuildingTour buildingTour: buildingTours) {
 				buildings.add(buildingTour.getBuilding());
 			}
-			fragment.loadBuildings(buildings);
+			fragment.loadBuildings(buildings); // set buildings for fragment
 		} else {
 			Log.e(MainActivity.AppName, "No tour ID detected");
 		}
-		// ((TextView) findViewById(R.id.tourTitle)).setText(tour.getTitle());
 	}
 
 	/**

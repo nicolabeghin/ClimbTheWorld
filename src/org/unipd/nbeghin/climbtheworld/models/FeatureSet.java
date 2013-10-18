@@ -3,6 +3,10 @@ package org.unipd.nbeghin.climbtheworld.models;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 
+/**
+ * A set of calculated features
+ *
+ */
 public class FeatureSet {
 	private String	title	= "";
 	private double	mean;

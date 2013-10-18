@@ -7,6 +7,7 @@ import com.j256.ormlite.table.DatabaseTable;
 
 @DatabaseTable(tableName = "buildings")
 public class Building implements Serializable {
+	private static final long	serialVersionUID	= 1L;
 	@DatabaseField(generatedId = true)
 	private int				_id;
 	@DatabaseField
