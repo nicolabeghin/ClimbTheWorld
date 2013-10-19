@@ -33,7 +33,7 @@ public class BuildingCard extends Card {
 	public View getCardContent(Context context) {
 		View view = LayoutInflater.from(context).inflate(R.layout.card_building_ex, null);
 		((TextView) view.findViewById(R.id.title)).setText(building.getName());
-		int imageId = context.getResources().getIdentifier(building.getPhoto(), "drawable", context.getPackageName());
+		int imageId = MainActivity.getBuildingImageResource(building);
 		if (imageId > 0) ((ImageView) view.findViewById(R.id.photo)).setImageResource(imageId);
 		((TextView) view.findViewById(R.id.buildingStat)).setText(building.getSteps() + " steps (" + building.getHeight() + "m)");
 		((TextView) view.findViewById(R.id.location)).setText(building.getLocation());

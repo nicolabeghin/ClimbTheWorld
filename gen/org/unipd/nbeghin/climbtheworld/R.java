@@ -1427,7 +1427,7 @@ containing a value of this type.
     }
     public static final class id {
         public static final int PositionWrapper=0x7f060056;
-        public static final int ScrollView1=0x7f060074;
+        public static final int ScrollView1=0x7f060076;
         public static final int StatusPanel=0x7f060058;
         public static final int StatusPanelWrapper=0x7f06005e;
         public static final int action_bar=0x7f06002b;
@@ -1443,8 +1443,8 @@ containing a value of this type.
         public static final int action_mode_bar=0x7f060040;
         public static final int action_mode_bar_stub=0x7f06003f;
         public static final int action_mode_close_button=0x7f060033;
-        public static final int action_search=0x7f06007f;
-        public static final int action_settings=0x7f060082;
+        public static final int action_search=0x7f060081;
+        public static final int action_settings=0x7f060084;
         public static final int activity_chooser_view_content=0x7f060034;
         public static final int alignBounds=0x7f060002;
         public static final int alignMargins=0x7f060003;
@@ -1455,10 +1455,11 @@ containing a value of this type.
         public static final int btnStartClimbing=0x7f060060;
         public static final int buildingPhoto=0x7f060053;
         public static final int buildingStat=0x7f06006b;
-        public static final int cardContent=0x7f06007b;
+        public static final int buildingsForTourPhotoList=0x7f060073;
+        public static final int cardContent=0x7f06007d;
         public static final int cardLayout=0x7f06006f;
-        public static final int cardsBuildings=0x7f060076;
-        public static final int cardsTours=0x7f060078;
+        public static final int cardsBuildings=0x7f060078;
+        public static final int cardsTours=0x7f06007a;
         public static final int center=0x7f06000c;
         public static final int center_horizontal=0x7f06000a;
         public static final int center_vertical=0x7f060008;
@@ -1484,12 +1485,13 @@ containing a value of this type.
         public static final int home=0x7f060025;
         public static final int homeAsUp=0x7f060017;
         public static final int horizontal=0x7f060000;
+        public static final int horizontalScrollView1=0x7f060072;
         public static final int icon=0x7f060039;
         public static final int ifRoom=0x7f06001c;
         public static final int image=0x7f060036;
         public static final int imageView1=0x7f060067;
-        public static final int itemProfile=0x7f060080;
-        public static final int itemSettings=0x7f060081;
+        public static final int itemProfile=0x7f060082;
+        public static final int itemSettings=0x7f060083;
         public static final int lblBuildingName=0x7f060061;
         public static final int lblClassifierOutput=0x7f06005c;
         public static final int lblHeight=0x7f06005a;
@@ -1502,7 +1504,7 @@ containing a value of this type.
         public static final int linearLayout1=0x7f060066;
         public static final int listMode=0x7f060013;
         public static final int listStatistics=0x7f060068;
-        public static final int listView=0x7f060072;
+        public static final int listView=0x7f060074;
         public static final int list_item=0x7f060038;
         public static final int loading=0x7f060065;
         public static final int location=0x7f06006a;
@@ -1514,7 +1516,7 @@ containing a value of this type.
         public static final int pager=0x7f060064;
         public static final int photo=0x7f06006c;
         public static final int photoGallery=0x7f060063;
-        public static final int placeholder=0x7f060079;
+        public static final int placeholder=0x7f06007b;
         public static final int progressBarClimbing=0x7f060059;
         public static final int progress_circular=0x7f060045;
         public static final int progress_horizontal=0x7f060046;
@@ -1538,21 +1540,21 @@ containing a value of this type.
         public static final int showHome=0x7f060016;
         public static final int showTitle=0x7f060018;
         public static final int split_action_bar=0x7f06002d;
-        public static final int stackContainer=0x7f06007d;
-        public static final int stackTitle=0x7f06007c;
+        public static final int stackContainer=0x7f06007f;
+        public static final int stackTitle=0x7f06007e;
         public static final int start=0x7f060010;
-        public static final int sticky=0x7f060073;
+        public static final int sticky=0x7f060075;
         public static final int submit_area=0x7f060050;
         public static final int tabMode=0x7f060014;
-        public static final int tableLayout=0x7f060075;
-        public static final int testo1=0x7f06007e;
-        public static final int textView2=0x7f06007a;
+        public static final int tableLayout=0x7f060077;
+        public static final int testo1=0x7f060080;
+        public static final int textView2=0x7f06007c;
         public static final int title=0x7f06003a;
         public static final int title_container=0x7f060041;
         public static final int top=0x7f060004;
         public static final int top_action_bar=0x7f06002f;
         public static final int tourOrder=0x7f060070;
-        public static final int tourTitle=0x7f060077;
+        public static final int tourTitle=0x7f060079;
         public static final int up=0x7f060030;
         public static final int useLogo=0x7f060015;
         public static final int vertical=0x7f060001;

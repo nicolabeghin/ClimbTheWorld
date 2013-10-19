@@ -1,5 +1,6 @@
 package org.unipd.nbeghin.climbtheworld;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -29,6 +30,7 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.ImageView;
 
 import com.j256.ormlite.dao.RuntimeExceptionDao;
 
@@ -155,6 +157,25 @@ public class MainActivity extends ActionBarActivity {
 		Intent intent = new Intent(sContext, GalleryActivity.class);
 		intent.putExtra("building_id", 1);
 		startActivity(intent);
+	}
+	
+	public static List<BuildingTour> getBuildingsForTour(int tour_id) {
+		Map<String, Object> conditions=new HashMap<String, Object> ();
+		conditions.put("tour_id", tour_id);
+		return buildingTourDao.queryForFieldValuesArgs(conditions); // get all buildings associated to a tour
+	}
+	
+	public static int getBuildingImageResource(Building building) {
+		return getContext().getResources().getIdentifier(building.getPhoto(), "drawable", getContext().getPackageName());
+	}
+	
+	public static List<Integer> getBuildingPhotosForTour(int tour_id) {
+		List<Integer> images=new ArrayList<Integer>();
+		List<BuildingTour> buildingsTour=getBuildingsForTour(tour_id);
+		for(BuildingTour buildingTour: buildingsTour) {
+			images.add(getBuildingImageResource(buildingTour.getBuilding()));
+		}
+		return images;
 	}
 
 	@Override
