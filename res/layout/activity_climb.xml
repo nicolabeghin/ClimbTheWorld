@@ -145,6 +145,17 @@
             android:text="Building name (location)"
             android:textColor="#fff"
             android:textSize="18sp" />
+
+        <Button
+            android:id="@+id/btnAccessPhotoGallery"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginTop="40dp"
+            android:visibility="invisible"
+            android:onClick="accessPhotoGallery"
+            android:text="Access gallery" />
+
     </FrameLayout>
 
 </FrameLayout>

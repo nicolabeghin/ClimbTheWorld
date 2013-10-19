@@ -116,6 +116,7 @@ public class ClimbActivity extends Activity {
 					findViewById(R.id.lblWin).setVisibility(View.VISIBLE); // load and animate completed climbing test
 					findViewById(R.id.lblWin).startAnimation(AnimationUtils.loadAnimation(getApplicationContext(), R.anim.blink));
 					findViewById(R.id.btnStartClimbing).setEnabled(false);
+					findViewById(R.id.btnAccessPhotoGallery).setVisibility(View.VISIBLE);
 				}
 			}
 			((TextView) findViewById(R.id.lblClassifierOutput)).setText(result); // debug: show currently detected classifier output
@@ -162,6 +163,12 @@ public class ClimbActivity extends Activity {
 		}
 	}
 
+	public void accessPhotoGallery(View v) {
+		Intent intent = new Intent(this, GalleryActivity.class);
+		intent.putExtra("building_id", building.get_id());
+		startActivity(intent);
+	}
+	
 	/**
 	 * Update the stat panel
 	 */
@@ -453,6 +460,7 @@ public class ClimbActivity extends Activity {
 		climbing.setCompleted_steps(num_steps); // update completed steps
 		climbing.setPercentage(percentage); // update progress percentage
 		climbing.setRemaining_steps(building.getSteps() - num_steps); // update remaining steps
+		if (percentage>=100) climbing.setCompleted(new Date().getTime());
 		MainActivity.climbingDao.update(climbing); // save to db
 		Log.i(MainActivity.AppName, "Updated climbing #" + climbing.get_id());
 		((ImageButton) findViewById(R.id.btnStartClimbing)).setImageResource(R.drawable.av_play); // set button icon to play again

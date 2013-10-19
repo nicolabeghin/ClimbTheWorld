@@ -1,4 +1,4 @@
-package org.unipd.nbeghin.climbtheworld.util;
+package org.unipd.nbeghin.climbtheworld.adapters;
 
 import java.util.List;
 
