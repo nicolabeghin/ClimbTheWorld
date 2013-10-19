@@ -106,7 +106,7 @@ public class ClimbActivity extends Activity {
 				boolean win = (num_steps >= building.getSteps()); // user wins?
 				if (win) {
 					num_steps = building.getSteps(); // ensure it did not exceed the number of steps (when multiple steps-at-once are detected)
-					percentage = 100.00;
+					percentage = 1.00;
 				}
 				updateStats(); // update the view of current stats
 				if (win) {
@@ -338,10 +338,11 @@ public class ClimbActivity extends Activity {
 		seekbarIndicator.setProgress(climbing.getCompleted_steps());
 		updateStats();
 		Log.i(MainActivity.AppName, "Loaded existing climbing (#" + climbing.get_id() + ")");
-		if (percentage >= 100) { // building already climbed
+		if (percentage >= 1.00) { // building already climbed
 			findViewById(R.id.btnStartClimbing).setVisibility(View.INVISIBLE);
 			SimpleDateFormat sdf = new SimpleDateFormat("yyyy.MM.dd");
 			((TextView) findViewById(R.id.lblReadyToClimb)).setText("ALREADY CLIMBED ON " + sdf.format(new Date(climbing.getCompleted())));
+			findViewById(R.id.btnAccessPhotoGallery).setVisibility(View.VISIBLE);
 		}
 	}
 

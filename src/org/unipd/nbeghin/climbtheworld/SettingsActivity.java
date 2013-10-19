@@ -92,8 +92,8 @@ public class SettingsActivity extends PreferenceActivity {
 		// to reflect the new value, per the Android Design guidelines.
 		bindPreferenceSummaryToValue(findPreference("profile_name"));
 //		bindPreferenceSummaryToValue(findPreference("vstep_for_rstep"));
-		bindPreferenceSummaryToValue(findPreference("userWeight"));
-		bindPreferenceSummaryToValue(findPreference("userHeight"));
+//		bindPreferenceSummaryToValue(findPreference("userWeight"));
+//		bindPreferenceSummaryToValue(findPreference("userHeight"));
 //		bindPreferenceSummaryToValue(findPreference("stepHeight"));	
 		bindPreferenceSummaryToValue(findPreference("difficulty"));
 //		float detectedSamplingRate=PreferenceManager.getDefaultSharedPreferences(getApplicationContext()).getFloat("detectedSamplingRate", 0.0f);

@@ -45,7 +45,7 @@ public class BuildingCard extends Card {
 			if (climbing.getPercentage() >= 100) {
 				climbingStatus.setText("Climbing: COMPLETED! (on "+sdf.format(new Date(climbing.getModified()))+")");
 			} else {
-				climbingStatus.setText("Climbing status: " + new DecimalFormat("#.##").format(climbing.getPercentage()*100) + "%, (last climb on "+sdf.format(new Date(climbing.getModified()))+")");
+				climbingStatus.setText("Climbing status: " + new DecimalFormat("#.##").format(climbing.getPercentage()*100) + "% (last attempt @ "+sdf.format(new Date(climbing.getModified()))+")");
 			}
 		} else {
 			climbingStatus.setText("Not climbed yet");

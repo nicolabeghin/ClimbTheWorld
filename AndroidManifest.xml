@@ -79,6 +79,14 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="org.unipd.nbeghin.climbtheworld.ClimbActivity" />
         </activity>
+                <activity
+            android:name="org.unipd.nbeghin.climbtheworld.PhotoPagerActivity"
+            android:label="@string/title_activity_photo_pager_activity"
+            android:parentActivityName="org.unipd.nbeghin.climbtheworld.GalleryActivity" >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="org.unipd.nbeghin.climbtheworld.GalleryActivity" />
+        </activity>
     </application>
 
 </manifest>

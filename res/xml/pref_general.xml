@@ -14,25 +14,25 @@
         android:singleLine="true"
         android:title="Profile" />
 
-    <PreferenceCategory android:title="User settings" >
-    </PreferenceCategory>
+<!--     <PreferenceCategory android:title="User settings" > -->
+<!--     </PreferenceCategory> -->
 
-    <EditTextPreference
-        android:dialogMessage="Please enter your height (in cm)"
-        android:dialogTitle="Your height"
-        android:key="userHeight"
-        android:maxLines="1"
-        android:numeric="integer"
-        android:summary="Your height (in cm)"
-        android:title="Your height" android:defaultValue="190"/>
-    <EditTextPreference
-        android:dialogMessage="Please enter your weight (in kg)"
-        android:dialogTitle="Your weight"
-        android:key="userWeight"
-        android:maxLines="1"
-        android:numeric="integer"
-        android:summary="Your weight (in kg)"
-        android:title="Your weight" android:defaultValue="80"/>
+<!--     <EditTextPreference -->
+<!--         android:dialogMessage="Please enter your height (in cm)" -->
+<!--         android:dialogTitle="Your height" -->
+<!--         android:key="userHeight" -->
+<!--         android:maxLines="1" -->
+<!--         android:numeric="integer" -->
+<!--         android:summary="Your height (in cm)" -->
+<!--         android:title="Your height" android:defaultValue="190"/> -->
+<!--     <EditTextPreference -->
+<!--         android:dialogMessage="Please enter your weight (in kg)" -->
+<!--         android:dialogTitle="Your weight" -->
+<!--         android:key="userWeight" -->
+<!--         android:maxLines="1" -->
+<!--         android:numeric="integer" -->
+<!--         android:summary="Your weight (in kg)" -->
+<!--         android:title="Your weight" android:defaultValue="80"/> -->
 
     <PreferenceCategory android:title="Climbing settings" >
     </PreferenceCategory>

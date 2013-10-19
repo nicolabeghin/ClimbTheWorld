@@ -1,16 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <string name="app_name">ClimbTheWorld</string>
+    <string name="app_name">Climb The World</string>
     <string name="action_settings">Settings</string>
-    <string name="hello_world">Hello world!</string>
-    <string name="ns_menu_open">Navigation Drawer Open Menu</string>
-    <string name="ns_menu_close">Navigation Drawer</string>
-    <string name="title_activity_climb">ClimbActivity</string>
+    <string name="title_activity_climb">Climb the building!</string>
     <string name="dummy_button">Dummy Button</string>
     <string name="dummy_content">DUMMY\nCONTENT</string>
-    <string name="title_activity_profile">ProfileActivity</string>
-    <string name="title_activity_tour_detail">TourDetailActivity</string>
-    <string name="title_activity_gallery">GalleryActivity</string>
+    <string name="title_activity_profile">Your profile</string>
+    <string name="title_activity_tour_detail">Tour detail</string>
+    <string name="title_activity_gallery">Gallery</string>
+    <string name="title_activity_photo_pager_activity">Gallery</string>
 
 </resources>
