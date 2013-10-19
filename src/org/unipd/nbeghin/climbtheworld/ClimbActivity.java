@@ -31,6 +31,7 @@ import android.util.Log;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.View.OnTouchListener;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.ImageButton;
@@ -64,7 +65,7 @@ public class ClimbActivity extends Activity {
 	private Building				building;																								// current building
 	private Climbing				climbing;																								// current climbing
 	private VerticalSeekBar			seekbarIndicator;																						// reference to vertical seekbar
-	private int						vstep_for_rstep				= 1; // number of virtual step for each real step
+	private int						vstep_for_rstep				= 1;																		// number of virtual step for each real step
 	/**
 	 * Whether or not the system UI should be auto-hidden after {@link #AUTO_HIDE_DELAY_MILLIS} milliseconds.
 	 */
@@ -86,14 +87,12 @@ public class ClimbActivity extends Activity {
 	 */
 	private SystemUiHider			mSystemUiHider;
 
-//	public static double getDetectedSamplingRate() {
-//		return detectedSamplingRate;
-//	}
-
-	
+	// public static double getDetectedSamplingRate() {
+	// return detectedSamplingRate;
+	// }
 	/**
 	 * Handles classifier service intents (STAIR/NON_STAIR)
-	 *
+	 * 
 	 */
 	public class ClassifierReceiver extends BroadcastReceiver {
 		@Override
@@ -125,7 +124,7 @@ public class ClimbActivity extends Activity {
 
 	/**
 	 * Handles sampling rate detector service intents (STAIR/NON_STAIR)
-	 *
+	 * 
 	 */
 	public class SamplingRateDetectorReceiver extends BroadcastReceiver {
 		@Override
@@ -168,7 +167,7 @@ public class ClimbActivity extends Activity {
 		intent.putExtra("building_id", building.get_id());
 		startActivity(intent);
 	}
-	
+
 	/**
 	 * Update the stat panel
 	 */
@@ -176,7 +175,6 @@ public class ClimbActivity extends Activity {
 		((TextView) findViewById(R.id.lblNumSteps)).setText(Integer.toString(num_steps) + " of " + Integer.toString(building.getSteps()) + " ("
 				+ (new DecimalFormat("#.##")).format(percentage * 100.00) + "%)");
 	}
-
 
 	/**
 	 * Setup the activity with a given sampling rate and sampling delay
@@ -249,22 +247,12 @@ public class ClimbActivity extends Activity {
 		findViewById(R.id.btnStartClimbing).setOnTouchListener(mDelayHideTouchListener);
 		// app-specific logic
 		seekbarIndicator = (VerticalSeekBar) findViewById(R.id.seekBarPosition); // get reference to vertical seekbar (only once for performance-related reasons)
-		seekbarIndicator.setOnSeekBarChangeListener(new OnSeekBarChangeListener() {
-			@Override
-			public void onStopTrackingTouch(SeekBar seekBar) {
-				// TODO Auto-generated method stub
-			}
-
-			@Override
-			public void onStartTrackingTouch(SeekBar seekBar) {
-				// TODO Auto-generated method stub
-			}
-
-			@Override
-			public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-				// TODO Auto-generated method stub
-			}
-		});
+		seekbarIndicator.setOnTouchListener(new OnTouchListener() { // disable user-driven seekbar changes
+					@Override
+					public boolean onTouch(View v, MotionEvent event) {
+						return true;
+					}
+				});
 		int building_id = getIntent().getIntExtra(MainActivity.building_intent_object, 0); // get building id from received intent
 		try {
 			// get building ID from intent
@@ -296,7 +284,7 @@ public class ClimbActivity extends Activity {
 	/**
 	 * Setup view with a given building and create/load an associated climbing
 	 */
-	private void setup_from_building() {	
+	private void setup_from_building() {
 		int imageId = getApplicationContext().getResources().getIdentifier(building.getPhoto(), "drawable", getApplicationContext().getPackageName()); // get building's photo resource ID
 		if (imageId > 0) ((ImageView) findViewById(R.id.buildingPhoto)).setImageResource(imageId);
 		// set building info
@@ -413,7 +401,6 @@ public class ClimbActivity extends Activity {
 		mHideHandler.postDelayed(mHideRunnable, delayMillis);
 	}
 
-	
 	/**
 	 * onClick listener for starting/stopping classifier
 	 * 
@@ -426,7 +413,7 @@ public class ClimbActivity extends Activity {
 		}
 		if (samplingEnabled) { // if sampling is enabled stop the classifier
 			stopClassify();
-		} else {  // if sampling is not enabled stop the classifier
+		} else { // if sampling is not enabled stop the classifier
 			startClassifyService();
 		}
 	}
@@ -461,11 +448,11 @@ public class ClimbActivity extends Activity {
 		climbing.setCompleted_steps(num_steps); // update completed steps
 		climbing.setPercentage(percentage); // update progress percentage
 		climbing.setRemaining_steps(building.getSteps() - num_steps); // update remaining steps
-		if (percentage>=100) climbing.setCompleted(new Date().getTime());
+		if (percentage >= 1.00) climbing.setCompleted(new Date().getTime());
 		MainActivity.climbingDao.update(climbing); // save to db
 		Log.i(MainActivity.AppName, "Updated climbing #" + climbing.get_id());
 		((ImageButton) findViewById(R.id.btnStartClimbing)).setImageResource(R.drawable.av_play); // set button icon to play again
-		findViewById(R.id.progressBarClimbing).startAnimation(AnimationUtils.loadAnimation(getApplicationContext(), R.anim.abc_fade_out)); // hide  progress bar
+		findViewById(R.id.progressBarClimbing).startAnimation(AnimationUtils.loadAnimation(getApplicationContext(), R.anim.abc_fade_out)); // hide progress bar
 		findViewById(R.id.progressBarClimbing).setVisibility(View.INVISIBLE);
 	}
 
@@ -522,7 +509,7 @@ public class ClimbActivity extends Activity {
 	public void onBackPressed() {
 		if (samplingEnabled == false) super.onBackPressed();
 		else { // disable back button if sampling is enabled
-			Toast.makeText(getApplicationContext(), "Sampling running - Stop it before exiting", Toast.LENGTH_SHORT).show();			
+			Toast.makeText(getApplicationContext(), "Sampling running - Stop it before exiting", Toast.LENGTH_SHORT).show();
 		}
 	}
 }
