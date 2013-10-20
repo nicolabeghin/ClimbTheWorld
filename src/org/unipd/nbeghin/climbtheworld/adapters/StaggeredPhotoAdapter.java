@@ -33,7 +33,7 @@ public class StaggeredPhotoAdapter extends ArrayAdapter<Photo> {
 				LayoutInflater layoutInflator = LayoutInflater.from(getContext());
 				convertView = layoutInflator.inflate(R.layout.row_staggered_demo, null);
 				holder = new ViewHolder(); // view-holder pattern
-				holder.imageView = (ScaleImageView) convertView.findViewById(R.id.imageView1);
+				holder.imageView = (ScaleImageView) convertView.findViewById(R.id.imgRocket);
 				holder.url=photos.get(position).getUrl();
 				convertView.setTag(holder);
 			}

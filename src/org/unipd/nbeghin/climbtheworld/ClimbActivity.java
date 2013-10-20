@@ -34,10 +34,9 @@ import android.view.View;
 import android.view.View.OnTouchListener;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
+import android.view.animation.TranslateAnimation;
 import android.widget.ImageButton;
 import android.widget.ImageView;
-import android.widget.SeekBar;
-import android.widget.SeekBar.OnSeekBarChangeListener;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.VerticalSeekBar;
@@ -120,6 +119,11 @@ public class ClimbActivity extends Activity {
 			}
 			((TextView) findViewById(R.id.lblClassifierOutput)).setText(result); // debug: show currently detected classifier output
 		}
+	}
+	
+	private void enableRocket() {
+		Animation animSequential = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.rocket);
+		findViewById(R.id.imgRocket).startAnimation(animSequential);
 	}
 
 	/**

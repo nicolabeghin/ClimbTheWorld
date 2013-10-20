@@ -43,7 +43,7 @@ public class GalleryActivity extends BaseImageLoaderActivity {
 				int margin = getResources().getDimensionPixelSize(R.dimen.margin);
 				gridView.setItemMargin(margin); // set the GridView margin
 				gridView.setPadding(margin, 0, margin, 0); // have the margin on the sides as well
-				StaggeredPhotoAdapter adapter = new StaggeredPhotoAdapter(this, R.id.imageView1, photos);
+				StaggeredPhotoAdapter adapter = new StaggeredPhotoAdapter(this, R.id.imgRocket, photos);
 				gridView.setAdapter(adapter);
 				gridView.setOnItemClickListener(new OnItemClickListener() {
 					@Override
