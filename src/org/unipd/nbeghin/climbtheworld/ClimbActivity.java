@@ -64,7 +64,10 @@ public class ClimbActivity extends Activity {
 	private Building				building;																								// current building
 	private Climbing				climbing;																								// current climbing
 	private VerticalSeekBar			seekbarIndicator;																						// reference to vertical seekbar
-	private int						vstep_for_rstep				= 1;																		// number of virtual step for each real step
+	private int						vstep_for_rstep				= 1;
+	private boolean					used_bonus					= false;
+	private double					percentage_bonus			= 0.50f;
+	// number of virtual step for each real step
 	/**
 	 * Whether or not the system UI should be auto-hidden after {@link #AUTO_HIDE_DELAY_MILLIS} milliseconds.
 	 */
@@ -98,29 +101,47 @@ public class ClimbActivity extends Activity {
 		public void onReceive(Context context, Intent intent) {
 			String result = intent.getExtras().getString(ClassifierCircularBuffer.CLASSIFIER_NOTIFICATION_STATUS);
 			if (result.equals("STAIR")) {
-				num_steps += vstep_for_rstep; // increase the number of steps
-				seekbarIndicator.setProgress(num_steps); // increase the seekbar progress
-				percentage = (double) num_steps / (double) building.getSteps(); // increase the progress percentage
-				boolean win = (num_steps >= building.getSteps()); // user wins?
-				if (win) {
-					num_steps = building.getSteps(); // ensure it did not exceed the number of steps (when multiple steps-at-once are detected)
-					percentage = 1.00;
-				}
-				updateStats(); // update the view of current stats
-				if (win) {
-					stopClassify(); // stop classifier service service
-					Toast.makeText(getApplicationContext(), "You successfully climbed " + building.getSteps() + " steps (" + building.getHeight() + "m) of " + building.getName() + "!",
-							Toast.LENGTH_LONG).show(); // show completion text
-					findViewById(R.id.lblWin).setVisibility(View.VISIBLE); // load and animate completed climbing test
-					findViewById(R.id.lblWin).startAnimation(AnimationUtils.loadAnimation(getApplicationContext(), R.anim.blink));
-					findViewById(R.id.btnStartClimbing).setEnabled(false);
-					findViewById(R.id.btnAccessPhotoGallery).setVisibility(View.VISIBLE);
+				if (percentage > 0.25f && used_bonus == false) { // bonus at 25%
+					apply_percentage_bonus();
+				} else { // standard, no bonus
+					num_steps += vstep_for_rstep; // increase the number of steps
+					seekbarIndicator.setProgress(num_steps); // increase the seekbar progress
+					percentage = (double) num_steps / (double) building.getSteps(); // increase the progress percentage
+					boolean win = (num_steps >= building.getSteps()); // user wins?
+					if (win) { // ensure it did not exceed the number of steps (when multiple steps-at-once are detected)
+						num_steps = building.getSteps();
+						percentage = 1.00;
+					}
+					updateStats(); // update the view of current stats
+					if (win) {
+						apply_win();
+					}
 				}
 			}
 			((TextView) findViewById(R.id.lblClassifierOutput)).setText(result); // debug: show currently detected classifier output
 		}
 	}
-	
+
+	private void apply_percentage_bonus() {
+		used_bonus = true;
+		stopClassify();
+		Toast.makeText(getApplicationContext(), "BONUS: you climbed yesterday too, you earn +50%", Toast.LENGTH_LONG).show();
+		enableRocket();
+		percentage += percentage_bonus;
+		num_steps = (int) (((double) building.getSteps()) * percentage);
+		updateStats(); // update the view of current stats
+		seekbarIndicator.setProgress(num_steps); // increase the seekbar progress
+	}
+
+	private void apply_win() {
+		stopClassify(); // stop classifier service service
+		Toast.makeText(getApplicationContext(), "You successfully climbed " + building.getSteps() + " steps (" + building.getHeight() + "m) of " + building.getName() + "!", Toast.LENGTH_LONG).show(); // show completion text
+		findViewById(R.id.lblWin).setVisibility(View.VISIBLE); // load and animate completed climbing test
+		findViewById(R.id.lblWin).startAnimation(AnimationUtils.loadAnimation(getApplicationContext(), R.anim.blink));
+		findViewById(R.id.btnStartClimbing).setEnabled(false);
+		findViewById(R.id.btnAccessPhotoGallery).setVisibility(View.VISIBLE);
+	}
+
 	private void enableRocket() {
 		Animation animSequential = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.rocket);
 		findViewById(R.id.imgRocket).startAnimation(animSequential);
@@ -508,7 +529,7 @@ public class ClimbActivity extends Activity {
 		stopAllServices(); // make sure to stop all background services
 		super.onDestroy();
 	}
-    
+
 	@Override
 	public void onBackPressed() {
 		if (samplingEnabled == false) super.onBackPressed();
