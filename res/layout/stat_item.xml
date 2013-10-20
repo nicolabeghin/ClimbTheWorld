@@ -14,20 +14,19 @@
      See the License for the specific language governing permissions and
      limitations under the License.
 -->
-
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/StatWrapper"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:minHeight="?android:attr/listPreferredItemHeight"
+    android:gravity="center_vertical"
     android:orientation="horizontal"
-    android:paddingTop="15dip" >
+     >
 
     <ImageView
         android:id="@+id/statIcon"
-        android:layout_width="35dp"
+        android:layout_width="40dp"
         android:layout_height="wrap_content"
-        android:layout_gravity="center_vertical"
+        android:layout_gravity="top"
         android:src="@drawable/device_access_storage" />
 
     <LinearLayout
@@ -43,16 +42,19 @@
             android:layout_height="wrap_content"
             android:gravity="center_vertical"
             android:text="Statistica"
-            android:textAppearance="?android:attr/textAppearanceLarge" />
+            style="@style/CardTitle"
+            
+            />
 
         <TextView
             android:id="@+id/statValue"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:layout_gravity="right"
+            style="@style/CardText"
             android:gravity="center_vertical"
             android:text="Valore"
-            android:textAppearance="?android:attr/textAppearanceMedium" />
+             />
     </LinearLayout>
 
 </LinearLayout>

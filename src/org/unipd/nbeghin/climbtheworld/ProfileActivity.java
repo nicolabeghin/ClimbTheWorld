@@ -32,12 +32,13 @@ public class ProfileActivity extends Activity {
 		stats.add(new Stat("Nr. of climbed buildings", new Double(5)));
 		stats.add(new Stat("Avg. time for 100 steps", new Double(16), R.drawable.device_access_alarms));
 		stats.add(new Stat("Fastest building so far", new Double(19), R.drawable.device_access_flash_on));
-//		stats=calculateStats();
+		stats=calculateStats();
 		((ListView) findViewById(R.id.listStatistics)).setAdapter(new StatAdapter(this, R.layout.stat_item, stats));
 	}
 
 	private List<Stat> calculateStats() {
-		List<Stat> stats = new ArrayList<Stat>();
+		List<Stat> stats = new ArrayList<Stat>();		
+		// fastest building so far
 		String statName="Fastest building so far";
 		String sql="SELECT building_id,MIN(completed-created) FROM climbings WHERE completed>created";
 		try {
@@ -46,6 +47,56 @@ public class ProfileActivity extends Activity {
 			stats.add(new Stat(statName, building.getName()));
 		} catch(NoStatFound e) {
 			stats.add(new Stat(statName, "No completed climbing yet"));
+		} catch(Exception e) {
+			Log.e(MainActivity.AppName, "SQL exception: "+e.getMessage());
+		}
+		statName="Climbed buildings";
+		sql="SELECT COUNT(*) FROM climbings WHERE completed>0";
+		try {
+			String count=execQuery(sql);
+			stats.add(new Stat(statName, count+" buildings have been climbed so far"));
+		} catch(NoStatFound e) {
+			stats.add(new Stat(statName, "No completed climbing yet"));
+		} catch(Exception e) {
+			Log.e(MainActivity.AppName, "SQL exception: "+e.getMessage());
+		}
+		statName="In-progress climbings";
+		sql="SELECT COUNT(*) FROM climbings WHERE completed=0";
+		try {
+			String count=execQuery(sql);
+			stats.add(new Stat(statName, count+" buildings in progress"));
+		} catch(NoStatFound e) {
+			stats.add(new Stat(statName, "No completed climbing yet"));
+		} catch(Exception e) {
+			Log.e(MainActivity.AppName, "SQL exception: "+e.getMessage());
+		}
+		statName="Climbings so far";
+		sql="SELECT COUNT(*) FROM climbings";
+		try {
+			String count=execQuery(sql);
+			stats.add(new Stat(statName, count+" climbings so far"));
+		} catch(NoStatFound e) {
+			stats.add(new Stat(statName, "No climbing yet"));
+		} catch(Exception e) {
+			Log.e(MainActivity.AppName, "SQL exception: "+e.getMessage());
+		}
+		statName="Available buildings";
+		sql="SELECT COUNT(*) FROM buildings";
+		try {
+			String count=execQuery(sql);
+			stats.add(new Stat(statName, count+" buildings"));
+		} catch(NoStatFound e) {
+			stats.add(new Stat(statName, "No building"));
+		} catch(Exception e) {
+			Log.e(MainActivity.AppName, "SQL exception: "+e.getMessage());
+		}
+		statName="Available tours";
+		sql="SELECT COUNT(*) FROM tours";
+		try {
+			String count=execQuery(sql);
+			stats.add(new Stat(statName, count+" tours"));
+		} catch(NoStatFound e) {
+			stats.add(new Stat(statName, "No tour"));
 		} catch(Exception e) {
 			Log.e(MainActivity.AppName, "SQL exception: "+e.getMessage());
 		}

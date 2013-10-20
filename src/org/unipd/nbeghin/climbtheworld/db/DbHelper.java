@@ -71,6 +71,10 @@ public class DbHelper extends OrmLiteSqliteOpenHelper {
 		return photoRuntimeDao;
 	}
 
+    public String getDbPath() {
+        return this.getReadableDatabase().getPath();
+    }
+    
 	/**
 	 * Close the database connections and clear any cached DAOs.
 	 */

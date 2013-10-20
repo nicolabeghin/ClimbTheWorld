@@ -508,7 +508,7 @@ public class ClimbActivity extends Activity {
 		stopAllServices(); // make sure to stop all background services
 		super.onDestroy();
 	}
-
+    
 	@Override
 	public void onBackPressed() {
 		if (samplingEnabled == false) super.onBackPressed();

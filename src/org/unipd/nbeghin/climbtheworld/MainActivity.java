@@ -1,6 +1,13 @@
 package org.unipd.nbeghin.climbtheworld;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -21,16 +28,18 @@ import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
 import android.database.sqlite.SQLiteDatabase;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
+import android.support.v7.internal.view.menu.MenuView.ItemView;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.ImageView;
+import android.widget.Toast;
 
 import com.j256.ormlite.dao.RuntimeExceptionDao;
 
@@ -50,7 +59,7 @@ public class MainActivity extends ActionBarActivity {
 	public static RuntimeExceptionDao<Climbing, Integer>		climbingDao;																					// DAO for climbings
 	public static RuntimeExceptionDao<Tour, Integer>			tourDao;																						// DAO for tours
 	public static RuntimeExceptionDao<BuildingTour, Integer>	buildingTourDao;																				// DAO for building_tours
-	public static RuntimeExceptionDao<Photo, Integer>					photoDao;
+	public static RuntimeExceptionDao<Photo, Integer>			photoDao;
 	public static final String									settings_file					= "ClimbTheWorldPreferences";
 	public static final String									settings_detected_sampling_rate	= "samplingRate";
 	private List<Fragment>										fragments						= new Vector<Fragment>();										// list of fragments to be loaded
@@ -58,7 +67,8 @@ public class MainActivity extends ActionBarActivity {
 	public static final String									building_intent_object			= "org.unipd.nbeghin.climbtheworld.intents.object.building";	// intent key for sending building id
 	private ViewPager											mPager;
 	private static Context										sContext;
-	
+	private DbHelper											dbHelper;
+
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -112,7 +122,7 @@ public class MainActivity extends ActionBarActivity {
 		PreExistingDbLoader preExistingDbLoader = new PreExistingDbLoader(getApplicationContext()); // extract db from zip
 		SQLiteDatabase db = preExistingDbLoader.getReadableDatabase();
 		db.close(); // close connection to extracted db
-		DbHelper dbHelper = new DbHelper(getApplicationContext()); // instance new db connection to now-standard db
+		dbHelper = new DbHelper(getApplicationContext()); // instance new db connection to now-standard db
 		buildingDao = dbHelper.getBuildingDao(); // create building DAO
 		climbingDao = dbHelper.getClimbingDao(); // create climbing DAO
 		tourDao = dbHelper.getTourDao(); // create tour DAO
@@ -158,21 +168,21 @@ public class MainActivity extends ActionBarActivity {
 		intent.putExtra("building_id", 1);
 		startActivity(intent);
 	}
-	
+
 	public static List<BuildingTour> getBuildingsForTour(int tour_id) {
-		Map<String, Object> conditions=new HashMap<String, Object> ();
+		Map<String, Object> conditions = new HashMap<String, Object>();
 		conditions.put("tour_id", tour_id);
 		return buildingTourDao.queryForFieldValuesArgs(conditions); // get all buildings associated to a tour
 	}
-	
+
 	public static int getBuildingImageResource(Building building) {
 		return getContext().getResources().getIdentifier(building.getPhoto(), "drawable", getContext().getPackageName());
 	}
-	
+
 	public static List<Integer> getBuildingPhotosForTour(int tour_id) {
-		List<Integer> images=new ArrayList<Integer>();
-		List<BuildingTour> buildingsTour=getBuildingsForTour(tour_id);
-		for(BuildingTour buildingTour: buildingsTour) {
+		List<Integer> images = new ArrayList<Integer>();
+		List<BuildingTour> buildingsTour = getBuildingsForTour(tour_id);
+		for (BuildingTour buildingTour : buildingsTour) {
 			images.add(getBuildingImageResource(buildingTour.getBuilding()));
 		}
 		return images;
@@ -188,5 +198,35 @@ public class MainActivity extends ActionBarActivity {
 	protected void onPause() {
 		Log.i(MainActivity.AppName, "onPause MainActivity");
 		super.onPause();
+	}
+
+	private void copyFile(InputStream in, OutputStream out) throws IOException {
+		byte[] buffer = new byte[1024];
+		int read;
+		while ((read = in.read(buffer)) != -1) {
+			out.write(buffer, 0, read);
+		}
+	}
+
+	public void onShareDb(MenuItem v) {
+		shareDb();
+	}
+	
+	private void shareDb() {
+		SimpleDateFormat df = new SimpleDateFormat("yyyyMMddHHmmss");
+		String output_name = "ClimbTheWorld_" + df.format(new Date()) + ".db";
+		try {
+			File file = new File(dbHelper.getDbPath()); // get private db reference
+			if (file.exists() == false || file.length() == 0) throw new Exception("Empty DB");
+			this.copyFile(new FileInputStream(file), this.openFileOutput(output_name, MODE_WORLD_READABLE));
+			file = this.getFileStreamPath(output_name);
+			Intent i = new Intent(Intent.ACTION_SEND);
+			i.putExtra(Intent.EXTRA_STREAM, Uri.fromFile(file));
+			i.setType("*/*");
+			startActivity(Intent.createChooser(i, "Share to"));
+		} catch (Exception e) {
+			Toast.makeText(getApplicationContext(), "Unable to export db: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+			Log.e(AppName, e.getMessage());
+		}
 	}
 }
