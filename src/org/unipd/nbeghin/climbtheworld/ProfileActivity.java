@@ -1,8 +1,12 @@
 package org.unipd.nbeghin.climbtheworld;
 
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.unipd.nbeghin.climbtheworld.adapters.StatAdapter;
+import org.unipd.nbeghin.climbtheworld.exceptions.NoStatFound;
+import org.unipd.nbeghin.climbtheworld.models.Building;
 import org.unipd.nbeghin.climbtheworld.models.Stat;
 
 import android.annotation.TargetApi;
@@ -10,10 +14,12 @@ import android.app.Activity;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.NavUtils;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.widget.ArrayAdapter;
 import android.widget.ListView;
+
+import com.j256.ormlite.dao.GenericRawResults;
 
 public class ProfileActivity extends Activity {
 	@Override
@@ -21,15 +27,37 @@ public class ProfileActivity extends Activity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_profile);
 		// Show the Up button in the action bar.
-//		setupActionBar();
-		List<String> items=new ArrayList<String>();
-		items.add("Climbings so far");
-		items.add("Nr. of climbed buildings");
-		items.add("Average time for 100 steps");
-		items.add("Fastest building so far");
-		List<Stat> stats=new ArrayList<Stat>();
-		stats.add(new Stat("test", new Double(10)));
-		((ListView) findViewById(R.id.listStatistics)).setAdapter(new ArrayAdapter<String>(this, R.layout.stat_item, items));
+		// setupActionBar();
+		List<Stat> stats = new ArrayList<Stat>();
+		stats.add(new Stat("Nr. of climbed buildings", new Double(5)));
+		stats.add(new Stat("Avg. time for 100 steps", new Double(16), R.drawable.device_access_alarms));
+		stats.add(new Stat("Fastest building so far", new Double(19), R.drawable.device_access_flash_on));
+//		stats=calculateStats();
+		((ListView) findViewById(R.id.listStatistics)).setAdapter(new StatAdapter(this, R.layout.stat_item, stats));
+	}
+
+	private List<Stat> calculateStats() {
+		List<Stat> stats = new ArrayList<Stat>();
+		String statName="Fastest building so far";
+		String sql="SELECT building_id,MIN(completed-created) FROM climbings WHERE completed>created";
+		try {
+			String building_id=execQuery(sql);
+			Building building=MainActivity.buildingDao.queryForId(Integer.valueOf(building_id));
+			stats.add(new Stat(statName, building.getName()));
+		} catch(NoStatFound e) {
+			stats.add(new Stat(statName, "No completed climbing yet"));
+		} catch(Exception e) {
+			Log.e(MainActivity.AppName, "SQL exception: "+e.getMessage());
+		}
+		return stats;
+	}
+
+	private String execQuery(String sql) throws SQLException, NoStatFound {
+		GenericRawResults<String[]> rawResults = MainActivity.climbingDao.queryRaw(sql);
+		List<String[]> results = rawResults.getResults();
+		if (results.isEmpty()) throw new NoStatFound();
+		String[] resultArray = results.get(0);
+		return resultArray[0];
 	}
 
 	/**
@@ -45,7 +73,7 @@ public class ProfileActivity extends Activity {
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		// Inflate the menu; this adds items to the action bar if it is present.
-//		getMenuInflater().inflate(R.menu.profile, menu);
+		// getMenuInflater().inflate(R.menu.profile, menu);
 		return true;
 	}
 
