@@ -5,8 +5,8 @@ import java.util.HashMap;
 import java.util.List;
 
 /**
- * 
- * @author Nicola Beghin
+ * A set of samples on which a feature will be calculated 
+ *
  */
 public class Batch {
 	private List<SingleCoordinateSet>		values				= new ArrayList<SingleCoordinateSet>();

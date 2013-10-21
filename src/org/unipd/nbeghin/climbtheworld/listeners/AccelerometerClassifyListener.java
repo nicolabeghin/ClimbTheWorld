@@ -11,8 +11,11 @@ import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.util.Log;
 
+/**
+ * Listener for classifier
+ *
+ */
 public class AccelerometerClassifyListener implements SensorEventListener {
-	private final float			NOISE			= (float) 2.0;
 	private int					sensorDelay;
 	private static double		samplingRate	= 18;			// default
 	private static double		step_per_second	= 0.77;		// nexus 4: 14 samples per step (77% of 18Hz)

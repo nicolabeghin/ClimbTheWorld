@@ -17,6 +17,10 @@ import android.widget.TextView;
 
 import com.fima.cardsui.objects.Card;
 
+/**
+ * CardsUI card for a single building associated to a tour
+ *
+ */
 public class BuildingForTourCard extends Card {
 	final private Building	building;
 	final private int		order;

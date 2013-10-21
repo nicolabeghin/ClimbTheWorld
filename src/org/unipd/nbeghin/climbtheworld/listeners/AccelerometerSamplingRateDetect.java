@@ -10,9 +10,12 @@ import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.util.Log;
 
+/**
+ * Listener for sampling rate detector
+ *
+ */
 public class AccelerometerSamplingRateDetect implements SensorEventListener {
     private int sensorDelay;
-    private final int buffer_size=14;
     private long now = 0;
     private long time = 0;
     private int temp = 0;

@@ -3,6 +3,10 @@ package org.unipd.nbeghin.climbtheworld.models;
 import com.j256.ormlite.field.DatabaseField;
 import com.j256.ormlite.table.DatabaseTable;
 
+/**
+ * A set of pre-determined buildings to be climbed one after the other
+ *
+ */
 @DatabaseTable(tableName = "tours")
 public class Tour {
 	@DatabaseField(generatedId = true)

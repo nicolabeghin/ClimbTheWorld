@@ -4,12 +4,17 @@
     android:versionCode="1"
     android:versionName="1.0" >
 
+    <uses-permission android:name="android.permission.INTERNET" />
+    <!-- Include next permission if you want to allow UIL to cache images on SD card -->
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+
     <uses-sdk
         android:minSdkVersion="10"
         android:targetSdkVersion="17" />
 
     <application
         android:allowBackup="true"
+        android:hardwareAccelerated="true"
         android:icon="@drawable/ic_launcher"
         android:label="@string/app_name"
         android:theme="@style/AppTheme" >
@@ -62,6 +67,45 @@
         <activity
             android:name="org.unipd.nbeghin.climbtheworld.TourDetailActivity"
             android:label="@string/title_activity_tour_detail"
+            android:parentActivityName="org.unipd.nbeghin.climbtheworld.MainActivity" >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="org.unipd.nbeghin.climbtheworld.MainActivity" />
+        </activity>
+        <activity
+            android:name="org.unipd.nbeghin.climbtheworld.GalleryActivity"
+            android:label="@string/title_activity_gallery"
+            android:parentActivityName="org.unipd.nbeghin.climbtheworld.ClimbActivity" >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="org.unipd.nbeghin.climbtheworld.ClimbActivity" />
+        </activity>
+        <activity
+            android:name="org.unipd.nbeghin.climbtheworld.PhotoPagerActivity"
+            android:label="@string/title_activity_photo_pager_activity"
+            android:parentActivityName="org.unipd.nbeghin.climbtheworld.GalleryActivity" >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="org.unipd.nbeghin.climbtheworld.GalleryActivity" />
+        </activity>
+
+        <meta-data
+            android:name="com.facebook.sdk.ApplicationId"
+            android:value="@string/app_id" />
+
+        <activity
+            android:name="org.unipd.nbeghin.climbtheworld.FBShareProgressActivity"
+            android:label="@string/title_activity_fbshare_progress"
+            android:parentActivityName="org.unipd.nbeghin.climbtheworld.MainActivity" >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="org.unipd.nbeghin.climbtheworld.MainActivity" />
+        </activity>
+        <activity android:name="com.facebook.LoginActivity" >
+        </activity>
+        <activity
+            android:name="org.unipd.nbeghin.climbtheworld.FBPickFriendActivity"
+            android:label="@string/title_activity_fbpick_friend"
             android:parentActivityName="org.unipd.nbeghin.climbtheworld.MainActivity" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"

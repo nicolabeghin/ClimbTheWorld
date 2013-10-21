@@ -1,9 +1,10 @@
 package org.unipd.nbeghin.climbtheworld;
 
-import java.util.ArrayList;
 import java.util.List;
 
+import org.unipd.nbeghin.climbtheworld.adapters.StatAdapter;
 import org.unipd.nbeghin.climbtheworld.models.Stat;
+import org.unipd.nbeghin.climbtheworld.util.StatUtils;
 
 import android.annotation.TargetApi;
 import android.app.Activity;
@@ -12,7 +13,6 @@ import android.os.Bundle;
 import android.support.v4.app.NavUtils;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
 public class ProfileActivity extends Activity {
@@ -20,16 +20,8 @@ public class ProfileActivity extends Activity {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_profile);
-		// Show the Up button in the action bar.
-//		setupActionBar();
-		List<String> items=new ArrayList<String>();
-		items.add("Climbings so far");
-		items.add("Nr. of climbed buildings");
-		items.add("Average time for 100 steps");
-		items.add("Fastest building so far");
-		List<Stat> stats=new ArrayList<Stat>();
-		stats.add(new Stat("test", new Double(10)));
-		((ListView) findViewById(R.id.listStatistics)).setAdapter(new ArrayAdapter<String>(this, R.layout.stat_item, items));
+		List<Stat> stats = StatUtils.calculateStats();
+		((ListView) findViewById(R.id.listStatistics)).setAdapter(new StatAdapter(this, R.layout.stat_item, stats));
 	}
 
 	/**
@@ -45,7 +37,7 @@ public class ProfileActivity extends Activity {
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		// Inflate the menu; this adds items to the action bar if it is present.
-//		getMenuInflater().inflate(R.menu.profile, menu);
+		// getMenuInflater().inflate(R.menu.profile, menu);
 		return true;
 	}
 

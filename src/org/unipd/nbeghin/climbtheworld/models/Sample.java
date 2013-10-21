@@ -1,5 +1,10 @@
 package org.unipd.nbeghin.climbtheworld.models;
 
+/**
+ * A model representing a single sampling (X,Y,Z)
+ * It automatically calculates |V|
+ *
+ */
 public class Sample {
 	final private long		time;
 	final private double	valueX;

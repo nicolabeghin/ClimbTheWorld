@@ -15,6 +15,10 @@ import android.hardware.Sensor;
 import android.hardware.SensorManager;
 import android.util.Log;
 
+/**
+ * Background service to detect sampling rate
+ *
+ */
 public class SamplingRateDetectorService extends IntentService {
 	private AccelerometerSamplingRateDetect	accelerometerListener;
 	private Sensor							mAccelerometer;
@@ -93,7 +97,7 @@ public class SamplingRateDetectorService extends IntentService {
 
 	public void startAccelerometer() {
 		Log.i(MainActivity.AppName, "Registering accelerometer listener");
-		mSensorManager.registerListener(accelerometerListener, mAccelerometer, sensorDelay); // SensorManager.SENSOR_DELAY_NORMAL
+		mSensorManager.registerListener(accelerometerListener, mAccelerometer, sensorDelay);
 	}
 
 	public void stopAccelerometer() {

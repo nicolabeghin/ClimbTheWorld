@@ -16,8 +16,12 @@ import android.hardware.Sensor;
 import android.hardware.SensorManager;
 import android.util.Log;
 
+/**
+ * Background service to classify collected samples
+ *
+ */
 public class SamplingClassifyService extends IntentService {
-	private AccelerometerClassifyListener	accelerometerListener;
+	private AccelerometerClassifyListener	accelerometerListener; // assigned listener
 	private Sensor							mAccelerometer;
 	private SensorManager					mSensorManager;
 	private int								notification_id	= 1;
@@ -32,7 +36,7 @@ public class SamplingClassifyService extends IntentService {
 	public void onCreate() {
 		try {
 			notificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
-			showNotification();
+			showNotification(); // show notification about background classifier
 			mSensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
 			Log.i(MainActivity.AppName, "Sensor manager instanced");
 			mAccelerometer = mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
@@ -45,7 +49,7 @@ public class SamplingClassifyService extends IntentService {
 	}
 
 	/**
-	 * Show a notification while this service is running.
+	 * Show a notification while this service is running
 	 */
 	private void showNotification() {
 		CharSequence text = "Accelbench classifying enabled";
@@ -59,9 +63,9 @@ public class SamplingClassifyService extends IntentService {
 	@Override
 	public int onStartCommand(Intent intent, int flags, int startId) {
 		try {
-			sensorDelay = intent.getExtras().getInt(ClimbActivity.SAMPLING_DELAY);
+			sensorDelay = intent.getExtras().getInt(ClimbActivity.SAMPLING_DELAY); // get sampling delay from received intent
 			accelerometerListener.setSensorDelay(sensorDelay);
-			accelerometerListener.setSamplingRate(intent.getExtras().getDouble(AccelerometerSamplingRateDetect.SAMPLING_RATE));
+			accelerometerListener.setSamplingRate(intent.getExtras().getDouble(AccelerometerSamplingRateDetect.SAMPLING_RATE)); // set sampling rate from received intent
 		} catch (NullPointerException e) {
 			Log.i(MainActivity.AppName, "No sampling delay detected.");
 		}

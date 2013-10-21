@@ -30,5 +30,15 @@
         <item>21</item>
         <item>25</item>
     </string-array>
+        <string-array name="difficulty_titles">
+        <item>Easy</item><!--  1 real step = 100 game step -->
+        <item>Normal</item><!-- 1 real step = 10 game step -->
+        <item>Hard</item><!-- 1 real step = 1 game step -->
+    </string-array>
+    <string-array name="difficulty_values">
+        <item>100</item>
+        <item>10</item>
+        <item>1</item>
+    </string-array>
 
 </resources>

@@ -12,14 +12,35 @@
     <item
         android:id="@+id/itemProfile"
         android:icon="@drawable/ic_action_user"
+        android:onClick="onShowActionProfile"
         android:title="Profile"
-        climbtheworld:showAsAction="ifRoom" android:onClick="onShowActionProfile">
+        climbtheworld:showAsAction="ifRoom">
     </item>
-        <item
+    <item
         android:id="@+id/itemSettings"
         android:icon="@drawable/action_settings"
+        android:onClick="onShowSettings"
         android:title="Settings"
-        climbtheworld:showAsAction="never" android:onClick="onShowSettings">
+        climbtheworld:showAsAction="never">
     </item>
+        <item
+        android:id="@+id/itemFacebookLogin"
+        android:onClick="onFacebookLogin"
+        android:title="Facebook login"
+        climbtheworld:showAsAction="never">
+    </item>
+            <item
+        android:id="@+id/itemFacebookPickFriends"
+        android:onClick="onFacebookPickFriends"
+        android:title="FB pick friends"
+        climbtheworld:showAsAction="never">
+    </item>
+    <item
+        android:id="@+id/itemShareDb"
+        android:onClick="onShareDb"
+        android:title="Share db"
+        climbtheworld:showAsAction="never">
+    </item>
+    
 
 </menu>

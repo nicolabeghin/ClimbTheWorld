@@ -17,6 +17,10 @@ import android.widget.TextView;
 
 import com.fima.cardsui.objects.Card;
 
+/**
+ * CardsUI card for a single building
+ *
+ */
 public class BuildingCard extends Card {
 	final Building	building;
 
@@ -29,7 +33,7 @@ public class BuildingCard extends Card {
 	public View getCardContent(Context context) {
 		View view = LayoutInflater.from(context).inflate(R.layout.card_building_ex, null);
 		((TextView) view.findViewById(R.id.title)).setText(building.getName());
-		int imageId = context.getResources().getIdentifier(building.getPhoto(), "drawable", context.getPackageName());
+		int imageId = MainActivity.getBuildingImageResource(building);
 		if (imageId > 0) ((ImageView) view.findViewById(R.id.photo)).setImageResource(imageId);
 		((TextView) view.findViewById(R.id.buildingStat)).setText(building.getSteps() + " steps (" + building.getHeight() + "m)");
 		((TextView) view.findViewById(R.id.location)).setText(building.getLocation());
@@ -41,7 +45,7 @@ public class BuildingCard extends Card {
 			if (climbing.getPercentage() >= 100) {
 				climbingStatus.setText("Climbing: COMPLETED! (on "+sdf.format(new Date(climbing.getModified()))+")");
 			} else {
-				climbingStatus.setText("Climbing status: " + new DecimalFormat("#.##").format(climbing.getPercentage()*100) + "%, (last climb on "+sdf.format(new Date(climbing.getModified()))+")");
+				climbingStatus.setText("Climbing status: " + new DecimalFormat("#").format(climbing.getPercentage()*100) + "% (last attempt @ "+sdf.format(new Date(climbing.getModified()))+")");
 			}
 		} else {
 			climbingStatus.setText("Not climbed yet");

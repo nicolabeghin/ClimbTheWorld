@@ -91,12 +91,13 @@ public class SettingsActivity extends PreferenceActivity {
 		// their values. When their values change, their summaries are updated
 		// to reflect the new value, per the Android Design guidelines.
 		bindPreferenceSummaryToValue(findPreference("profile_name"));
-		bindPreferenceSummaryToValue(findPreference("vstep_for_rstep"));
-		bindPreferenceSummaryToValue(findPreference("userWeight"));
-		bindPreferenceSummaryToValue(findPreference("userHeight"));
-		bindPreferenceSummaryToValue(findPreference("stepHeight"));		
-		float detectedSamplingRate=PreferenceManager.getDefaultSharedPreferences(getApplicationContext()).getFloat("detectedSamplingRate", 0.0f);
-		findPreference("detectedSamplingRate").setSummary(new DecimalFormat("#.##").format(detectedSamplingRate)+"Hz");
+//		bindPreferenceSummaryToValue(findPreference("vstep_for_rstep"));
+//		bindPreferenceSummaryToValue(findPreference("userWeight"));
+//		bindPreferenceSummaryToValue(findPreference("userHeight"));
+//		bindPreferenceSummaryToValue(findPreference("stepHeight"));	
+		bindPreferenceSummaryToValue(findPreference("difficulty"));
+//		float detectedSamplingRate=PreferenceManager.getDefaultSharedPreferences(getApplicationContext()).getFloat("detectedSamplingRate", 0.0f);
+//		findPreference("detectedSamplingRate").setSummary(new DecimalFormat("#.##").format(detectedSamplingRate)+"Hz");
 	}
 
 	/** {@inheritDoc} */
