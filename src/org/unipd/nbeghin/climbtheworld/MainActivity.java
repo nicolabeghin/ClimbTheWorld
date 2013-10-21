@@ -7,6 +7,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -41,6 +42,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Toast;
 
+import com.facebook.model.GraphUser;
 import com.j256.ormlite.dao.RuntimeExceptionDao;
 
 /**
@@ -68,6 +70,7 @@ public class MainActivity extends ActionBarActivity {
 	private ViewPager											mPager;
 	private static Context										sContext;
 	private DbHelper											dbHelper;
+
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -211,7 +214,17 @@ public class MainActivity extends ActionBarActivity {
 	public void onShareDb(MenuItem v) {
 		shareDb();
 	}
-	
+
+	public void onFacebookLogin(MenuItem v) {
+		Intent intent = new Intent(sContext, FBShareProgressActivity.class);
+		startActivity(intent);
+	}
+
+	public void onFacebookPickFriends(MenuItem v) {
+		Intent intent = new Intent(sContext, FBPickFriendActivity.class);
+		startActivity(intent);
+	}
+
 	private void shareDb() {
 		SimpleDateFormat df = new SimpleDateFormat("yyyyMMddHHmmss");
 		String output_name = "ClimbTheWorld_" + df.format(new Date()) + ".db";

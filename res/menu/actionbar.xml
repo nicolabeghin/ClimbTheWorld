@@ -23,11 +23,24 @@
         android:title="Settings"
         climbtheworld:showAsAction="never">
     </item>
+        <item
+        android:id="@+id/itemFacebookLogin"
+        android:onClick="onFacebookLogin"
+        android:title="Facebook login"
+        climbtheworld:showAsAction="never">
+    </item>
+            <item
+        android:id="@+id/itemFacebookPickFriends"
+        android:onClick="onFacebookPickFriends"
+        android:title="FB pick friends"
+        climbtheworld:showAsAction="never">
+    </item>
     <item
         android:id="@+id/itemShareDb"
         android:onClick="onShareDb"
         android:title="Share db"
         climbtheworld:showAsAction="never">
     </item>
+    
 
 </menu>

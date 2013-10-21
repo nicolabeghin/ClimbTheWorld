@@ -10,5 +10,11 @@
     <string name="title_activity_tour_detail">Tour detail</string>
     <string name="title_activity_gallery">Gallery</string>
     <string name="title_activity_photo_pager_activity">Gallery</string>
+    <string name="app_id">1444608782432270</string>
+    <string name="app_name">ClimbTheWorld</string>
+    <!-- <string name="app_id">370546396320150</string> -->
+    <string name="title_activity_fbshare_progress">FBShareProgressActivity</string>
+    <string name="hello_world">Hello world!</string>
+    <string name="title_activity_fbpick_friend">FBPickFriendActivity</string>
 
 </resources>
