@@ -101,7 +101,7 @@ public class ClimbActivity extends Activity {
 		public void onReceive(Context context, Intent intent) {
 			String result = intent.getExtras().getString(ClassifierCircularBuffer.CLASSIFIER_NOTIFICATION_STATUS);
 			if (result.equals("STAIR")) {
-				if (percentage > 0.25f && used_bonus == false) { // bonus at 25%
+				if (percentage > 0.25f && percentage < 0.50f && used_bonus == false) { // bonus at 25%
 					apply_percentage_bonus();
 				} else { // standard, no bonus
 					num_steps += vstep_for_rstep; // increase the number of steps

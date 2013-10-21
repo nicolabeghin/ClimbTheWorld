@@ -1959,7 +1959,8 @@ containing a value of this type.
         public static final int hello_world=0x7f090031;
         public static final int title_activity_climb=0x7f090028;
         public static final int title_activity_fbpick_friend=0x7f090032;
-        /**  <string name="app_id">370546396320150</string> 
+        /**      <string name="app_name">ClimbTheWorld</string> 
+ <string name="app_id">370546396320150</string> 
          */
         public static final int title_activity_fbshare_progress=0x7f090030;
         public static final int title_activity_gallery=0x7f09002d;
