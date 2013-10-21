@@ -1,5 +1,8 @@
 package org.unipd.nbeghin.climbtheworld;
 
+import org.unipd.nbeghin.climbtheworld.models.Building;
+import org.unipd.nbeghin.climbtheworld.models.Climbing;
+
 import android.app.AlertDialog;
 import android.content.Intent;
 import android.os.Bundle;
@@ -22,9 +25,9 @@ public class BaseFBActivity extends FragmentActivity {
 	protected UiLifecycleHelper		uiHelper;
 	protected static final int		REAUTH_ACTIVITY_CODE	= 100;
 	protected static final String	PERMISSION				= "publish_actions";
-	protected boolean				canPresentShareDialog = false;
-	protected PendingAction pendingAction = PendingAction.NONE;
-	protected GraphUser user;
+	protected boolean				canPresentShareDialog	= true;
+	protected PendingAction			pendingAction			= PendingAction.NONE;
+	protected GraphUser				user;
 
 	protected enum PendingAction {
 		NONE, POST_PHOTO, POST_STATUS_UPDATE
@@ -116,82 +119,93 @@ public class BaseFBActivity extends FragmentActivity {
 		return session != null && session.getPermissions().contains("publish_actions");
 	}
 
-	@SuppressWarnings("incomplete-switch")
-	protected void handlePendingAction() {
-		PendingAction previouslyPendingAction = pendingAction;
-		// These actions may re-set pendingAction if they are still pending, but we assume they
-		// will succeed.
-		pendingAction = PendingAction.NONE;
-		switch (previouslyPendingAction) {
-			case POST_STATUS_UPDATE:
-				postStatusUpdate();
-				break;
-		}
+	// @SuppressWarnings("incomplete-switch")
+	// protected void handlePendingAction() {
+	// PendingAction previouslyPendingAction = pendingAction;
+	// // These actions may re-set pendingAction if they are still pending, but we assume they
+	// // will succeed.
+	// pendingAction = PendingAction.NONE;
+	// switch (previouslyPendingAction) {
+	// case POST_STATUS_UPDATE:
+	// postStatusUpdate();
+	// break;
+	// }
+	// }
+	private FacebookDialog.ShareDialogBuilder createShareDialogBuilder() {
+		return new FacebookDialog.ShareDialogBuilder(this).setName("ClimbTheWorld").setDescription("ClimbTheWorld: a serious game to promote physical activity")
+				.setLink("http://www.climbtheworld.com");
 	}
 
-    private FacebookDialog.ShareDialogBuilder createShareDialogBuilder() {
-        return new FacebookDialog.ShareDialogBuilder(this)
-                .setName("ClimbTheWorld")
-                .setDescription("ClimbTheWorld: a serious game to promote physical activity")
-                .setLink("http://www.climbtheworld.com");
-    }
-    
-    private void showPublishResult(String message, GraphObject result, FacebookRequestError error) {
-        String title = null;
-        String alertMessage = null;
-        if (error == null) {
-            title = "Pubblicazione ok";
-//            String id = result.cast(GraphObjectWithId.class).getId();
-            alertMessage = "Pubblicato con successo";
-        } else {
-            title = "Error";
-            alertMessage = error.getErrorMessage();
-        }
+	private void showPublishResult(String message, GraphObject result, FacebookRequestError error) {
+		String title = null;
+		String alertMessage = null;
+		if (error == null) {
+			title = "Pubblicazione ok";
+			// String id = result.cast(GraphObjectWithId.class).getId();
+			alertMessage = "Pubblicato con successo";
+		} else {
+			title = "Error";
+			alertMessage = error.getErrorMessage();
+		}
+		new AlertDialog.Builder(this).setTitle(title).setMessage(alertMessage).setPositiveButton("Ok", null).show();
+	}
 
-        new AlertDialog.Builder(this)
-                .setTitle(title)
-                .setMessage(alertMessage)
-                .setPositiveButton("Ok", null)
-                .show();
-    }
+	protected void postStatusUpdate() {
+		if (canPresentShareDialog) {
+			FacebookDialog shareDialog = createShareDialogBuilder().setName("prova").setDescription("descrizione")
+					.setPicture("http://upload.wikimedia.org/wikipedia/commons/b/b0/Tour_Eiffel_3c02660.jpg").setLink("http://www.climbtheworld.com").setCaption("I just climbed the Everest").build();
+			uiHelper.trackPendingDialogCall(shareDialog.present());
+		}
+		// } else if (hasPublishPermission()) {
+		// final String message = "messaggio da pubblicare";
+		// Request request = Request
+		// .newStatusUpdateRequest(Session.getActiveSession(), message, new Request.Callback() {
+		// @Override
+		// public void onCompleted(Response response) {
+		// showPublishResult(message, response.getGraphObject(), response.getError());
+		// }
+		// });
+		// request.executeAsync();
+		// } else {
+		// pendingAction = PendingAction.POST_STATUS_UPDATE;
+		// }
+	}
 
-    protected void postStatusUpdate() {
-        if (canPresentShareDialog) {
-            FacebookDialog shareDialog = createShareDialogBuilder().build();
-            uiHelper.trackPendingDialogCall(shareDialog.present());
-        } else if (hasPublishPermission()) {
-            final String message = "messaggio da pubblicare";
-            Request request = Request
-                    .newStatusUpdateRequest(Session.getActiveSession(), message, new Request.Callback() {
-                        @Override
-                        public void onCompleted(Response response) {
-                            showPublishResult(message, response.getGraphObject(), response.getError());
-                        }
-                    });
-            request.executeAsync();
-        } else {
-            pendingAction = PendingAction.POST_STATUS_UPDATE;
-        }
-    }
-    
-	protected void performPublish(PendingAction action, boolean allowNoSession) {
+	protected void performPublish(Climbing climbing) {
 		Session session = Session.getActiveSession();
 		if (session != null) {
-			pendingAction = action;
+			// pendingAction = action;
 			if (hasPublishPermission()) {
 				// We can do the action right away.
-				handlePendingAction();
+				Building building = climbing.getBuilding();
+				// FacebookDialog shareDialog = createShareDialogBuilder().
+				// set
+				// setName("Just climbed "+building.getName()+" ("+building.getHeight()+"mt)!").
+				// setDescription("I just climbed "+building.getName()+" ("+building.getSteps()+") in "+climbing.totalTime()).
+				// // setLink("http://www.climbtheworld.com").
+				// build();
+				// uiHelper.trackPendingDialogCall(shareDialog.present());
+				final String message = "I just climbed " + building.getName() + " (" + building.getHeight() + "mt, "+building.getSteps()+" steps) in " + climbing.totalTime();
+				Request request = Request.newStatusUpdateRequest(Session.getActiveSession(), message, new Request.Callback() {
+					@Override
+					public void onCompleted(Response response) {
+						showPublishResult(message, response.getGraphObject(), response.getError());
+					}
+				});
+				request.executeAsync();
 				return;
 			} else if (session.isOpened()) {
+				Log.e(MainActivity.AppName, "No publish permission");
 				// We need to get new permissions, then complete the action when we get called back.
 				session.requestNewPublishPermissions(new Session.NewPermissionsRequest(this, PERMISSION));
 				return;
 			}
 		}
-		if (allowNoSession) {
-			pendingAction = action;
-			handlePendingAction();
-		}
+		// if (allowNoSession) {
+		// postStatusUpdate();
+		// pendingAction = action;
+		// handlePendingAction();
+		// }
 	}
 
 	@Override

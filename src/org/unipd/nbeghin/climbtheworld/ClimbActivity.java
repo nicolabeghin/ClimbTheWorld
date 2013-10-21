@@ -5,12 +5,14 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 
 import org.unipd.nbeghin.climbtheworld.exceptions.ClimbingNotFound;
+import org.unipd.nbeghin.climbtheworld.exceptions.NoFBSession;
 import org.unipd.nbeghin.climbtheworld.listeners.AccelerometerSamplingRateDetect;
 import org.unipd.nbeghin.climbtheworld.models.Building;
 import org.unipd.nbeghin.climbtheworld.models.ClassifierCircularBuffer;
 import org.unipd.nbeghin.climbtheworld.models.Climbing;
 import org.unipd.nbeghin.climbtheworld.services.SamplingClassifyService;
 import org.unipd.nbeghin.climbtheworld.services.SamplingRateDetectorService;
+import org.unipd.nbeghin.climbtheworld.util.FacebookUtils;
 import org.unipd.nbeghin.climbtheworld.util.SystemUiHider;
 
 import android.annotation.TargetApi;
@@ -114,6 +116,7 @@ public class ClimbActivity extends Activity {
 					}
 					updateStats(); // update the view of current stats
 					if (win) {
+						stopClassify(); // stop classifier service service
 						apply_win();
 					}
 				}
@@ -134,11 +137,11 @@ public class ClimbActivity extends Activity {
 	}
 
 	private void apply_win() {
-		stopClassify(); // stop classifier service service
 		Toast.makeText(getApplicationContext(), "You successfully climbed " + building.getSteps() + " steps (" + building.getHeight() + "m) of " + building.getName() + "!", Toast.LENGTH_LONG).show(); // show completion text
 		findViewById(R.id.lblWin).setVisibility(View.VISIBLE); // load and animate completed climbing test
 		findViewById(R.id.lblWin).startAnimation(AnimationUtils.loadAnimation(getApplicationContext(), R.anim.blink));
-		findViewById(R.id.btnStartClimbing).setEnabled(false);
+		((ImageButton) findViewById(R.id.btnStartClimbing)).setImageResource(R.drawable.social_share);
+		findViewById(R.id.btnAccessPhotoGallery).startAnimation(AnimationUtils.loadAnimation(getApplicationContext(), R.anim.abc_fade_in));
 		findViewById(R.id.btnAccessPhotoGallery).setVisibility(View.VISIBLE);
 	}
 
@@ -301,6 +304,8 @@ public class ClimbActivity extends Activity {
 				Log.i(MainActivity.AppName, "Using the previously detected sampling rate");
 				setupByDetectedSamplingRate(); // setup activity with given sampling rate
 			}
+			Animation anim = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.arrow);
+			findViewById(R.id.imgArrow).startAnimation(anim);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -316,25 +321,7 @@ public class ClimbActivity extends Activity {
 		((TextView) findViewById(R.id.lblBuildingName)).setText(building.getName() + " (" + building.getLocation() + ")"); // building's location
 		((TextView) findViewById(R.id.lblNumSteps)).setText(Integer.toString(building.getSteps()) + " steps"); // building's steps
 		((TextView) findViewById(R.id.lblHeight)).setText(Integer.toString(building.getHeight()) + "mt"); // building's height (in mt)
-		try { // get previous climbing for this building
-			loadPreviousClimbing();
-		} catch (ClimbingNotFound e) {
-			Log.i(MainActivity.AppName, "No previous climbing found");
-			climbing = new Climbing(); // create a new empty climbing for this building
-			climbing.setBuilding(building);
-			climbing.setCompleted(0);
-			climbing.setCompleted_steps(0);
-			climbing.setCreated(new Date().getTime());
-			climbing.setModified(new Date().getTime());
-			seekbarIndicator.setMax(building.getSteps());
-			seekbarIndicator.setProgress(climbing.getCompleted_steps());
-			MainActivity.climbingDao.create(climbing);
-			Log.i(MainActivity.AppName, "Created new climbing #" + climbing.get_id());
-		}
-		// animate "ready to climb" text
-		Animation anim = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.abc_slide_in_top);
-		anim.setDuration(2500);
-		findViewById(R.id.lblReadyToClimb).startAnimation(anim);
+		loadPreviousClimbing(); // get previous climbing for this building
 	}
 
 	/**
@@ -342,20 +329,40 @@ public class ClimbActivity extends Activity {
 	 * 
 	 * @throws ClimbingNotFound
 	 */
-	private void loadPreviousClimbing() throws ClimbingNotFound {
+	private void loadPreviousClimbing() {
 		climbing = MainActivity.getClimbingForBuilding(building.get_id());
-		if (climbing == null) throw new ClimbingNotFound(); // no climbing found
-		num_steps = climbing.getCompleted_steps();
-		percentage = climbing.getPercentage();
 		seekbarIndicator.setMax(building.getSteps());
 		seekbarIndicator.setProgress(climbing.getCompleted_steps());
+		if (climbing == null) { // no climbing found
+			Log.i(MainActivity.AppName, "No previous climbing found");
+			num_steps = 0;
+			percentage = 0;
+			climbing = new Climbing(); // create a new empty climbing for this building
+			climbing.setBuilding(building);
+			climbing.setCompleted(0);
+			climbing.setRemaining_steps(building.getSteps());
+			climbing.setCompleted_steps(num_steps);
+			climbing.setCreated(new Date().getTime());
+			climbing.setModified(new Date().getTime());
+			MainActivity.climbingDao.create(climbing);
+			Log.i(MainActivity.AppName, "Created new climbing #" + climbing.get_id());
+		} else {
+			num_steps = climbing.getCompleted_steps();
+			percentage = climbing.getPercentage();
+			Log.i(MainActivity.AppName, "Loaded existing climbing (#" + climbing.get_id() + ")");
+		}
 		updateStats();
-		Log.i(MainActivity.AppName, "Loaded existing climbing (#" + climbing.get_id() + ")");
 		if (percentage >= 1.00) { // building already climbed
-			findViewById(R.id.btnStartClimbing).setVisibility(View.INVISIBLE);
+			findViewById(R.id.lblReadyToClimb).setVisibility(View.GONE);
 			SimpleDateFormat sdf = new SimpleDateFormat("yyyy.MM.dd");
-			((TextView) findViewById(R.id.lblReadyToClimb)).setText("ALREADY CLIMBED ON " + sdf.format(new Date(climbing.getCompleted())));
-			findViewById(R.id.btnAccessPhotoGallery).setVisibility(View.VISIBLE);
+			((TextView) findViewById(R.id.lblWin)).setText("ALREADY CLIMBED ON " + sdf.format(new Date(climbing.getCompleted())));
+			apply_win();
+		} else { // building to be completed
+			// animate "ready to climb" text
+            Animation anim = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.abc_slide_in_top);
+            anim.setDuration(2500);
+            findViewById(R.id.lblReadyToClimb).startAnimation(anim);
+            findViewById(R.id.lblReadyToClimb).setVisibility(View.VISIBLE);
 		}
 	}
 
@@ -432,14 +439,24 @@ public class ClimbActivity extends Activity {
 	 * @param v
 	 */
 	public void onBtnStartClimbing(View v) {
-		if (detectedSamplingRate == 0 || detectedSamplingRate < minimumSamplingRate) { // sampling rate detection still in progress
-			Toast.makeText(getApplicationContext(), "Accelerometer calibration is not ready yet. Please wait", Toast.LENGTH_SHORT).show();
-			return;
-		}
-		if (samplingEnabled) { // if sampling is enabled stop the classifier
-			stopClassify();
-		} else { // if sampling is not enabled stop the classifier
-			startClassifyService();
+		if (percentage >= 1.00) { // already win
+			FacebookUtils fb = new FacebookUtils(this);
+			try {
+				fb.postToWall(climbing);
+			} catch (NoFBSession e) {
+				Intent intent = new Intent(getApplicationContext(), SettingsActivity.class);
+				startActivity(intent);
+			}
+		} else {
+			if (detectedSamplingRate == 0 || detectedSamplingRate < minimumSamplingRate) { // sampling rate detection still in progress
+				Toast.makeText(getApplicationContext(), "Accelerometer calibration is not ready yet. Please wait", Toast.LENGTH_SHORT).show();
+				return;
+			}
+			if (samplingEnabled) { // if sampling is enabled stop the classifier
+				stopClassify();
+			} else { // if sampling is not enabled stop the classifier
+				startClassifyService();
+			}
 		}
 	}
 

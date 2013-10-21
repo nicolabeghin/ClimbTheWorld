@@ -62,5 +62,6 @@
     <!-- android:summary="Detected sampling rate" -->
     <!-- android:title="Sampling rate" /> -->
     <!-- <ListPreference android:dialogTitle="Step height" android:title="Step height" android:entries="@array/steps_height_titles" android:key="stepHeight" android:entryValues="@array/steps_height_values" android:summary="Step height" android:defaultValue="17"/> -->
-
+    <PreferenceCategory android:title="Facebook" >
+    </PreferenceCategory>
 </PreferenceScreen>

@@ -3,22 +3,21 @@ package org.unipd.nbeghin.climbtheworld;
 import android.annotation.TargetApi;
 import android.os.Build;
 import android.os.Bundle;
+import android.support.v4.app.FragmentActivity;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
 
 import com.facebook.Session;
 
-public class FBShareProgressActivity extends BaseFBActivity {
+public class FBShareProgressActivity extends FragmentActivity {
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_fb_share_progress);
 		Session session = Session.getActiveSession();
-		if (session != null && session.isOpened()) {
-			makeMeRequest(session);
-			onClickPostStatusUpdate();
-		}
+		// if (session != null && session.isOpened()) {
+		// makeMeRequest(session);
+		// }
 	}
 
 	/**
@@ -47,15 +46,13 @@ public class FBShareProgressActivity extends BaseFBActivity {
 		}
 		return super.onOptionsItemSelected(item);
 	}
+//
+//	public void onClickPost(View v) {
+//		System.out.println("clicked");
+//		List<Climbing> climbings=MainActivity.climbingDao.queryForAll();
+//		FacebookUtils fb=new FacebookUtils(this);
+//		fb.postToWall(climbings.get(0));
+//	}
 
-	public void onClickPost(View v) {
-		onClickPostStatusUpdate();
-	}
 
-	private void onClickPostStatusUpdate() {
-		Session session = Session.getActiveSession();
-		if (session != null && session.isOpened()) {
-			performPublish(PendingAction.POST_STATUS_UPDATE, canPresentShareDialog);
-		}
-	}
 }

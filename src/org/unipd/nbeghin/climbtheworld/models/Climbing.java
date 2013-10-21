@@ -1,26 +1,28 @@
 package org.unipd.nbeghin.climbtheworld.models;
 
+import java.util.concurrent.TimeUnit;
+
 import com.j256.ormlite.field.DatabaseField;
 import com.j256.ormlite.table.DatabaseTable;
 
 @DatabaseTable(tableName = "climbings")
 public class Climbing {
 	@DatabaseField(generatedId = true)
-	private int		_id;
-    @DatabaseField(canBeNull = false, foreign = true, foreignAutoRefresh = true)
-    private Building building;
+	private int			_id;
+	@DatabaseField(canBeNull = false, foreign = true, foreignAutoRefresh = true)
+	private Building	building;
 	@DatabaseField
-	private int		completed_steps;
+	private int			completed_steps;
 	@DatabaseField
-	private int		remaining_steps;
+	private int			remaining_steps;
 	@DatabaseField
-	private double	percentage;
+	private double		percentage;
 	@DatabaseField
-	private long	created;
+	private long		created;
 	@DatabaseField
-	private long	modified;
+	private long		modified;
 	@DatabaseField
-	private long	completed;
+	private long		completed;
 
 	public Climbing() {} // needed by ormlite
 
@@ -50,6 +52,22 @@ public class Climbing {
 
 	public int getRemaining_steps() {
 		return remaining_steps;
+	}
+
+	public boolean isCompleted() {
+		return this.completed > 0;
+	}
+
+	public String getFBStatusMessage() {
+		return "I just climbed " + building.getName() + " (" + building.getHeight() + "mt, " + building.getSteps() + " steps) in " + totalTime();
+	}
+
+	public String totalTime() {
+		long diff = 0;
+		if (isCompleted() == false) diff = this.modified - this.created; // not completed
+		else
+			diff = this.completed - this.created; // completed
+		return String.format("%dm%ds", TimeUnit.MILLISECONDS.toMinutes(diff), TimeUnit.MILLISECONDS.toSeconds(diff) - TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes(diff)));
 	}
 
 	public void setRemaining_steps(int remaining_steps) {
@@ -87,6 +105,4 @@ public class Climbing {
 	public void setCompleted(long completed) {
 		this.completed = completed;
 	}
-	
-	
 }

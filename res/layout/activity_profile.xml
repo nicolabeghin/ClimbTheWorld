@@ -18,7 +18,7 @@
 <!--             android:src="@drawable/social_person" /> -->
 
         <ImageView
-            android:id="@+id/imageView1"
+            android:id="@+id/imgArrow"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal"

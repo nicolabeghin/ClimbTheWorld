@@ -22,6 +22,16 @@
         android:src="@drawable/rocket"
         android:visibility="invisible" />
 
+    <ImageView
+        android:id="@+id/imgArrow"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|center_horizontal"
+        android:layout_marginBottom="40dp"
+        android:layout_marginLeft="10dp"
+        android:visibility="invisible"
+        android:src="@drawable/arrow" />
+
     <TextView
         android:id="@+id/lblReadyToClimb"
         android:layout_width="match_parent"
@@ -29,6 +39,7 @@
         android:layout_marginBottom="60dp"
         android:gravity="center"
         android:keepScreenOn="true"
+        android:visibility="invisible"
         android:text="READY TO CLIMB!"
         android:textColor="#33b5e5"
         android:textSize="50sp"
@@ -155,15 +166,16 @@
             android:textColor="#fff"
             android:textSize="18sp" />
 
-        <Button
+        <ImageButton
             android:id="@+id/btnAccessPhotoGallery"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:layout_marginTop="45dp"
+            android:src="@drawable/device_access_video"
+            android:layout_gravity="left"
+            android:layout_marginTop="75dp"
             android:visibility="invisible"
             android:onClick="accessPhotoGallery"
-            android:text="Access gallery" />
+            />
 
     </FrameLayout>
 

@@ -95,7 +95,7 @@ public class GalleryActivity extends BaseImageLoaderActivity {
 				// http://developer.android.com/design/patterns/navigation.html#up-vs-back
 				//
 
-				NavUtils.navigateUpFromSameTask(this);
+				finish();
 				return true;
 		}
 		return super.onOptionsItemSelected(item);
