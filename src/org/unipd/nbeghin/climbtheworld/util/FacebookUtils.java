@@ -1,5 +1,8 @@
 package org.unipd.nbeghin.climbtheworld.util;
 
+import java.util.Collection;
+import java.util.List;
+
 import org.unipd.nbeghin.climbtheworld.MainActivity;
 import org.unipd.nbeghin.climbtheworld.exceptions.NoFBSession;
 import org.unipd.nbeghin.climbtheworld.models.Climbing;
@@ -11,11 +14,8 @@ import android.widget.Toast;
 
 import com.facebook.FacebookException;
 import com.facebook.FacebookOperationCanceledException;
-import com.facebook.FacebookRequestError;
-import com.facebook.Request;
-import com.facebook.Response;
 import com.facebook.Session;
-import com.facebook.model.GraphObject;
+import com.facebook.model.GraphUser;
 import com.facebook.widget.WebDialog;
 import com.facebook.widget.WebDialog.OnCompleteListener;
 
@@ -55,6 +55,19 @@ public class FacebookUtils {
 		params.putString("link", "https://developers.facebook.com/android");
 		params.putString("picture", "https://raw.github.com/fbsamples/ios-3.x-howtos/master/Images/iossdk_logo.png");
 		publishFeedDialog(params);
+	}
+	
+	public void inviteFriends(Collection<GraphUser> friends) throws NoFBSession {
+		for(GraphUser friend: friends) {
+			Bundle params = new Bundle();
+			params.putString("name", "ClimbTheWorld");
+			params.putString("caption", "Climb the world: a serious game to promote physical activity");
+			params.putString("description", "Download ClimbTheWorld from Google Play (FREE)");
+			params.putString("link", "https://developers.facebook.com/android");
+			params.putString("to", friend.getId());
+			params.putString("picture", "https://raw.github.com/fbsamples/ios-3.x-howtos/master/Images/iossdk_logo.png");
+			publishFeedDialog(params);
+		}
 	}
 
 	public void publishFeedDialog() throws NoFBSession {

@@ -218,15 +218,8 @@ public class MainActivity extends ActionBarActivity {
 	}
 
 	public void onInviteFacebookFriends(MenuItem v) {
-//		Intent intent = new Intent(sContext, FBPickFriendActivity.class);
-//		startActivity(intent);		
-		try {
-			FacebookUtils fb=new FacebookUtils(this);
-			fb.publishFeedDialog();
-		} catch (NoFBSession e) {
-			Intent intent = new Intent(getApplicationContext(), SettingsActivity.class);
-			startActivity(intent);
-		}
+		Intent intent = new Intent(sContext, FBPickFriendActivity.class);
+		startActivity(intent);
 	}
 
 	private void shareDb() {

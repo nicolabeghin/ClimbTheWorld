@@ -3,7 +3,11 @@ package org.unipd.nbeghin.climbtheworld;
 import java.util.ArrayList;
 import java.util.Collection;
 
+import org.unipd.nbeghin.climbtheworld.exceptions.NoFBSession;
+import org.unipd.nbeghin.climbtheworld.util.FacebookUtils;
+
 import android.annotation.TargetApi;
+import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.FragmentManager;
@@ -51,8 +55,15 @@ public class FBPickFriendActivity extends BaseFBActivity {
 				@Override
 				public void onDoneButtonClicked(PickerFragment<?> fragment) {
 					selectedUsers = friendPickerFragment.getSelection();
+					FacebookUtils fb=new FacebookUtils(getApplicationContext());
 					setResult(RESULT_OK, null);
 					displaySelectedFriends();
+					try {
+						fb.inviteFriends(selectedUsers);
+					} catch (NoFBSession e) {
+						Intent intent = new Intent(getApplicationContext(), SettingsActivity.class);
+						startActivity(intent);
+					}
 					finish();
 				}
 			});
