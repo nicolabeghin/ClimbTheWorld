@@ -93,6 +93,8 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:background="@color/black_overlay"
+                android:paddingLeft="6dp"
+                android:paddingRight="1dp"
                 android:text="Height"
                 android:textColor="#fff" />
 
@@ -101,6 +103,8 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:background="@color/black_overlay"
+                android:paddingLeft="6dp"
+                android:paddingRight="1dp"
                 android:text="Steps"
                 android:textColor="#fff" />
 
@@ -170,12 +174,11 @@
             android:id="@+id/btnAccessPhotoGallery"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:src="@drawable/device_access_video"
-            android:layout_gravity="left"
-            android:layout_marginTop="75dp"
-            android:visibility="invisible"
+            android:layout_gravity="bottom|center_horizontal"
+            android:layout_marginBottom="75dp"
             android:onClick="accessPhotoGallery"
-            />
+            android:src="@drawable/device_access_video"
+            android:visibility="invisible" />
 
     </FrameLayout>
 
