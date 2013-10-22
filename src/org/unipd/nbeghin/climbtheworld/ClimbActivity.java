@@ -13,6 +13,7 @@ import org.unipd.nbeghin.climbtheworld.models.Climbing;
 import org.unipd.nbeghin.climbtheworld.services.SamplingClassifyService;
 import org.unipd.nbeghin.climbtheworld.services.SamplingRateDetectorService;
 import org.unipd.nbeghin.climbtheworld.util.FacebookUtils;
+import org.unipd.nbeghin.climbtheworld.util.StatUtils;
 import org.unipd.nbeghin.climbtheworld.util.SystemUiHider;
 
 import android.annotation.TargetApi;
@@ -69,6 +70,8 @@ public class ClimbActivity extends Activity {
 	private int						vstep_for_rstep				= 1;
 	private boolean					used_bonus					= false;
 	private double					percentage_bonus			= 0.50f;
+	private boolean climbedYesterday=false;
+	
 	// number of virtual step for each real step
 	/**
 	 * Whether or not the system UI should be auto-hidden after {@link #AUTO_HIDE_DELAY_MILLIS} milliseconds.
@@ -103,7 +106,7 @@ public class ClimbActivity extends Activity {
 		public void onReceive(Context context, Intent intent) {
 			String result = intent.getExtras().getString(ClassifierCircularBuffer.CLASSIFIER_NOTIFICATION_STATUS);
 			if (result.equals("STAIR")) {
-				if (percentage > 0.25f && percentage < 0.50f && used_bonus == false) { // bonus at 25%
+				if (climbedYesterday && percentage > 0.25f && percentage < 0.50f && used_bonus == false) { // bonus at 25%
 					apply_percentage_bonus();
 				} else { // standard, no bonus
 					num_steps += vstep_for_rstep; // increase the number of steps
@@ -128,7 +131,7 @@ public class ClimbActivity extends Activity {
 	private void apply_percentage_bonus() {
 		used_bonus = true;
 		stopClassify();
-		Toast.makeText(getApplicationContext(), "BONUS: you climbed yesterday too, you earn +50%", Toast.LENGTH_LONG).show();
+		Toast.makeText(getApplicationContext(), "BONUS: you climbed less than 24h ago, you earn +50%", Toast.LENGTH_LONG).show();
 		enableRocket();
 		percentage += percentage_bonus;
 		num_steps = (int) (((double) building.getSteps()) * percentage);
@@ -329,8 +332,6 @@ public class ClimbActivity extends Activity {
 	 */
 	private void loadPreviousClimbing() {
 		climbing = MainActivity.getClimbingForBuilding(building.get_id());
-		seekbarIndicator.setMax(building.getSteps());
-		seekbarIndicator.setProgress(climbing.getCompleted_steps());
 		if (climbing == null) { // no climbing found
 			Log.i(MainActivity.AppName, "No previous climbing found");
 			num_steps = 0;
@@ -349,6 +350,9 @@ public class ClimbActivity extends Activity {
 			percentage = climbing.getPercentage();
 			Log.i(MainActivity.AppName, "Loaded existing climbing (#" + climbing.get_id() + ")");
 		}
+		seekbarIndicator.setMax(building.getSteps());
+		seekbarIndicator.setProgress(climbing.getCompleted_steps());
+
 		updateStats();
 		if (percentage >= 1.00) { // building already climbed
 			findViewById(R.id.lblReadyToClimb).setVisibility(View.GONE);
@@ -424,6 +428,7 @@ public class ClimbActivity extends Activity {
 															mSystemUiHider.hide();
 														}
 													};
+	
 
 	/**
 	 * Schedules a call to hide() in [delay] milliseconds, canceling any previously scheduled calls.
@@ -455,6 +460,9 @@ public class ClimbActivity extends Activity {
 			if (samplingEnabled) { // if sampling is enabled stop the classifier
 				stopClassify();
 			} else { // if sampling is not enabled stop the classifier
+				climbedYesterday=StatUtils.climbedYesterday();
+				// FOR TESTING PURPOSES
+//				climbedYesterday=true;
 				startClassifyService();
 			}
 		}
