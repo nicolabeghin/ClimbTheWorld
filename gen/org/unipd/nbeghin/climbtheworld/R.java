@@ -1638,7 +1638,7 @@ containing a value of this type.
         public static final int action_mode_bar_stub=0x7f060041;
         public static final int action_mode_close_button=0x7f060035;
         public static final int action_search=0x7f0600a6;
-        public static final int action_settings=0x7f0600ac;
+        public static final int action_settings=0x7f0600ab;
         public static final int activity_chooser_view_content=0x7f060036;
         public static final int alignBounds=0x7f060005;
         public static final int alignMargins=0x7f060006;
@@ -1709,11 +1709,10 @@ containing a value of this type.
         public static final int image=0x7f060038;
         public static final int imgArrow=0x7f060057;
         public static final int imgRocket=0x7f060056;
-        public static final int itemFacebookLogin=0x7f0600a9;
-        public static final int itemFacebookPickFriends=0x7f0600aa;
+        public static final int itemInviteFacebookFriends=0x7f0600a9;
         public static final int itemProfile=0x7f0600a7;
         public static final int itemSettings=0x7f0600a8;
-        public static final int itemShareDb=0x7f0600ab;
+        public static final int itemShareDb=0x7f0600aa;
         public static final int large=0x7f060002;
         public static final int lblBuildingName=0x7f060065;
         public static final int lblClassifierOutput=0x7f060060;

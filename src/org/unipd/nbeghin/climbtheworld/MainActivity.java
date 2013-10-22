@@ -17,6 +17,7 @@ import java.util.Vector;
 import org.unipd.nbeghin.climbtheworld.adapters.PagerAdapter;
 import org.unipd.nbeghin.climbtheworld.db.DbHelper;
 import org.unipd.nbeghin.climbtheworld.db.PreExistingDbLoader;
+import org.unipd.nbeghin.climbtheworld.exceptions.NoFBSession;
 import org.unipd.nbeghin.climbtheworld.fragments.BuildingsFragment;
 import org.unipd.nbeghin.climbtheworld.fragments.ToursFragment;
 import org.unipd.nbeghin.climbtheworld.models.Building;
@@ -24,6 +25,7 @@ import org.unipd.nbeghin.climbtheworld.models.BuildingTour;
 import org.unipd.nbeghin.climbtheworld.models.Climbing;
 import org.unipd.nbeghin.climbtheworld.models.Photo;
 import org.unipd.nbeghin.climbtheworld.models.Tour;
+import org.unipd.nbeghin.climbtheworld.util.FacebookUtils;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
@@ -215,14 +217,16 @@ public class MainActivity extends ActionBarActivity {
 		shareDb();
 	}
 
-	public void onFacebookLogin(MenuItem v) {
-		Intent intent = new Intent(sContext, FBShareProgressActivity.class);
-		startActivity(intent);
-	}
-
-	public void onFacebookPickFriends(MenuItem v) {
-		Intent intent = new Intent(sContext, FBPickFriendActivity.class);
-		startActivity(intent);
+	public void onInviteFacebookFriends(MenuItem v) {
+//		Intent intent = new Intent(sContext, FBPickFriendActivity.class);
+//		startActivity(intent);		
+		try {
+			FacebookUtils fb=new FacebookUtils(this);
+			fb.publishFeedDialog();
+		} catch (NoFBSession e) {
+			Intent intent = new Intent(getApplicationContext(), SettingsActivity.class);
+			startActivity(intent);
+		}
 	}
 
 	private void shareDb() {

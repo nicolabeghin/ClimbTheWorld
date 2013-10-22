@@ -23,16 +23,10 @@
         android:title="Settings"
         climbtheworld:showAsAction="never">
     </item>
-        <item
-        android:id="@+id/itemFacebookLogin"
-        android:onClick="onFacebookLogin"
-        android:title="Facebook login"
-        climbtheworld:showAsAction="never">
-    </item>
             <item
-        android:id="@+id/itemFacebookPickFriends"
-        android:onClick="onFacebookPickFriends"
-        android:title="FB pick friends"
+        android:id="@+id/itemInviteFacebookFriends"
+        android:onClick="onInviteFacebookFriends"
+        android:title="Invite friends"
         climbtheworld:showAsAction="never">
     </item>
     <item

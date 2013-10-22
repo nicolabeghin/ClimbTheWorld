@@ -304,8 +304,6 @@ public class ClimbActivity extends Activity {
 				Log.i(MainActivity.AppName, "Using the previously detected sampling rate");
 				setupByDetectedSamplingRate(); // setup activity with given sampling rate
 			}
-			Animation anim = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.arrow);
-			findViewById(R.id.imgArrow).startAnimation(anim);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -360,8 +358,10 @@ public class ClimbActivity extends Activity {
 		} else { // building to be completed
 			// animate "ready to climb" text
             Animation anim = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.abc_slide_in_top);
+            Animation arrowAnim = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.arrow);
             anim.setDuration(2500);
             findViewById(R.id.lblReadyToClimb).startAnimation(anim);
+			findViewById(R.id.imgArrow).startAnimation(arrowAnim);
             findViewById(R.id.lblReadyToClimb).setVisibility(View.VISIBLE);
 		}
 	}
