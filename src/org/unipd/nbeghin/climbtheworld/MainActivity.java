@@ -7,7 +7,6 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -17,7 +16,6 @@ import java.util.Vector;
 import org.unipd.nbeghin.climbtheworld.adapters.PagerAdapter;
 import org.unipd.nbeghin.climbtheworld.db.DbHelper;
 import org.unipd.nbeghin.climbtheworld.db.PreExistingDbLoader;
-import org.unipd.nbeghin.climbtheworld.exceptions.NoFBSession;
 import org.unipd.nbeghin.climbtheworld.fragments.BuildingsFragment;
 import org.unipd.nbeghin.climbtheworld.fragments.ToursFragment;
 import org.unipd.nbeghin.climbtheworld.models.Building;
@@ -25,7 +23,6 @@ import org.unipd.nbeghin.climbtheworld.models.BuildingTour;
 import org.unipd.nbeghin.climbtheworld.models.Climbing;
 import org.unipd.nbeghin.climbtheworld.models.Photo;
 import org.unipd.nbeghin.climbtheworld.models.Tour;
-import org.unipd.nbeghin.climbtheworld.util.FacebookUtils;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
@@ -37,14 +34,12 @@ import android.support.v4.app.Fragment;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
-import android.support.v7.internal.view.menu.MenuView.ItemView;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Toast;
 
-import com.facebook.model.GraphUser;
 import com.j256.ormlite.dao.RuntimeExceptionDao;
 
 /**
@@ -195,13 +190,14 @@ public class MainActivity extends ActionBarActivity {
 
 	@Override
 	protected void onResume() {
-		Log.i(MainActivity.AppName, "onResume MainActivity");
+		Log.i(MainActivity.AppName, "MainActivity onResume");
 		super.onResume();
+		refresh();
 	}
 
 	@Override
 	protected void onPause() {
-		Log.i(MainActivity.AppName, "onPause MainActivity");
+		Log.i(MainActivity.AppName, "MainActivity onPause");
 		super.onPause();
 	}
 

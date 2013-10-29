@@ -129,17 +129,19 @@ public class ClimbActivity extends Activity {
 	}
 
 	private void apply_percentage_bonus() {
-		used_bonus = true;
-		stopClassify();
-		Toast.makeText(getApplicationContext(), "BONUS: you climbed less than 24h ago, you earn +50%", Toast.LENGTH_LONG).show();
-		enableRocket();
+		Log.i(MainActivity.AppName, "Applying percentage bonus");
 		percentage += percentage_bonus;
 		num_steps = (int) (((double) building.getSteps()) * percentage);
+		stopClassify();
+		used_bonus = true;
+		Toast.makeText(getApplicationContext(), "BONUS: you climbed less than 24h ago, you earn +50%", Toast.LENGTH_LONG).show();
+		enableRocket();
 		updateStats(); // update the view of current stats
 		seekbarIndicator.setProgress(num_steps); // increase the seekbar progress
 	}
 
 	private void apply_win() {
+		Log.i(MainActivity.AppName, "Succesfully climbed building #"+building.get_id());
 		Toast.makeText(getApplicationContext(), "You successfully climbed " + building.getSteps() + " steps (" + building.getHeight() + "m) of " + building.getName() + "!", Toast.LENGTH_LONG).show(); // show completion text
 		findViewById(R.id.lblWin).setVisibility(View.VISIBLE); // load and animate completed climbing test
 		findViewById(R.id.lblWin).startAnimation(AnimationUtils.loadAnimation(getApplicationContext(), R.anim.blink));
@@ -194,8 +196,9 @@ public class ClimbActivity extends Activity {
 	}
 
 	public void accessPhotoGallery(View v) {
+		Log.i(MainActivity.AppName, "Accessing gallery for building "+building.get_id());
 		Intent intent = new Intent(this, GalleryActivity.class);
-		intent.putExtra("building_id", building.get_id());
+		intent.putExtra("gallery_building_id", building.get_id());
 		startActivity(intent);
 	}
 
@@ -312,6 +315,11 @@ public class ClimbActivity extends Activity {
 		}
 	}
 
+	protected void onNewIntent (Intent intent) {
+		int building_id = intent.getIntExtra(MainActivity.building_intent_object, 0); // get building id from received intent
+		Log.i(MainActivity.AppName, "New intent building id: "+building_id);
+	}
+	
 	/**
 	 * Setup view with a given building and create/load an associated climbing
 	 */
@@ -403,7 +411,8 @@ public class ClimbActivity extends Activity {
 				//
 				// TODO: If Settings has multiple levels, Up should navigate up
 				// that hierarchy.
-				NavUtils.navigateUpFromSameTask(this);
+//				NavUtils.navigateUpFromSameTask(this);
+				finish();
 				return true;
 		}
 		return super.onOptionsItemSelected(item);
@@ -460,7 +469,7 @@ public class ClimbActivity extends Activity {
 			if (samplingEnabled) { // if sampling is enabled stop the classifier
 				stopClassify();
 			} else { // if sampling is not enabled stop the classifier
-				climbedYesterday=StatUtils.climbedYesterday();
+				climbedYesterday=StatUtils.climbedYesterday(climbing.get_id());
 				// FOR TESTING PURPOSES
 //				climbedYesterday=true;
 				startClassifyService();
@@ -538,19 +547,22 @@ public class ClimbActivity extends Activity {
 
 	@Override
 	protected void onResume() {
-		Log.i(MainActivity.AppName, "onResume");
+		Log.i(MainActivity.AppName, "ClimbActivity onResume");
+		int building_id = getIntent().getIntExtra(MainActivity.building_intent_object, 0); // get building id from received intent
+		Log.i(MainActivity.AppName, "Building id: "+building_id);
 		super.onResume();
 	}
 
 	@Override
 	protected void onPause() {
-		Log.i(MainActivity.AppName, "onPause");
+		Log.i(MainActivity.AppName, "ClimbActivity onPause");
 		super.onPause();
+		this.finish();
 	}
 
 	@Override
 	protected void onDestroy() {
-		Log.i(MainActivity.AppName, "onDestroy");
+		Log.i(MainActivity.AppName, "ClimbActivity onDestroy");
 		stopAllServices(); // make sure to stop all background services
 		super.onDestroy();
 	}

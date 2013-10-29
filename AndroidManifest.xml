@@ -75,6 +75,7 @@
         <activity
             android:name="org.unipd.nbeghin.climbtheworld.GalleryActivity"
             android:label="@string/title_activity_gallery"
+            android:theme="@style/Theme.AppCompat.Light"
             android:parentActivityName="org.unipd.nbeghin.climbtheworld.ClimbActivity" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
@@ -83,6 +84,7 @@
         <activity
             android:name="org.unipd.nbeghin.climbtheworld.PhotoPagerActivity"
             android:label="@string/title_activity_photo_pager_activity"
+            android:theme="@style/Theme.AppCompat.Light"
             android:parentActivityName="org.unipd.nbeghin.climbtheworld.GalleryActivity" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"

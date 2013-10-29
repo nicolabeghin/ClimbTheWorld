@@ -89,6 +89,14 @@
                 android:visibility="invisible" />
 
             <TextView
+                android:id="@+id/lblClassifierOutput"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="N"
+                android:textColor="@color/black_overlay"
+                android:textSize="48sp" />
+
+            <TextView
                 android:id="@+id/lblHeight"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -109,16 +117,12 @@
                 android:textColor="#fff" />
 
             <TextView
-                android:id="@+id/lblClassifierOutput"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Classifier" />
-
-            <TextView
                 android:id="@+id/lblSamplingRateDetected"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Sampling rate" />
+                android:text="Sampling rate"
+                android:visibility="gone" />
+
         </LinearLayout>
 
         <RelativeLayout

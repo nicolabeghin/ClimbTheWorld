@@ -30,7 +30,7 @@ public class GalleryActivity extends BaseImageLoaderActivity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_gallery);
 		if (building_id == 0) { // get the building id only if not coming back from 
-			building_id = getIntent().getIntExtra("building_id", 0);
+			building_id = getIntent().getIntExtra("gallery_building_id", 0);
 		}
 		if (building_id != 0) {
 			Log.i(MainActivity.AppName, "Loading gallery for building #" + building_id);
@@ -95,7 +95,7 @@ public class GalleryActivity extends BaseImageLoaderActivity {
 				// http://developer.android.com/design/patterns/navigation.html#up-vs-back
 				//
 
-				finish();
+				onBackPressed();
 				return true;
 		}
 		return super.onOptionsItemSelected(item);
@@ -104,19 +104,19 @@ public class GalleryActivity extends BaseImageLoaderActivity {
 
 	@Override
 	protected void onResume() {
-		Log.i(MainActivity.AppName, "onResume");
+		Log.i(MainActivity.AppName, "GalleryActivity onResume");
 		super.onResume();
 	}
 
 	@Override
 	protected void onPause() {
-		Log.i(MainActivity.AppName, "onPause");
+		Log.i(MainActivity.AppName, "GalleryActivity onPause");
 		super.onPause();
 	}
 
 	@Override
 	protected void onDestroy() {
-		Log.i(MainActivity.AppName, "onDestroy");
+		Log.i(MainActivity.AppName, "GalleryActivity onDestroy");
 		super.onDestroy();
 	}
 }

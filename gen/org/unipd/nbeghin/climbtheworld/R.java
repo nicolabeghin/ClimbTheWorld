@@ -1715,10 +1715,10 @@ containing a value of this type.
         public static final int itemShareDb=0x7f0600aa;
         public static final int large=0x7f060002;
         public static final int lblBuildingName=0x7f060065;
-        public static final int lblClassifierOutput=0x7f060060;
+        public static final int lblClassifierOutput=0x7f06005e;
         public static final int lblFacebookUser=0x7f060098;
-        public static final int lblHeight=0x7f06005e;
-        public static final int lblNumSteps=0x7f06005f;
+        public static final int lblHeight=0x7f06005f;
+        public static final int lblNumSteps=0x7f060060;
         public static final int lblReadyToClimb=0x7f060058;
         public static final int lblSamplingRateDetected=0x7f060061;
         public static final int lblWin=0x7f060059;

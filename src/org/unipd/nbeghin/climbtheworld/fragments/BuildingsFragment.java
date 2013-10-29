@@ -12,6 +12,7 @@ import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -22,7 +23,6 @@ import android.view.View.OnClickListener;
  *
  */
 public class BuildingsFragment extends Fragment {
-	public static final String	building_intent_object	= "org.unipd.nbeghin.climbtheworld.intents.object.building";
 	public CardUI				buildingCards;
 
 	private class LoadBuildingsTask extends AsyncTask<Void, Void, Void> {
@@ -34,13 +34,15 @@ public class BuildingsFragment extends Fragment {
 	}
 
 	public void refresh() {
+		buildingCards.clearCards();
 		for (final Building building : MainActivity.buildings) {
 			BuildingCard buildingCard = new BuildingCard(building);
 			buildingCard.setOnClickListener(new OnClickListener() {
 				@Override
 				public void onClick(View v) {
+					Log.i(MainActivity.AppName, "Building id clicked: "+building.get_id());
 					Intent intent = new Intent(getActivity().getApplicationContext(), ClimbActivity.class);
-					intent.putExtra(building_intent_object, building.get_id());
+					intent.putExtra(MainActivity.building_intent_object, building.get_id());
 					startActivity(intent);
 				}
 			});

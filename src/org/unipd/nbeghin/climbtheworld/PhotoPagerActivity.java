@@ -57,10 +57,6 @@ public class PhotoPagerActivity extends BaseImageLoaderActivity {
 		if (savedInstanceState != null) {
 			pagerPosition = savedInstanceState.getInt(STATE_POSITION);
 		}
-		options = new DisplayImageOptions.Builder()
-		// .showImageForEmptyUri(R.drawable.ic_empty)
-		// .showImageOnFail(R.drawable.ic_error)
-				.resetViewBeforeLoading(true).cacheOnDisc(true).imageScaleType(ImageScaleType.EXACTLY).bitmapConfig(Bitmap.Config.RGB_565).displayer(new FadeInBitmapDisplayer(300)).build();
 		pager = (ViewPager) findViewById(R.id.pager);
 		pager.setAdapter(new ImagePagerAdapter(GalleryActivity.photos));
 		pager.setCurrentItem(pagerPosition);
@@ -115,41 +111,45 @@ public class PhotoPagerActivity extends BaseImageLoaderActivity {
 			View imageLayout = inflater.inflate(R.layout.activity_photo_pager_item, view, false);
 			ImageView imageView = (ImageView) imageLayout.findViewById(R.id.image);
 			final ProgressBar spinner = (ProgressBar) imageLayout.findViewById(R.id.loading);
-			imageLoader.displayImage(images.get(position).getUrl(), imageView, options, new SimpleImageLoadingListener() {
-				@Override
-				public void onLoadingStarted(String imageUri, View view) {
-					spinner.setVisibility(View.VISIBLE);
-				}
-
-				@Override
-				public void onLoadingFailed(String imageUri, View view, FailReason failReason) {
-					String message = null;
-					switch (failReason.getType()) {
-						case IO_ERROR:
-							message = "Input/Output error";
-							break;
-						case DECODING_ERROR:
-							message = "Image can't be decoded";
-							break;
-						case NETWORK_DENIED:
-							message = "Downloads are denied";
-							break;
-						case OUT_OF_MEMORY:
-							message = "Out Of Memory error";
-							break;
-						case UNKNOWN:
-							message = "Unknown error";
-							break;
+			try {
+				imageLoader.displayImage(images.get(position).getUrl(), imageView, options, new SimpleImageLoadingListener() {
+					@Override
+					public void onLoadingStarted(String imageUri, View view) {
+						spinner.setVisibility(View.VISIBLE);
 					}
-					Toast.makeText(PhotoPagerActivity.this, message, Toast.LENGTH_SHORT).show();
-					spinner.setVisibility(View.GONE);
-				}
 
-				@Override
-				public void onLoadingComplete(String imageUri, View view, Bitmap loadedImage) {
-					spinner.setVisibility(View.GONE);
-				}
-			});
+					@Override
+					public void onLoadingFailed(String imageUri, View view, FailReason failReason) {
+						String message = null;
+						switch (failReason.getType()) {
+							case IO_ERROR:
+								message = "Input/Output error";
+								break;
+							case DECODING_ERROR:
+								message = "Image can't be decoded";
+								break;
+							case NETWORK_DENIED:
+								message = "Downloads are denied";
+								break;
+							case OUT_OF_MEMORY:
+								message = "Out Of Memory error";
+								break;
+							case UNKNOWN:
+								message = "Unknown error";
+								break;
+						}
+						Toast.makeText(PhotoPagerActivity.this, message, Toast.LENGTH_SHORT).show();
+						spinner.setVisibility(View.GONE);
+					}
+
+					@Override
+					public void onLoadingComplete(String imageUri, View view, Bitmap loadedImage) {
+						spinner.setVisibility(View.GONE);
+					}
+				});
+			} catch (Exception ex) {
+				Log.e(MainActivity.AppName, "Image loading: "+ex.getMessage());
+			}
 			((ViewPager) view).addView(imageLayout, 0);
 			return imageLayout;
 		}

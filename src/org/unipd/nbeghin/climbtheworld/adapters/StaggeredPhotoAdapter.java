@@ -42,7 +42,7 @@ public class StaggeredPhotoAdapter extends ArrayAdapter<Photo> {
 		} catch(NullPointerException e) {
 			Log.w(MainActivity.AppName, "No photo at position @"+position);
 		} catch(Exception e) {
-			
+			Log.e(MainActivity.AppName, "GalleryActivity: unable to show image");
 		}
 		return convertView;
 	}

@@ -26,6 +26,7 @@ public class BuildingsForTourFragment extends Fragment {
 	public CardUI				buildingCards;
 
 	public void loadBuildings(List<Building> buildings) {
+		buildingCards.clearCards();
 		int i=0;
 		for (final Building building : buildings) {
 			i++;

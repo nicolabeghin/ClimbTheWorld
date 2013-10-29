@@ -34,6 +34,7 @@ public class ToursFragment extends Fragment {
 	}
 
 	public void refresh() {
+		toursCards.clearCards();
 		for (final Tour tour : MainActivity.tours) {
 			TourCard tourCard = new TourCard(tour);
 			tourCard.setOnClickListener(new OnClickListener() {

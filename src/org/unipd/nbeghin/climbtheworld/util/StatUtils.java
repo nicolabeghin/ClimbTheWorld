@@ -20,17 +20,18 @@ public class StatUtils {
 	 * 
 	 * @return boolean
 	 */
-	public static boolean climbedYesterday() {
-		try {
-			String max_modified = execQuery("SELECT MAX(modified) FROM climbings");
-			long diff = new Date().getTime() - Long.parseLong(max_modified);
-			Log.i(MainActivity.AppName, "Last climbing diff: "+diff);
-			return diff <= 86400000;
-		} catch (SQLException e) {
-			return false;
-		} catch (NoStatFound e) {
-			return false;
-		}
+	public static boolean climbedYesterday(int climbing_id) {
+//		try {
+			return true; // for testing purposes
+//			String max_modified = execQuery("SELECT MAX(modified) FROM climbings WHERE id!="+climbing_id);
+//			long diff = new Date().getTime() - Long.parseLong(max_modified);
+//			Log.i(MainActivity.AppName, "Last climbing diff: "+diff);
+//			return diff <= 86400000;
+//		} catch (SQLException e) {
+//			return false;
+//		} catch (NoStatFound e) {
+//			return false;
+//		}
 	}
 
 	public static List<Stat> calculateStats() {

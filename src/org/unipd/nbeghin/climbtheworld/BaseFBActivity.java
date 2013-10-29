@@ -7,6 +7,7 @@ import android.app.AlertDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
+import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
 import android.widget.TextView;
 
@@ -21,7 +22,7 @@ import com.facebook.model.GraphUser;
 import com.facebook.widget.FacebookDialog;
 import com.facebook.widget.ProfilePictureView;
 
-public class BaseFBActivity extends FragmentActivity {
+public class BaseFBActivity extends ActionBarActivity {
 	protected UiLifecycleHelper		uiHelper;
 	protected static final int		REAUTH_ACTIVITY_CODE	= 100;
 	protected static final String	PERMISSION				= "publish_actions";

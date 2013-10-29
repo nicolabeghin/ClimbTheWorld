@@ -37,12 +37,6 @@ public class TourCard extends Card {
 		((TextView) view.findViewById(R.id.description)).setText(tour.getDescription());
 		LinearLayout layout=(LinearLayout) view.findViewById(R.id.buildingsForTourPhotoList);
 		List<Integer> images=MainActivity.getBuildingPhotosForTour(tour.get_id());
-		Log.i(MainActivity.AppName, images.size()+" immagini per tour #"+tour.get_id());
-//        android:id="@+id/ImageView01"
-//        android:layout_width="wrap_content"
-//        android:layout_height="wrap_content"
-//        android:adjustViewBounds="true"
-//        android:scaleType="fitStart"
 		for(int image: images) {
 			ImageView imageView=new ImageView(context);
 			imageView.setImageResource(image);
