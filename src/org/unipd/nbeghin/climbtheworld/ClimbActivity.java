@@ -412,7 +412,10 @@ public class ClimbActivity extends Activity {
 				// TODO: If Settings has multiple levels, Up should navigate up
 				// that hierarchy.
 //				NavUtils.navigateUpFromSameTask(this);
-				finish();
+				if (samplingEnabled == false) finish();
+				else { // disable back button if sampling is enabled
+					Toast.makeText(getApplicationContext(), "Sampling running - Stop it before exiting", Toast.LENGTH_SHORT).show();
+				}
 				return true;
 		}
 		return super.onOptionsItemSelected(item);

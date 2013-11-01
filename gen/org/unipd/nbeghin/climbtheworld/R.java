@@ -1163,11 +1163,14 @@ containing a value of this type.
         public static final int abc_split_action_bar_is_narrow=0x7f0b0002;
     }
     public static final class color {
-        public static final int abc_search_url_text_holo=0x7f080013;
+        public static final int abc_search_url_text_holo=0x7f080023;
         public static final int abc_search_url_text_normal=0x7f080007;
         public static final int abc_search_url_text_pressed=0x7f080009;
         public static final int abc_search_url_text_selected=0x7f080008;
+        public static final int aqua=0x7f08001c;
+        public static final int black=0x7f080022;
         public static final int black_overlay=0x7f080012;
+        public static final int blue=0x7f080020;
         public static final int card_border=0x7f080011;
         public static final int card_grid_text=0x7f08000f;
         public static final int card_light_text=0x7f08000e;
@@ -1181,8 +1184,21 @@ containing a value of this type.
         public static final int com_facebook_usersettingsfragment_connected_shadow_color=0x7f080004;
         public static final int com_facebook_usersettingsfragment_connected_text_color=0x7f080003;
         public static final int com_facebook_usersettingsfragment_not_connected_text_color=0x7f080005;
+        public static final int fuchsia=0x7f080015;
+        public static final int gray=0x7f080018;
+        public static final int green=0x7f08001f;
+        public static final int lime=0x7f08001d;
+        public static final int maroon=0x7f08001b;
+        public static final int navy=0x7f080021;
+        public static final int olive=0x7f080019;
+        public static final int purple=0x7f08001a;
+        public static final int red=0x7f080016;
+        public static final int silver=0x7f080017;
         public static final int stroke=0x7f08000a;
+        public static final int teal=0x7f08001e;
         public static final int text_light=0x7f08000b;
+        public static final int white=0x7f080013;
+        public static final int yellow=0x7f080014;
     }
     public static final class dimen {
         /**  Default height of an action bar. 
