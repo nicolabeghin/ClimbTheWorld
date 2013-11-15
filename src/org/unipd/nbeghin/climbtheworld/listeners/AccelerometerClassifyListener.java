@@ -13,12 +13,12 @@ import android.util.Log;
 
 /**
  * Listener for classifier
- *
+ * 
  */
 public class AccelerometerClassifyListener implements SensorEventListener {
 	private int					sensorDelay;
-	private static double		samplingRate	= 18;			// default
-	private static double		step_per_second	= 0.77;		// nexus 4: 14 samples per step (77% of 18Hz)
+	private static double		samplingRate	= 18;	// default
+	private static double		step_per_second	= 0.51; // 0.51200396: 30.720238 ms
 	ClassifierCircularBuffer	buffer;
 	IntentService				service;
 
