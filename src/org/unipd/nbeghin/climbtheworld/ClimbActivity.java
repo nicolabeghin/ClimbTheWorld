@@ -176,10 +176,10 @@ public class ClimbActivity extends Activity {
 				unregisterReceiver(this); // unregister listener
 				setupByDetectedSamplingRate(); // setup app with detected sampling rate
 			} else { // sampling rate not high enough: try to decrease the sampling delay
-				if (backgroundSamplingRateDetector.getExtras().getInt(ClimbActivity.SAMPLING_DELAY) != SensorManager.SENSOR_DELAY_GAME) { // decrease sampling delay in order to increase sampling rate
+				if (backgroundSamplingRateDetector.getExtras().getInt(ClimbActivity.SAMPLING_DELAY) != SensorManager.SENSOR_DELAY_UI) { // decrease sampling delay in order to increase sampling rate
 					Log.w(MainActivity.AppName, "Sampling rate not high enough: trying to decrease the sampling delay");
 					stopService(backgroundSamplingRateDetector); // stop previous sampling rate detector service
-					backgroundSamplingRateDetector.putExtra(SAMPLING_DELAY, SensorManager.SENSOR_DELAY_GAME); // set new sampling delay (lower than the previous one)
+					backgroundSamplingRateDetector.putExtra(SAMPLING_DELAY, SensorManager.SENSOR_DELAY_UI); // set new sampling delay (lower than the previous one)
 					startService(backgroundSamplingRateDetector); // start new sampling rate detector service
 				} else { // unable to determine a sampling rate high enough for our purposes: stop
 					Log.e(MainActivity.AppName, "Sampling rate not high enough for this application");
