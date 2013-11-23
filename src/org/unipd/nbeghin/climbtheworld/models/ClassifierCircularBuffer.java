@@ -1,6 +1,7 @@
 package org.unipd.nbeghin.climbtheworld.models;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
@@ -26,7 +27,7 @@ public class ClassifierCircularBuffer {
 	public final static String	CLASSIFIER_NOTIFICATION_STATUS	= "CLASSIFIER_NOTIFICATION_STATUS";
 	private int					axis_to_be_considered			= 4;											// (4 == |V|)
 	private int					size							= 0;
-	private int					average_step_duration			= 497000000;											// in ms
+	private int					average_step_duration			= 488771008;											// in ms
 	private long deltaTime;
 	
 	/**
@@ -52,11 +53,12 @@ public class ClassifierCircularBuffer {
 
 	private void classify() {
 		List<Sample> used_samples=new ArrayList<Sample>(samples); // clone given samples in order to unlock access to main samples
-		samples.clear();
+		samples = samples.subList((int)(samples.size() / 2), samples.size()); // overlapping sliding window
+//		samples.clear();	
 		try {
 			Collections.sort(used_samples, new SampleTimeComparator()); // make sure it's ordered by timestamp
 			Batch batch = new Batch(used_samples); // create a new batch with given samples
-			Log.i(MainActivity.AppName, "deltaTime=" + deltaTime/1000000 + "ms, batch size=" + used_samples.size());
+//			Log.i(MainActivity.AppName, "deltaTime=" + deltaTime/1000000 + "ms, batch size=" + used_samples.size());
 			List<FeatureSet> features = batch.getFeatures(); // calculate features
 			features = features.subList(0, axis_to_be_considered); // get (if requested) a subset of the calculated features
 			Collections.sort(features, new MeanComparator());
@@ -69,11 +71,11 @@ public class ClassifierCircularBuffer {
 				data_row[i] = featureSet.getVariance();
 				i++;
 			}
+//			Log.d(MainActivity.AppName, "FEATURES: "+Arrays.toString(data_row));
 			Intent intent = new Intent();
 			intent.setAction(CLASSIFIER_ACTION);
 			intent.putExtra(CLASSIFIER_NOTIFICATION_STATUS, WekaClassifier.explicit_classify(data_row));
 			service.sendBroadcast(intent); // broadcast the classifier output
-//			samples = samples.subList(size / 2, samples.size()); // overlapping sliding window
 		} catch (Exception e) {
 			Log.e(MainActivity.AppName, "Unable to classify batch:" + e.getMessage());
 		}
