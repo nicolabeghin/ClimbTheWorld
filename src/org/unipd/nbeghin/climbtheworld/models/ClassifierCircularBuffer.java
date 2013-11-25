@@ -27,7 +27,7 @@ public class ClassifierCircularBuffer {
 	public final static String	CLASSIFIER_NOTIFICATION_STATUS	= "CLASSIFIER_NOTIFICATION_STATUS";
 	private int					axis_to_be_considered			= 4;											// (4 == |V|)
 	private int					size							= 0;
-	private int					average_step_duration			= 488771008;											// in ms
+	private int					average_step_duration			= 487118048;											// in ms
 	private long deltaTime;
 	
 	/**
