@@ -138,6 +138,7 @@ public class ClimbActivity extends Activity {
 		enableRocket();
 		updateStats(); // update the view of current stats
 		seekbarIndicator.setProgress(num_steps); // increase the seekbar progress
+		startClimbing();
 	}
 
 	private void apply_win() {
@@ -467,6 +468,10 @@ public class ClimbActivity extends Activity {
 	 * @param v
 	 */
 	public void onBtnStartClimbing(View v) {
+		startClimbing();
+	}
+	
+	private void startClimbing() {
 		if (percentage >= 1.00) { // already win
 			FacebookUtils fb = new FacebookUtils(this);
 			try {
