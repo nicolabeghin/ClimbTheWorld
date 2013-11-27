@@ -1,7 +1,6 @@
 package org.unipd.nbeghin.climbtheworld.models;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
@@ -12,6 +11,8 @@ import org.unipd.nbeghin.climbtheworld.weka.WekaClassifier;
 
 import android.app.IntentService;
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.preference.PreferenceManager;
 import android.util.Log;
 
 /**
@@ -27,38 +28,40 @@ public class ClassifierCircularBuffer {
 	public final static String	CLASSIFIER_NOTIFICATION_STATUS	= "CLASSIFIER_NOTIFICATION_STATUS";
 	private int					axis_to_be_considered			= 4;											// (4 == |V|)
 	private int					size							= 0;
-	private int					average_step_duration			= 487118048;											// in ms
-	private long deltaTime;
+	public static int			average_step_duration			= 487118048;									// in ms
+	private long				deltaTime;
+	private boolean				debug							= false;
 	
 	/**
 	 * @param size Size of the buffer
 	 * @param service Reference to the service that will be used to issue BroadcastRequest
 	 */
 	public ClassifierCircularBuffer(int size, IntentService service) {
-//		if (size % 2 != 0) { // not an even number
-//			size++; // get an even number (odd + 1)
-//			Log.w(MainActivity.AppName, (size - 1) + " is not an even number: using " + size + " as circular buffer size");
-//		}
+		// if (size % 2 != 0) { // not an even number
+		// size++; // get an even number (odd + 1)
+		// Log.w(MainActivity.AppName, (size - 1) + " is not an even number: using " + size + " as circular buffer size");
+		// }
 		this.service = service;
 		this.size = size;
+		SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(MainActivity.getContext()); // reference to android preferences
+		debug = settings.getBoolean("debug", false);
 	}
 
 	public void add(Sample sample) {
 		samples.add(sample);
-		deltaTime=(samples.get(samples.size()-1).getTime()-samples.get(0).getTime());
+		deltaTime = (samples.get(samples.size() - 1).getTime() - samples.get(0).getTime());
 		if (deltaTime >= average_step_duration) {
 			this.classify();
 		}
 	}
 
 	private void classify() {
-		List<Sample> used_samples=new ArrayList<Sample>(samples); // clone given samples in order to unlock access to main samples
-		samples = samples.subList((int)(samples.size() / 2), samples.size()); // overlapping sliding window
-//		samples.clear();	
+		List<Sample> used_samples = new ArrayList<Sample>(samples); // clone given samples in order to unlock access to main samples
+		samples = new ArrayList<Sample>(samples.subList((int) (samples.size() / 2), samples.size())); // overlapping sliding window
 		try {
 			Collections.sort(used_samples, new SampleTimeComparator()); // make sure it's ordered by timestamp
 			Batch batch = new Batch(used_samples); // create a new batch with given samples
-//			Log.i(MainActivity.AppName, "deltaTime=" + deltaTime/1000000 + "ms, batch size=" + used_samples.size());
+			if (debug) Log.i(MainActivity.AppName, "deltaTime=" + deltaTime / 1000000 + "ms, batch size=" + used_samples.size());
 			List<FeatureSet> features = batch.getFeatures(); // calculate features
 			features = features.subList(0, axis_to_be_considered); // get (if requested) a subset of the calculated features
 			Collections.sort(features, new MeanComparator());
@@ -71,7 +74,7 @@ public class ClassifierCircularBuffer {
 				data_row[i] = featureSet.getVariance();
 				i++;
 			}
-//			Log.d(MainActivity.AppName, "FEATURES: "+Arrays.toString(data_row));
+			// Log.d(MainActivity.AppName, "FEATURES: "+Arrays.toString(data_row));
 			Intent intent = new Intent();
 			intent.setAction(CLASSIFIER_ACTION);
 			intent.putExtra(CLASSIFIER_NOTIFICATION_STATUS, WekaClassifier.explicit_classify(data_row));

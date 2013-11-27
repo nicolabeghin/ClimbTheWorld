@@ -311,6 +311,7 @@ public class ClimbActivity extends Activity {
 				findViewById(R.id.lblSamplingRateDetected).setVisibility(View.GONE);
 			}
 			// sampling rate not detected or lower than the minimum one
+			Log.i(MainActivity.AppName, "Minimum sampling rate: "+minimumSamplingRate+"Hz");
 			if (samplingDelay == -1 || detectedSamplingRate < minimumSamplingRate) { // start sampling rate detector
 				Log.w(MainActivity.AppName, "Sampling rate not previously detected or too low. Detecting a new one");
 				backgroundSamplingRateDetector = new Intent(this, SamplingRateDetectorService.class); // instance (without starting) background sampling rate detected
@@ -576,6 +577,9 @@ public class ClimbActivity extends Activity {
 	protected void onPause() {
 		Log.i(MainActivity.AppName, "ClimbActivity onPause");
 		super.onPause();
+		if (samplingEnabled) { // if sampling is enabled stop the classifier
+			stopClassify();
+		}
 		this.finish();
 	}
 
