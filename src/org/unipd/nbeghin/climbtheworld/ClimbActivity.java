@@ -164,7 +164,7 @@ public class ClimbActivity extends Activity {
 		public void onReceive(Context context, Intent intent) {
 			detectedSamplingRate = intent.getExtras().getDouble(AccelerometerSamplingRateDetect.SAMPLING_RATE); // get detected sampling rate from received intent
 			samplingDelay = backgroundSamplingRateDetector.getExtras().getInt(SAMPLING_DELAY); // get used sampling delay from received intent
-			Log.i(MainActivity.AppName, "Detected sampling rate: " + Double.toString(detectedSamplingRate) + "Hz");
+			Log.i(MainActivity.AppName, "Detected sampling rate: " + Double.toString(detectedSamplingRate) + "Hz");			
 			if (detectedSamplingRate >= minimumSamplingRate) { // sampling rate high enough
 				SharedPreferences.Editor editor = PreferenceManager.getDefaultSharedPreferences(getApplicationContext()).edit(); // get refence to android preferences
 				editor.putFloat("detectedSamplingRate", (float) detectedSamplingRate); // store detected sampling rate
@@ -172,6 +172,7 @@ public class ClimbActivity extends Activity {
 				editor.apply(); // commit preferences
 				Log.i(MainActivity.AppName, "Stored detected sampling rate of " + detectedSamplingRate + "Hz");
 				Log.i(MainActivity.AppName, "Stored sampling delay of " + samplingDelay);
+				((TextView) findViewById(R.id.lblSamplingRateDetected)).setText((int) detectedSamplingRate + " Hz");
 				stopService(backgroundSamplingRateDetector); // stop sampling rate detector service
 				unregisterReceiver(this); // unregister listener
 				setupByDetectedSamplingRate(); // setup app with detected sampling rate
@@ -302,9 +303,11 @@ public class ClimbActivity extends Activity {
 			if (settings.getBoolean("debug", false)) {
 				Log.w(MainActivity.AppName, "Debug enabled");
 				findViewById(R.id.lblClassifierOutput).setVisibility(View.VISIBLE);
+				findViewById(R.id.lblSamplingRateDetected).setVisibility(View.VISIBLE);
 			} else {
 				Log.w(MainActivity.AppName, "Debug disabled");
 				findViewById(R.id.lblClassifierOutput).setVisibility(View.GONE);
+				findViewById(R.id.lblSamplingRateDetected).setVisibility(View.GONE);
 			}
 			// sampling rate not detected or lower than the minimum one
 			if (samplingDelay == -1 || detectedSamplingRate < minimumSamplingRate) { // start sampling rate detector
@@ -315,6 +318,7 @@ public class ClimbActivity extends Activity {
 				startService(backgroundSamplingRateDetector); // start background service
 			} else {
 				Log.i(MainActivity.AppName, "Using the previously detected sampling rate");
+				((TextView) findViewById(R.id.lblSamplingRateDetected)).setText((int) detectedSamplingRate + " Hz");
 				setupByDetectedSamplingRate(); // setup activity with given sampling rate
 			}
 		} catch (Exception e) {
