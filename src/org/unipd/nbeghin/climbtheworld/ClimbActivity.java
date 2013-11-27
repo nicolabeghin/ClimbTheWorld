@@ -299,6 +299,13 @@ public class ClimbActivity extends Activity {
 			detectedSamplingRate = settings.getFloat("detectedSamplingRate", 0.00f); // load previously detected sampling rate
 			samplingDelay = settings.getInt("sensor_delay", -1); // load previously detected sampling delay
 			Log.i(MainActivity.AppName, "Previous detected sampling rate of " + Double.toString(detectedSamplingRate) + "Hz");
+			if (settings.getBoolean("debug", false)) {
+				Log.w(MainActivity.AppName, "Debug enabled");
+				findViewById(R.id.lblClassifierOutput).setVisibility(View.VISIBLE);
+			} else {
+				Log.w(MainActivity.AppName, "Debug disabled");
+				findViewById(R.id.lblClassifierOutput).setVisibility(View.GONE);
+			}
 			// sampling rate not detected or lower than the minimum one
 			if (samplingDelay == -1 || detectedSamplingRate < minimumSamplingRate) { // start sampling rate detector
 				Log.w(MainActivity.AppName, "Sampling rate not previously detected or too low. Detecting a new one");

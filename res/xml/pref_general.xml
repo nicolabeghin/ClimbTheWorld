@@ -36,6 +36,15 @@
     <!-- android:title="Your weight" android:defaultValue="80"/> -->
 
     <PreferenceCategory android:title="Climbing settings" >
+            <ListPreference
+        android:defaultValue="10"
+        android:entries="@array/difficulty_titles"
+        android:entryValues="@array/difficulty_values"
+        android:key="difficulty"
+        android:negativeButtonText="@null"
+        android:positiveButtonText="@null"
+        android:summary="Difficulty"
+        android:title="Level" />
     </PreferenceCategory>
 
     <!-- <ListPreference -->
@@ -47,16 +56,11 @@
     <!-- android:positiveButtonText="@null" -->
     <!-- android:summary="How many steps for each real one" -->
     <!-- android:title="Step cheating" /> -->
-    <ListPreference
-        android:defaultValue="10"
-        android:entries="@array/difficulty_titles"
-        android:entryValues="@array/difficulty_values"
-        android:key="difficulty"
-        android:negativeButtonText="@null"
-        android:positiveButtonText="@null"
-        android:summary="Difficulty"
-        android:title="Level" />
 
+    <PreferenceCategory android:title="Advanced" >
+        <CheckBoxPreference android:key="debug" android:title="Debug" android:summaryOff="Debug disabled" android:summaryOn="Debug enabled"/>
+    </PreferenceCategory>
+    
     <!-- <Preference -->
     <!-- android:key="detectedSamplingRate" -->
     <!-- android:summary="Detected sampling rate" -->
