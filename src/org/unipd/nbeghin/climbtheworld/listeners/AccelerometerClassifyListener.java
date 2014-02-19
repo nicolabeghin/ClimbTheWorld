@@ -3,6 +3,7 @@ package org.unipd.nbeghin.climbtheworld.listeners;
 import org.unipd.nbeghin.climbtheworld.MainActivity;
 import org.unipd.nbeghin.climbtheworld.models.ClassifierCircularBuffer;
 import org.unipd.nbeghin.climbtheworld.models.Sample;
+import org.unipd.nbeghin.climbtheworld.services.SamplingClassifyService;
 
 import android.app.IntentService;
 import android.content.Context;
@@ -19,6 +20,7 @@ public class AccelerometerClassifyListener implements SensorEventListener {
 	private int					sensorDelay;
 	private static double		samplingRate	= 18;	// default
 	private static double		step_per_second	= 0.51; // 0.51200396: 30.720238 ms
+	private float[] 			lastValuesRotationVector;
 	ClassifierCircularBuffer	buffer;
 	IntentService				service;
 
@@ -44,7 +46,13 @@ public class AccelerometerClassifyListener implements SensorEventListener {
 
 	@Override
 	public void onSensorChanged(SensorEvent event) {
-		buffer.add(new Sample(event.timestamp, event.values[0], event.values[1], event.values[2]));
+		
+		if (event.sensor == SamplingClassifyService.mRotationVector) {
+			lastValuesRotationVector = (float[])event.values.clone();
+		}
+		else {
+			buffer.add(new Sample(event.timestamp, event.values[0], event.values[1], event.values[2]), lastValuesRotationVector);
+		}
 	}
 
 	@Override

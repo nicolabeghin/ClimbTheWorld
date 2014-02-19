@@ -22,7 +22,8 @@ import android.util.Log;
  */
 public class SamplingClassifyService extends IntentService {
 	private AccelerometerClassifyListener	accelerometerListener; // assigned listener
-	private Sensor							mAccelerometer;
+	public static Sensor					mAccelerometer;
+	public static Sensor					mRotationVector;
 	private SensorManager					mSensorManager;
 	private int								notification_id	= 1;
 	private int								sensorDelay		= SensorManager.SENSOR_DELAY_NORMAL;
@@ -41,6 +42,8 @@ public class SamplingClassifyService extends IntentService {
 			Log.i(MainActivity.AppName, "Sensor manager instanced");
 			mAccelerometer = mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
 			Log.i(MainActivity.AppName, "Accelerometer instanced");
+			mRotationVector = mSensorManager.getDefaultSensor(Sensor.TYPE_ROTATION_VECTOR);
+			Log.i(MainActivity.AppName, "Rotation Vector istantiated");
 			accelerometerListener = new AccelerometerClassifyListener(getApplicationContext(), this);
 			Log.i(MainActivity.AppName, "Accelerometer listener instanced");
 		} catch (Exception e) {
