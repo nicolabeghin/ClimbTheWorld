@@ -183,7 +183,7 @@ public class Batch {
 	private void calculateMagnitudeMean() {
 		
 		magnitudeMean = Math.sqrt(Math.pow(basicFeatures.get(0).getMean(), 2) 
-				+ Math.pow(basicFeatures.get(1).getMean(), 2) + Math.pow(basicFeatures.get(3).getMean(), 2));
+				+ Math.pow(basicFeatures.get(1).getMean(), 2) + Math.pow(basicFeatures.get(2).getMean(), 2));
 	}
 	
 	public List<Double> getRatios() {
@@ -194,8 +194,13 @@ public class Batch {
 		return this.correlations;
 	}
 	
+	public Double getMagnitudeMean() {
+		return this.magnitudeMean;
+	}
 	
-	
+	public Double getSignalMagnitudeArea() {
+		return this.signalMagnitudeArea;
+	}
 	
 	
 	

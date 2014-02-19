@@ -104,10 +104,12 @@ public class SamplingClassifyService extends IntentService {
 	public void startAccelerometer() {
 		Log.i(MainActivity.AppName, "Registering accelerometer listener");
 		mSensorManager.registerListener(accelerometerListener, mAccelerometer, sensorDelay); // SensorManager.SENSOR_DELAY_NORMAL
+		mSensorManager.registerListener(accelerometerListener, mRotationVector, sensorDelay);
 	}
 
 	public void stopAccelerometer() {
 		Log.i(MainActivity.AppName, "Un-registering accelerometer listener");
-		mSensorManager.unregisterListener(accelerometerListener);
+		mSensorManager.unregisterListener(accelerometerListener, mAccelerometer);
+		mSensorManager.unregisterListener(accelerometerListener, mRotationVector);
 	}
 }

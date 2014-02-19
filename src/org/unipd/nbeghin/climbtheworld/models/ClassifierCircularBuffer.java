@@ -24,7 +24,7 @@ public class ClassifierCircularBuffer {
 	private List<Sample>		bufferToRemoveGravity			= new ArrayList<Sample>();
 	private boolean				bufferFull						= false;
 	private float 				bufferDuration					= 5000000000F;
-	private Double[]			data_row						= new Double[12];
+	private List<Double>		data_row						= new ArrayList<Double>();
 	IntentService				service;
 	public final static String	CLASSIFIER_ACTION				= "org.unipd.nbeghin.classifier.notification";
 	public final static String	CLASSIFIER_NOTIFICATION_STATUS	= "CLASSIFIER_NOTIFICATION_STATUS";
@@ -97,8 +97,8 @@ public class ClassifierCircularBuffer {
 	/**
 	 * Rotates the values of the sample depending on the values of the 
 	 * rotation vector
-	 * @param sample
-	 * @param rotationValues
+	 * @param sample: initial x,y,z values
+	 * @param rotationValues: x,y,z values of the rotation vector
 	 */
 	private void rotateAccelerometerValues(Sample sample, float[] rotationValues) {
 		
@@ -133,28 +133,35 @@ public class ClassifierCircularBuffer {
 	private void classify() {
 		
 		List<Sample> used_samples=new ArrayList<Sample>(samples); // clone given samples in order to unlock access to main samples
-		samples = samples.subList((int)(samples.size() / 2), samples.size()); // overlapping sliding window
-//		samples.clear();	
+		samples = samples.subList((int)(samples.size() / 4), samples.size()); // overlapping sliding window
+
 		try {
 			Collections.sort(used_samples, new SampleTimeComparator()); // make sure it's ordered by timestamp
+			
+			/**
+			 * Creates a new batch with the given sample that is responsible 
+			 * to calculate all the required features
+			 */
 			Batch batch = new Batch(used_samples); // create a new batch with given samples
 //			Log.i(MainActivity.AppName, "deltaTime=" + deltaTime/1000000 + "ms, batch size=" + used_samples.size());
 			List<FeatureSet> features = batch.getBasicFeatures(); // calculate features
-			features = features.subList(0, axis_to_be_considered); // get (if requested) a subset of the calculated features
-			Collections.sort(features, new MeanComparator());
-			int i = 0;
+			
 			for (FeatureSet featureSet : features) {
-				data_row[i] = featureSet.getMean();
-				i++;
-				data_row[i] = featureSet.getStd();
-				i++;
-				data_row[i] = featureSet.getVariance();
-				i++;
+				data_row.add(featureSet.getMean());
+				data_row.add(featureSet.getStd());
+				data_row.add(featureSet.getVariance());
+				data_row.add(featureSet.getDifferenceMinMax());
 			}
+			
+			data_row.addAll(batch.getRatios());
+			data_row.addAll(batch.getCorrelations());
+			data_row.add(batch.getMagnitudeMean());
+			data_row.add(batch.getSignalMagnitudeArea());
+			
 //			Log.d(MainActivity.AppName, "FEATURES: "+Arrays.toString(data_row));
 			Intent intent = new Intent();
 			intent.setAction(CLASSIFIER_ACTION);
-			intent.putExtra(CLASSIFIER_NOTIFICATION_STATUS, WekaClassifier.explicit_classify(data_row));
+			intent.putExtra(CLASSIFIER_NOTIFICATION_STATUS, WekaClassifier.explicit_classify((Double[])data_row.toArray()));
 			service.sendBroadcast(intent); // broadcast the classifier output
 		} catch (Exception e) {
 			Log.e(MainActivity.AppName, "Unable to classify batch:" + e.getMessage());

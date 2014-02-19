@@ -51,7 +51,9 @@ public class AccelerometerClassifyListener implements SensorEventListener {
 			lastValuesRotationVector = (float[])event.values.clone();
 		}
 		else {
-			buffer.add(new Sample(event.timestamp, event.values[0], event.values[1], event.values[2]), lastValuesRotationVector);
+			if (lastValuesRotationVector != null) {
+				buffer.add(new Sample(event.timestamp, event.values[0], event.values[1], event.values[2]), lastValuesRotationVector);
+			}
 		}
 	}
 
