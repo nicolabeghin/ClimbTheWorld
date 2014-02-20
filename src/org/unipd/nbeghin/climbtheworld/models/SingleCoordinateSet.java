@@ -46,38 +46,7 @@ public class SingleCoordinateSet {
 	public double getMin() {
 		return Collections.min(this.values, new CoupleTimeDataComparator()).getValue();
 	}
-
-	/**
-	 * Normalize on a single axis (this one)
-	 */
-	public void normalize() {
-		DataTime max = Collections.max(this.values, new CoupleTimeDataComparator());
-		DataTime min = Collections.min(this.values, new CoupleTimeDataComparator());
-		this.normalize(min.getValue(), max.getValue());
-	}
-
-	public void normalize(double min, double max) {
-		for (DataTime ctd : this.values) {
-			ctd.normalize(min, max);
-		}
-	}
-
-	/**
-	 * Normalize on all given axes
-	 * 
-	 * @param values List of set of samples of single coordinates
-	 */
-	public void normalize(List<SingleCoordinateSet> values) {
-		ArrayList<Double> maxmin = new ArrayList<Double>();
-		for (int i = 0; i < values.size(); i++) {
-			maxmin.add(values.get(i).getMin());
-			maxmin.add(values.get(i).getMax());
-		}
-		for (int i = 0; i < values.size(); i++) {
-			values.get(i).normalize(Collections.min(maxmin).doubleValue(), Collections.max(maxmin).doubleValue());
-		}
-	}
-
+	
 	public double getMean() {
 		double sum = 0;
 		for (DataTime ctd : this.values) {

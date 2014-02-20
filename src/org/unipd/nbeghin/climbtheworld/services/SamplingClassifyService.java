@@ -65,27 +65,7 @@ public class SamplingClassifyService extends IntentService {
 
 	@Override
 	public int onStartCommand(Intent intent, int flags, int startId) {
-		try {
-			sensorDelay = intent.getExtras().getInt(ClimbActivity.SAMPLING_DELAY); // get sampling delay from received intent
-			accelerometerListener.setSensorDelay(sensorDelay);
-			accelerometerListener.setSamplingRate(intent.getExtras().getDouble(AccelerometerSamplingRateDetect.SAMPLING_RATE)); // set sampling rate from received intent
-		} catch (NullPointerException e) {
-			Log.i(MainActivity.AppName, "No sampling delay detected.");
-		}
-		switch (sensorDelay) {
-			case SensorManager.SENSOR_DELAY_FASTEST:
-				Log.i(MainActivity.AppName, "Chosen FASTEST sensor delay");
-				break;
-			case SensorManager.SENSOR_DELAY_NORMAL:
-				Log.i(MainActivity.AppName, "Chosen NORMAL sensor delay");
-				break;
-			case SensorManager.SENSOR_DELAY_UI:
-				Log.i(MainActivity.AppName, "Chosen UI sensor delay");
-				break;
-			case SensorManager.SENSOR_DELAY_GAME:
-				Log.i(MainActivity.AppName, "Chosen GAME sensor delay");
-				break;
-		}
+		
 		startAccelerometer();
 		return START_STICKY;
 	}
@@ -103,8 +83,8 @@ public class SamplingClassifyService extends IntentService {
 
 	public void startAccelerometer() {
 		Log.i(MainActivity.AppName, "Registering accelerometer listener");
-		mSensorManager.registerListener(accelerometerListener, mAccelerometer, sensorDelay); // SensorManager.SENSOR_DELAY_NORMAL
-		mSensorManager.registerListener(accelerometerListener, mRotationVector, sensorDelay);
+		mSensorManager.registerListener(accelerometerListener, mAccelerometer, 20000); // SensorManager.SENSOR_DELAY_NORMAL
+		mSensorManager.registerListener(accelerometerListener, mRotationVector, 20000);
 	}
 
 	public void stopAccelerometer() {

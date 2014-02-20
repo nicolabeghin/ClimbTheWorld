@@ -294,22 +294,6 @@ public class ClimbActivity extends Activity {
 			building = MainActivity.buildingDao.queryForId(building_id); // query db to get asked building
 			setup_from_building(); // load building info
 			backgroundClassifySampler = new Intent(this, SamplingClassifyService.class); // instance (without starting) background classifier
-			// check for pre-detected sampling rate
-			SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(getApplicationContext()); // reference to android preferences
-			detectedSamplingRate = settings.getFloat("detectedSamplingRate", 0.00f); // load previously detected sampling rate
-			samplingDelay = settings.getInt("sensor_delay", -1); // load previously detected sampling delay
-			Log.i(MainActivity.AppName, "Previous detected sampling rate of " + Double.toString(detectedSamplingRate) + "Hz");
-			// sampling rate not detected or lower than the minimum one
-			if (samplingDelay == -1 || detectedSamplingRate < minimumSamplingRate) { // start sampling rate detector
-				Log.w(MainActivity.AppName, "Sampling rate not previously detected or too low. Detecting a new one");
-				backgroundSamplingRateDetector = new Intent(this, SamplingRateDetectorService.class); // instance (without starting) background sampling rate detected
-				backgroundSamplingRateDetector.putExtra(SAMPLING_DELAY, SensorManager.SENSOR_DELAY_NORMAL); // set default sampling delay
-				registerReceiver(sampleRateDetectorReceiver, samplingRateDetectorFilter); // register listener for background sampling rate detector
-				startService(backgroundSamplingRateDetector); // start background service
-			} else {
-				Log.i(MainActivity.AppName, "Using the previously detected sampling rate");
-				setupByDetectedSamplingRate(); // setup activity with given sampling rate
-			}
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -465,10 +449,6 @@ public class ClimbActivity extends Activity {
 				startActivity(intent);
 			}
 		} else {
-			if (detectedSamplingRate == 0 || detectedSamplingRate < minimumSamplingRate) { // sampling rate detection still in progress
-				Toast.makeText(getApplicationContext(), "Accelerometer calibration is not ready yet. Please wait", Toast.LENGTH_SHORT).show();
-				return;
-			}
 			if (samplingEnabled) { // if sampling is enabled stop the classifier
 				stopClassify();
 			} else { // if sampling is not enabled stop the classifier

@@ -1,12 +1,10 @@
 package org.unipd.nbeghin.climbtheworld.models;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
 import org.unipd.nbeghin.climbtheworld.MainActivity;
-import org.unipd.nbeghin.climbtheworld.comparator.MeanComparator;
 import org.unipd.nbeghin.climbtheworld.comparator.SampleTimeComparator;
 import org.unipd.nbeghin.climbtheworld.weka.WekaClassifier;
 
@@ -23,15 +21,13 @@ public class ClassifierCircularBuffer {
 	private List<Sample>		samples							= new ArrayList<Sample>();
 	private List<Sample>		bufferToRemoveGravity			= new ArrayList<Sample>();
 	private boolean				bufferFull						= false;
-	private float 				bufferDuration					= 5000000000F;
-	private List<Double>		data_row						= new ArrayList<Double>();
+	private long 				bufferDuration					= 500000000; // 500 ms
 	IntentService				service;
 	public final static String	CLASSIFIER_ACTION				= "org.unipd.nbeghin.classifier.notification";
 	public final static String	CLASSIFIER_NOTIFICATION_STATUS	= "CLASSIFIER_NOTIFICATION_STATUS";
-	private int					axis_to_be_considered			= 4;											// (4 == |V|)
-	private int					size							= 0;
-	private float				average_step_duration			= 5000000000F;											// in ms
-	private long deltaTime;
+	private long				average_step_duration			= 500000000;									// in ms
+	
+	private long lastTime = 0;
 	
 	/**
 	 * @param size Size of the buffer
@@ -43,7 +39,6 @@ public class ClassifierCircularBuffer {
 //			Log.w(MainActivity.AppName, (size - 1) + " is not an even number: using " + size + " as circular buffer size");
 //		}
 		this.service = service;
-		this.size = size;
 	}
 
 	public void add(Sample sample, float[] rotationVector) {
@@ -85,9 +80,10 @@ public class ClassifierCircularBuffer {
 					sample.getValueY() - meanValueY, sample.getValueZ() - meanValueZ);
 			
 			rotateAccelerometerValues(finalSample, rotationVector);
+			
 			samples.add(finalSample);
 			
-			deltaTime = sample.getTime() - samples.get(0).getTime();
+			long deltaTime = sample.getTime() - samples.get(0).getTime();
 			if (deltaTime > average_step_duration) {
 				this.classify();
 			}
@@ -136,32 +132,35 @@ public class ClassifierCircularBuffer {
 		samples = samples.subList((int)(samples.size() / 4), samples.size()); // overlapping sliding window
 
 		try {
-			Collections.sort(used_samples, new SampleTimeComparator()); // make sure it's ordered by timestamp
+			/**
+			 * Make sure it's ordered by timestamp
+			 */
+			Collections.sort(used_samples, new SampleTimeComparator()); // 
 			
 			/**
 			 * Creates a new batch with the given sample that is responsible 
 			 * to calculate all the required features
 			 */
 			Batch batch = new Batch(used_samples); // create a new batch with given samples
-//			Log.i(MainActivity.AppName, "deltaTime=" + deltaTime/1000000 + "ms, batch size=" + used_samples.size());
+
 			List<FeatureSet> features = batch.getBasicFeatures(); // calculate features
-			
+			Double[] data_row = new Double[batch.getFeaturesSize()];
+			int i = 0; 
 			for (FeatureSet featureSet : features) {
-				data_row.add(featureSet.getMean());
-				data_row.add(featureSet.getStd());
-				data_row.add(featureSet.getVariance());
-				data_row.add(featureSet.getDifferenceMinMax());
+				data_row[i] = featureSet.getMean(); i++;
+				data_row[i] = featureSet.getStd(); i++;
+				data_row[i] = featureSet.getVariance(); i++;
+				data_row[i] = featureSet.getDifferenceMinMax(); i++;
 			}
 			
-			data_row.addAll(batch.getRatios());
-			data_row.addAll(batch.getCorrelations());
-			data_row.add(batch.getMagnitudeMean());
-			data_row.add(batch.getSignalMagnitudeArea());
+			i = batch.calculateRatios(data_row, i);
+			i = batch.calculateCorrelations(data_row, i);
+			data_row[i] = batch.calculateMagnitudeMean(); i++;
+			data_row[i] = batch.calculateSignalMagnitudeArea();
 			
-//			Log.d(MainActivity.AppName, "FEATURES: "+Arrays.toString(data_row));
 			Intent intent = new Intent();
 			intent.setAction(CLASSIFIER_ACTION);
-			intent.putExtra(CLASSIFIER_NOTIFICATION_STATUS, WekaClassifier.explicit_classify((Double[])data_row.toArray()));
+			intent.putExtra(CLASSIFIER_NOTIFICATION_STATUS, WekaClassifier.explicit_classify(data_row));
 			service.sendBroadcast(intent); // broadcast the classifier output
 		} catch (Exception e) {
 			Log.e(MainActivity.AppName, "Unable to classify batch:" + e.getMessage());

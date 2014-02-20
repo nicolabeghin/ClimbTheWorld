@@ -4,20 +4,22 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
+import org.unipd.nbeghin.climbtheworld.MainActivity;
+
+import android.util.Log;
+
 /**
  * A set of samples on which a feature will be calculated 
  *
  */
 public class Batch {
 	private List<SingleCoordinateSet>		values				= new ArrayList<SingleCoordinateSet>();
-	private static HashMap<Integer, String>	coordinates_mapping	= new HashMap<Integer, String>();
+	private static HashMap<Integer, String>	coordinates_mapping	= new HashMap<Integer, String>(5);
 	private String							title;
-	private int								trunk				= 0;
-	private List<Double> 					ratios 				= new ArrayList<Double>();
+	private int								trunk				= 0;	
 	private List<FeatureSet>				basicFeatures		= new ArrayList<FeatureSet>();
-	private List<Double>					correlations 		= new ArrayList<Double>();
-	private double							signalMagnitudeArea = 0.0;
-	private double 							magnitudeMean 		= 0.0;
+	private int 							featuresSize 		= 5 * 4 + 10 * 4 + 10 + 2; // coordinates_mapping.size + binomial + correlations + 
+																						   // calculated magnitude area and signal magnitude area
 	
 	static {
 		coordinates_mapping.put(0, "X");
@@ -50,8 +52,13 @@ public class Batch {
 	public List<SingleCoordinateSet> getValues() {
 		return values;
 	}
+	
+	public int getFeaturesSize() {
+		return featuresSize;
+	}
 
 	public Batch(List<Sample> samples) throws Exception {
+		
 		if (samples.isEmpty()) throw new Exception("No element given for this batch");
 		for (int i = 0; i < coordinates_mapping.size(); i++) {
 			values.add(new SingleCoordinateSet());
@@ -66,8 +73,7 @@ public class Batch {
 			values.get(4).addValue(new DataTime(sample.getTime(), sample.getValueXPlusY()));
 		}
 		
-		calculateMagnitudeMean(); calculateRatios(); calculateSignalMagnitueArea();
-		calculateCorrelations();
+		calculateBasicFeatures();
 	}
 
 	public void printFeatures() {
@@ -76,21 +82,25 @@ public class Batch {
 			System.out.println(featureSet);
 		}
 	}
-
-	public List<FeatureSet> getBasicFeatures() {
-		List<FeatureSet> features = new ArrayList<FeatureSet>();
+	
+	private void calculateBasicFeatures() {
+		
 		for (int i = 0; i < values.size(); i++) {
-			features.add(new FeatureSet(coordinates_mapping.get(i), values.get(i).getMean(), 
+			Log.d(MainActivity.AppName, "MEAN: " + values.get(i).getMean());
+			basicFeatures.add(new FeatureSet(coordinates_mapping.get(i), values.get(i).getMean(), 
 					values.get(i).getVariance(), values.get(i).getStandardDeviation(), 
 					values.get(i).getMin(), values.get(i).getMax()));
 		}
-		return features;
+	}
+	
+	public List<FeatureSet> getBasicFeatures() {
+		return basicFeatures;
 	}
 	
 	/**
 	 * Calculcates all the ratios between all the basic features of the sample
 	 */
-	private void calculateRatios() {
+	public int calculateRatios(Double[] data_row, int index) {
 		
 		for (int i = 0; i < basicFeatures.size() - 1; i++) {
 			for (int j = i+1; j < basicFeatures.size(); j++) {
@@ -112,35 +122,38 @@ public class Batch {
 				if (Double.isInfinite(ratioMinMax) || Double.isNaN(ratioMinMax)) {
 					ratioMinMax = 0.0;
 				}
-				ratios.add(ratioMean); ratios.add(ratioStd); ratios.add(ratioVariance);
-				ratios.add(ratioMinMax);
+				data_row[index] = ratioMean; index++;
+				data_row[index] = ratioStd; index++; 
+				data_row[index] = ratioVariance; index++;
+				data_row[index] = ratioMinMax; index++;
 			}
 			
 		}
+		return index;
 	}
 	
 	/**
 	 * Calculates correlation between all the axis used to calculate 
 	 * the features
 	 */
-	private void calculateCorrelations() {
+	public int calculateCorrelations(Double[] data_row, int index) {
 		
 		for (int i = 0; i < values.size() - 1; i++) {
 			for (int j = i+1; j < values.size(); j++) {
 				
 				Double covariance = calculateCovariance(values.get(i).getValues(), values.get(j).getValues());
 				
-				Double correlation = covariance / 
+				data_row[index] = covariance / 
 						(basicFeatures.get(i).getStd() * basicFeatures.get(j).getStd());
 				
-				if (Double.isNaN(correlation) || Double.isInfinite(correlation)) {
-					correlation = 0.0;
+				if (Double.isNaN(data_row[index]) || Double.isInfinite(data_row[index])) {
+					data_row[index] = 0.0;
 				}
 				
-				correlations.add(correlation);
+				index++;
 			}
 		}
-		
+		return index;
 	}
 	
 	/**
@@ -167,7 +180,9 @@ public class Batch {
 		return covariance;
 	}
 	
-	private void calculateSignalMagnitueArea() {
+	public Double calculateSignalMagnitudeArea() {
+		
+		Double signalMagnitudeArea = 0.0;
 		
 		for (int i = 0; i < values.get(0).getValues().size(); i++) {
 			
@@ -178,38 +193,12 @@ public class Batch {
 		}
 		
 		signalMagnitudeArea /= values.get(0).getValues().size();
+		return signalMagnitudeArea;
 	}
 	
-	private void calculateMagnitudeMean() {
+	public Double calculateMagnitudeMean() {
 		
-		magnitudeMean = Math.sqrt(Math.pow(basicFeatures.get(0).getMean(), 2) 
+		return Math.sqrt(Math.pow(basicFeatures.get(0).getMean(), 2) 
 				+ Math.pow(basicFeatures.get(1).getMean(), 2) + Math.pow(basicFeatures.get(2).getMean(), 2));
 	}
-	
-	public List<Double> getRatios() {
-		return ratios;
-	}
-	
-	public List<Double> getCorrelations() {
-		return this.correlations;
-	}
-	
-	public Double getMagnitudeMean() {
-		return this.magnitudeMean;
-	}
-	
-	public Double getSignalMagnitudeArea() {
-		return this.signalMagnitudeArea;
-	}
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
 }

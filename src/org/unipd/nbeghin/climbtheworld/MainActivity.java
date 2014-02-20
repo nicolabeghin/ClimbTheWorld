@@ -73,10 +73,6 @@ public class MainActivity extends ActionBarActivity {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
-		// ab = getSupportActionBar();
-		// ab.setHomeButtonEnabled(false);
-		// ab.setTitle(APP_TITLE);
-		// instance entities from db (to be moved inside AsyncTask)
 		loadDb(); // instance db connection
 		// loading fragments
 		fragments.add(Fragment.instantiate(this, BuildingsFragment.class.getName())); // instance building fragments

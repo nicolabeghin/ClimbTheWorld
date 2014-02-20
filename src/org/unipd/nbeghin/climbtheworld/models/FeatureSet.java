@@ -3,6 +3,10 @@ package org.unipd.nbeghin.climbtheworld.models;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 
+import org.unipd.nbeghin.climbtheworld.MainActivity;
+
+import android.util.Log;
+
 /**
  * A set of calculated features
  *
