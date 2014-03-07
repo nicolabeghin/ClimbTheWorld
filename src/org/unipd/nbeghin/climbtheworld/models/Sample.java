@@ -6,12 +6,12 @@ package org.unipd.nbeghin.climbtheworld.models;
  *
  */
 public class Sample {
-	private long		time;
+	private long	time;
 	private double	valueX;
 	private double	valueY;
 	private double	valueZ;
 	private double	valueV;
-	private double 	valueXPlusY;
+	private double 	meanXAndY;
 
 	public Sample(long time, double valueX, double valueY, double valueZ) {
 		this.time = time;
@@ -19,7 +19,7 @@ public class Sample {
 		this.valueY = valueY;
 		this.valueZ = valueZ;
 		this.valueV = Math.sqrt(Math.pow(valueX, 2) + Math.pow(valueY, 2) + Math.pow(valueZ, 2));
-		this.valueXPlusY = this.valueX + this.valueY;
+		this.meanXAndY = (this.valueX + this.valueY) / 2.0;
 	}
 
 	public long getTime() {
@@ -42,8 +42,8 @@ public class Sample {
 		return valueV;
 	}
 	
-	public double getValueXPlusY() {
-		return valueXPlusY;
+	public double getMeanXAndY() {
+		return meanXAndY;
 	}
 	
 	public void setValueX(double x) {
@@ -60,7 +60,7 @@ public class Sample {
 	
 	public void updateVAndXPlusY() {
 		this.valueV = Math.sqrt(Math.pow(this.valueX, 2) + Math.pow(this.valueY, 2) + Math.pow(this.valueZ, 2));
-		this.valueXPlusY = this.valueX + this.valueY;
+		this.meanXAndY = (this.valueX + this.valueY) / 2.0;
 	}
 
 	@Override

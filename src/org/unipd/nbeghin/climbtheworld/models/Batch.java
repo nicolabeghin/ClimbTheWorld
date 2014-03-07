@@ -70,7 +70,7 @@ public class Batch {
 			values.get(1).addValue(new DataTime(sample.getTime(), sample.getValueY()));
 			values.get(2).addValue(new DataTime(sample.getTime(), sample.getValueZ()));
 			values.get(3).addValue(new DataTime(sample.getTime(), sample.getValueV()));
-			values.get(4).addValue(new DataTime(sample.getTime(), sample.getValueXPlusY()));
+			values.get(4).addValue(new DataTime(sample.getTime(), sample.getMeanXAndY()));
 		}
 		
 		calculateBasicFeatures();
@@ -172,7 +172,6 @@ public class Batch {
 			product += (first.get(i).getValue() * second.get(i).getValue());
 			sumX += first.get(i).getValue();
 			sumY += second.get(i).getValue();
-		
 		}
 		
 		covariance = (product / first.size()) - ((sumX * sumY) / Math.pow(first.size(), 2));
