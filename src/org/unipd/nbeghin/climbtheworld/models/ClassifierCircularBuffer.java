@@ -146,16 +146,16 @@ public class ClassifierCircularBuffer {
 			Batch batch = new Batch(used_samples); // create a new batch with given samples
 
 			List<FeatureSet> features = batch.getBasicFeatures(); // calculate features
-			Double[] data_row = new Double[batch.getFeaturesSize()];
+			List<Double> data_row = new ArrayList<Double>();
 			int i = 0; 
 			for (FeatureSet featureSet : features) {
-				data_row[i] = featureSet.getMean(); i++;
-				data_row[i] = featureSet.getStd(); i++;
-				data_row[i] = featureSet.getVariance(); i++;
-				data_row[i] = featureSet.getDifferenceMinMax(); i++;
+				data_row.add(featureSet.getMean());
+				data_row.add(featureSet.getStd());
+				data_row.add(featureSet.getVariance());
+				data_row.add(featureSet.getDifferenceMinMax());
 			}
 			
-			i = batch.calculateRatios(data_row, i);
+			data_row.addAll(batch.calculateRatios());
 			i = batch.calculateCorrelations(data_row, i);
 			data_row[i] = batch.calculateMagnitudeMean(); i++;
 			data_row[i] = batch.calculateSignalMagnitudeArea();

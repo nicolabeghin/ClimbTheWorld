@@ -103,7 +103,9 @@ public class Batch {
 	/**
 	 * Calculcates all the ratios between all the basic features of the sample
 	 */
-	public int calculateRatios(Double[] data_row, int index) {
+	public List<Double> calculateRatios() {
+		
+		List<Double> ratios = new ArrayList<Double>();
 		
 		for (int i = 0; i < basicFeatures.size() - 1; i++) {
 			for (int j = i+1; j < basicFeatures.size(); j++) {
@@ -125,14 +127,14 @@ public class Batch {
 				if (Double.isInfinite(ratioMinMax) || Double.isNaN(ratioMinMax)) {
 					ratioMinMax = 0.0;
 				}
-				data_row[index] = ratioMean; index++;
-				data_row[index] = ratioStd; index++; 
-				data_row[index] = ratioVariance; index++;
-				data_row[index] = ratioMinMax; index++;
+				ratios.add(ratioMean);
+				ratios.add(ratioStd); 
+				ratios.add(ratioVariance);
+				ratios.add(ratioMinMax);
 			}
 			
 		}
-		return index;
+		return ratios;
 	}
 	
 	/**
