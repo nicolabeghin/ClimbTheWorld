@@ -83,9 +83,10 @@ public class ClassifierCircularBuffer {
 			
 			samples.add(finalSample);
 			
-			long deltaTime = sample.getTime() - samples.get(0).getTime();
-			if (deltaTime > average_step_duration) {
-				this.classify();
+			if (samples.size() > 0 && samples.get(samples.size() - 2).getValueZ() <= 0 
+					&& samples.get(samples.size() - 1).getValueZ() >= 0) {
+				
+				classify();
 			}
 		}
 	}
@@ -123,6 +124,7 @@ public class ClassifierCircularBuffer {
 							(zSquare + (1 - zSquare) * cosAlpha) * sample.getValueZ());
 		
 		sample.setValueX(rotatedX); sample.setValueY(rotatedY); sample.setValueZ(rotatedZ);
+		sample.updateVAndXPlusY();
 		
 	}
 
@@ -160,7 +162,7 @@ public class ClassifierCircularBuffer {
 			
 			Intent intent = new Intent();
 			intent.setAction(CLASSIFIER_ACTION);
-			intent.putExtra(CLASSIFIER_NOTIFICATION_STATUS, WekaClassifier.explicit_classify(data_row));
+			intent.putExtra(CLASSIFIER_NOTIFICATION_STATUS, WekaClassifier.classify(data_row));
 			service.sendBroadcast(intent); // broadcast the classifier output
 		} catch (Exception e) {
 			Log.e(MainActivity.AppName, "Unable to classify batch:" + e.getMessage());

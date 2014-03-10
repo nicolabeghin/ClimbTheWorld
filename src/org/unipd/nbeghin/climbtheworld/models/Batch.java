@@ -26,7 +26,7 @@ public class Batch {
 		coordinates_mapping.put(1, "Y");
 		coordinates_mapping.put(2, "Z");
 		coordinates_mapping.put(3, "|V|");
-		coordinates_mapping.put(4, "X+Y");
+		coordinates_mapping.put(4, "(X+Y)/2");
 	}
 
 	public void setTitle(String title) {
@@ -87,9 +87,12 @@ public class Batch {
 		
 		for (int i = 0; i < values.size(); i++) {
 			Log.d(MainActivity.AppName, "MEAN: " + values.get(i).getMean());
-			basicFeatures.add(new FeatureSet(coordinates_mapping.get(i), values.get(i).getMean(), 
-					values.get(i).getVariance(), values.get(i).getStandardDeviation(), 
-					values.get(i).getMin(), values.get(i).getMax()));
+			basicFeatures.add(new FeatureSet(coordinates_mapping.get(i), 
+					values.get(i).getMean(), 
+					values.get(i).getStandardDeviation(), 
+					values.get(i).getVariance(), 
+					values.get(i).getMin(), 
+					values.get(i).getMax()));
 		}
 	}
 	

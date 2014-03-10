@@ -23,6 +23,7 @@ import org.unipd.nbeghin.climbtheworld.models.BuildingTour;
 import org.unipd.nbeghin.climbtheworld.models.Climbing;
 import org.unipd.nbeghin.climbtheworld.models.Photo;
 import org.unipd.nbeghin.climbtheworld.models.Tour;
+import org.unipd.nbeghin.climbtheworld.weka.WekaClassifier;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
@@ -81,6 +82,13 @@ public class MainActivity extends ActionBarActivity {
 		mPager = (ViewPager) super.findViewById(R.id.pager);
 		mPager.setAdapter(this.mPagerAdapter);
 		sContext = getApplicationContext();
+		
+		try {
+			WekaClassifier.initializeParameters(getResources().openRawResource(R.raw.modelvsw30osl0));
+		}
+		catch(IOException exc) {
+			this.finish();
+		}
 	}
 
 	/**

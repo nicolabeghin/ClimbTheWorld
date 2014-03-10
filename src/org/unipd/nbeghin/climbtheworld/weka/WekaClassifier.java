@@ -1,7 +1,17 @@
 package org.unipd.nbeghin.climbtheworld.weka;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.util.ArrayList;
+import java.util.List;
+
 import org.unipd.nbeghin.climbtheworld.MainActivity;
 
+import com.facebook.Session.OpenRequest;
+
+import android.content.Context;
 import android.util.Log;
 
 /**
@@ -10,18 +20,126 @@ import android.util.Log;
  * 
  */
 public class WekaClassifier {
-	private static String[]	classifications	= new String[] { "NONSTAIR", "STAIR" };
+	
+	private static double delta = 0.0;
+	private static List<Double> gamma = new ArrayList<Double>();
+	private static List<ArrayList<Double>> matrixM = new ArrayList<ArrayList<Double>>();
+	private static double b = 0.0;
+	private static double N;
+	private static double R;
+	private static List<Double> minF = new ArrayList<Double>();
+	private static List<Double> maxF = new ArrayList<Double>();
+	private static List<Double> differenceMaxMinF = new ArrayList<Double>();
 
+	private static String[]	classifications	= new String[] { "NONSTAIR", "STAIR" };
+	
+	public static void initializeParameters(InputStream stream) throws IOException {
+		
+		BufferedReader reader = new BufferedReader(new InputStreamReader(stream));
+		String line;
+		
+		/**
+         * Read the first line with the delta value
+         */
+        line = reader.readLine();
+        delta = Double.valueOf(line);
+        
+        /**
+         * read the line with the gamma values
+         */
+        line = reader.readLine();
+        String[] values = line.split(";");
+        
+        for (String value: values) {
+            gamma.add(Double.valueOf(value));
+        }
+        
+        /**
+         * Read N and R values, N is the number of following lines to build the 
+         * matrixM matrix
+         */
+        line = reader.readLine();
+        values = line.split(";");
+        
+        N = Double.valueOf(values[0]); R = Double.valueOf(values[1]);
+        
+        /**
+         * reads N lines to build the matrix matrixM
+         */
+        for (int i = 0; i < N; i++) {
+            
+            matrixM.add(i, new ArrayList<Double>());
+            line = reader.readLine();
+            values = line.split(";");
+            
+            for (String value: values) {
+                matrixM.get(i).add(Double.valueOf(value));
+            }
+        }
+        
+        /**
+         * Reads the b value
+         */
+        b = Double.valueOf(reader.readLine());
+        
+        /**
+         * Read the line with the values for the minF vector
+         */
+        line = reader.readLine();
+        values = line.split(";");
+        
+        for (String value: values) {
+            minF.add(Double.valueOf(value));
+        }
+        
+        /**
+         * Reads the line with the values of the maxF vector
+         */
+        line = reader.readLine();
+        values = line.split(";");
+        
+        for (String value: values) {
+            maxF.add(Double.valueOf(value));
+        }
+        
+        for (int i = 0; i < minF.size(); i++) {
+            differenceMaxMinF.add(maxF.get(i) - minF.get(i));
+        }
+		
+	}
+	
+	public static double classify(List<Double> w) {
+	        
+        double classification = 0.0;
+        
+        for (int i = 0; i < N; i++) {
+            
+            double internalSum = 0.0;
+            
+            for (int j = 0; j < R; j++) {
+                
+                double valoreNormalizzato = ((w.get(j) - minF.get(j)) / (differenceMaxMinF.get(j))) 
+                        * 2 - 1;
+                
+                internalSum += Math.pow(valoreNormalizzato  - matrixM.get(i).get(j), 2);
+            }
+            
+            classification += (Math.exp(internalSum * (-delta)) * gamma.get(i));
+        }
+        classification -= b;
+        return classification;
+    }
+	
 	/**
 	 * @param i Classifier numeric output
 	 * @return String A string explicitly stating the classifier output
 	 * @throws Exception
 	 */
 	public static String explicit_classify(Object[] i) throws Exception {
-		return classifications[(int) classify(i)];
+		return classifications[(int) classifyTree(i)];
 	}
 
-	public static double classify(Object[] i)
+	public static double classifyTree(Object[] i)
 		    throws Exception {
 
 		    double p = Double.NaN;
