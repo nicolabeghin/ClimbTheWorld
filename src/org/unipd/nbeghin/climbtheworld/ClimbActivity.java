@@ -2,7 +2,9 @@ package org.unipd.nbeghin.climbtheworld;
 
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 import org.unipd.nbeghin.climbtheworld.exceptions.ClimbingNotFound;
 import org.unipd.nbeghin.climbtheworld.exceptions.NoFBSession;
@@ -19,6 +21,7 @@ import org.unipd.nbeghin.climbtheworld.util.SystemUiHider;
 import android.annotation.TargetApi;
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.app.backup.RestoreObserver;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -102,10 +105,43 @@ public class ClimbActivity extends Activity {
 	 * 
 	 */
 	public class ClassifierReceiver extends BroadcastReceiver {
+		
+		private static final double tradeoffG = 0.001;
+		private static final double g = tradeoffG / (double)100;
+		private List<Double> history = new ArrayList<Double>();
+		private static final int historySize = 10;
+		
 		@Override
 		public void onReceive(Context context, Intent intent) {
-			String result = intent.getExtras().getString(ClassifierCircularBuffer.CLASSIFIER_NOTIFICATION_STATUS);
-			if (result.equals("STAIR")) {
+			//String result = intent.getExtras().getString(ClassifierCircularBuffer.CLASSIFIER_NOTIFICATION_STATUS);
+			Double result = intent.getExtras().getDouble(ClassifierCircularBuffer.CLASSIFIER_NOTIFICATION_STATUS);
+			
+			double correction = 0.0;
+			for (int indexHistory = 0; indexHistory < history.size(); indexHistory++) {
+				correction += (100 / Math.pow(2, indexHistory + 1)) * (double)history.get(indexHistory) * g;
+			}
+			
+			if (Double.isNaN(correction)) {
+				correction = 0.0;
+			}
+			
+			double finalClassification = result + correction;
+			
+			if (result * finalClassification >= 0) {
+				if (history.size() == historySize) {
+					history.remove(historySize - 1);
+					history.add(0, (finalClassification > 0 ? 1.0 : -1.0));
+				}
+				else {
+					history.add(0, (finalClassification > 0 ? 1.0 : -1.0));
+				}
+			}
+			else {
+				history.clear();
+				history.add(result > 0 ? 1.0 : -1.0);
+			}
+			
+			if (finalClassification > 0) {
 				if (climbedYesterday && percentage > 0.25f && percentage < 0.50f && used_bonus == false) { // bonus at 25%
 					apply_percentage_bonus();
 				} else { // standard, no bonus
@@ -124,7 +160,9 @@ public class ClimbActivity extends Activity {
 					}
 				}
 			}
-			((TextView) findViewById(R.id.lblClassifierOutput)).setText(result); // debug: show currently detected classifier output
+			
+			
+			((TextView) findViewById(R.id.lblClassifierOutput)).setText(finalClassification > 0 ? "STAIR" : "NON_STAIR"); // debug: show currently detected classifier output
 		}
 	}
 
@@ -408,22 +446,22 @@ public class ClimbActivity extends Activity {
 	/**
 	 * Touch listener to use for in-layout UI controls to delay hiding the system UI. This is to prevent the jarring behavior of controls going away while interacting with activity UI.
 	 */
-	View.OnTouchListener	mDelayHideTouchListener	= new View.OnTouchListener() {
-														@Override
-														public boolean onTouch(View view, MotionEvent motionEvent) {
-															if (AUTO_HIDE) {
-																delayedHide(AUTO_HIDE_DELAY_MILLIS);
-															}
-															return false;
-														}
-													};
-	Handler					mHideHandler			= new Handler();
-	Runnable				mHideRunnable			= new Runnable() {
-														@Override
-														public void run() {
-															mSystemUiHider.hide();
-														}
-													};
+	View.OnTouchListener mDelayHideTouchListener	= new View.OnTouchListener() {
+			@Override
+			public boolean onTouch(View view, MotionEvent motionEvent) {
+				if (AUTO_HIDE) {
+					delayedHide(AUTO_HIDE_DELAY_MILLIS);
+				}
+				return false;
+			}
+		};
+	Handler	mHideHandler			= new Handler();
+	Runnable mHideRunnable			= new Runnable() {
+		@Override
+		public void run() {
+			mSystemUiHider.hide();
+		}
+	};
 	
 
 	/**

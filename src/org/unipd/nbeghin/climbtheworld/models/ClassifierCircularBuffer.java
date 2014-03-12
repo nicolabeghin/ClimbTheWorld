@@ -25,7 +25,8 @@ public class ClassifierCircularBuffer {
 	IntentService				service;
 	public final static String	CLASSIFIER_ACTION				= "org.unipd.nbeghin.classifier.notification";
 	public final static String	CLASSIFIER_NOTIFICATION_STATUS	= "CLASSIFIER_NOTIFICATION_STATUS";
-	private long				average_step_duration			= 500000000;									// in ms
+	private final static long	MIN_WINDOW_DURATION				= 300000000;	// 300 ms
+	private final static long 	MAX_WINDOW_DURATION				= 2000000000;	// 2 seconds
 	
 	private long lastTime = 0;
 	
@@ -33,11 +34,7 @@ public class ClassifierCircularBuffer {
 	 * @param size Size of the buffer
 	 * @param service Reference to the service that will be used to issue BroadcastRequest
 	 */
-	public ClassifierCircularBuffer(int size, IntentService service) {
-//		if (size % 2 != 0) { // not an even number
-//			size++; // get an even number (odd + 1)
-//			Log.w(MainActivity.AppName, (size - 1) + " is not an even number: using " + size + " as circular buffer size");
-//		}
+	public ClassifierCircularBuffer(IntentService service) {
 		this.service = service;
 	}
 
@@ -83,7 +80,7 @@ public class ClassifierCircularBuffer {
 			
 			samples.add(finalSample);
 			
-			if (samples.size() > 0 && samples.get(samples.size() - 2).getValueZ() <= 0 
+			if (samples.size() > 1 && samples.get(samples.size() - 2).getValueZ() <= 0 
 					&& samples.get(samples.size() - 1).getValueZ() >= 0) {
 				
 				classify();
@@ -130,42 +127,60 @@ public class ClassifierCircularBuffer {
 
 	private void classify() {
 		
-		List<Sample> used_samples=new ArrayList<Sample>(samples); // clone given samples in order to unlock access to main samples
-		samples = samples.subList((int)(samples.size() / 4), samples.size()); // overlapping sliding window
-
-		try {
-			/**
-			 * Make sure it's ordered by timestamp
-			 */
-			Collections.sort(used_samples, new SampleTimeComparator()); // 
+		if (samples.get(samples.size() - 1).getTime() - 
+				samples.get(0).getTime() > MIN_WINDOW_DURATION && 
+			samples.get(samples.size() - 1).getTime() - 
+				samples.get(0).getTime() < MAX_WINDOW_DURATION) {
 			
-			/**
-			 * Creates a new batch with the given sample that is responsible 
-			 * to calculate all the required features
-			 */
-			Batch batch = new Batch(used_samples); // create a new batch with given samples
-
-			List<FeatureSet> features = batch.getBasicFeatures(); // calculate features
-			List<Double> data_row = new ArrayList<Double>();
-			int i = 0; 
-			for (FeatureSet featureSet : features) {
-				data_row.add(featureSet.getMean());
-				data_row.add(featureSet.getStd());
-				data_row.add(featureSet.getVariance());
-				data_row.add(featureSet.getDifferenceMinMax());
+			List<Sample> used_samples = new ArrayList<Sample>(samples); // clone given samples in order to unlock access to main samples
+			samples.clear(); 
+			
+			try {
+				/**
+				 * Make sure it's ordered by timestamp
+				 */
+				Collections.sort(used_samples, new SampleTimeComparator()); // 
+				
+				/**
+				 * Creates a new batch with the given sample that is responsible 
+				 * to calculate all the required features
+				 */
+				Batch batch = new Batch(used_samples); // create a new batch with given samples
+	
+				List<FeatureSet> features = batch.getBasicFeatures(); // calculate features
+				List<Double> data_row = new ArrayList<Double>();
+	
+				for (FeatureSet featureSet : features) {
+					data_row.add(featureSet.getMean());
+					data_row.add(featureSet.getStd());
+					data_row.add(featureSet.getVariance());
+					data_row.add(featureSet.getDifferenceMinMax());
+				}
+				
+				batch.addRatios(data_row);
+				batch.addIntelligentRatios(data_row);
+				batch.addCorrelations(data_row);
+				data_row.add(batch.calculateMagnitudeMean());
+				data_row.add(batch.calculateSignalMagnitudeArea());
+				
+				Intent intent = new Intent();
+				intent.setAction(CLASSIFIER_ACTION);
+				//intent.putExtra(CLASSIFIER_NOTIFICATION_STATUS, WekaClassifier.classify(data_row));
+				intent.putExtra(CLASSIFIER_NOTIFICATION_STATUS, WekaClassifier.classify(data_row));
+				service.sendBroadcast(intent); // broadcast the classifier output
+				
+				used_samples.clear();
+				
+			} catch (Exception e) {
+				Log.e(MainActivity.AppName, "Unable to classify batch:" + e.getMessage());
 			}
-			
-			data_row.addAll(batch.calculateRatios());
-			i = batch.calculateCorrelations(data_row, i);
-			data_row[i] = batch.calculateMagnitudeMean(); i++;
-			data_row[i] = batch.calculateSignalMagnitudeArea();
-			
+		}
+		else {
+			samples.clear();
 			Intent intent = new Intent();
 			intent.setAction(CLASSIFIER_ACTION);
-			intent.putExtra(CLASSIFIER_NOTIFICATION_STATUS, WekaClassifier.classify(data_row));
-			service.sendBroadcast(intent); // broadcast the classifier output
-		} catch (Exception e) {
-			Log.e(MainActivity.AppName, "Unable to classify batch:" + e.getMessage());
+			intent.putExtra(CLASSIFIER_NOTIFICATION_STATUS, -0.001);
+			service.sendBroadcast(intent);
 		}
 	}
 }

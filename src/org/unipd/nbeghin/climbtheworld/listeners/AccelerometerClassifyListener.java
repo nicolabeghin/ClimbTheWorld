@@ -17,31 +17,17 @@ import android.util.Log;
  * 
  */
 public class AccelerometerClassifyListener implements SensorEventListener {
-	private int					sensorDelay;
-	private static double		samplingRate	= 18;	// default
-	private static double		step_per_second	= 0.51; // 0.51200396: 30.720238 ms
 	private float[] 			lastValuesRotationVector;
 	ClassifierCircularBuffer	buffer;
 	IntentService				service;
 
-	public void setSensorDelay(int sensorDelay) {
-		this.sensorDelay = sensorDelay;
-	}
-
-	private void initialize_buffer(double samplingRate) {
-		int buffer_size = (int) (samplingRate * step_per_second);
-		buffer = new ClassifierCircularBuffer(buffer_size, service);
-		Log.i(MainActivity.AppName, "Accelerometer listener instanced with a circular buffer size of " + buffer_size + " (detected sampling rate: " + samplingRate + " Hz)");
-	}
-
-	public void setSamplingRate(double samplingRate) {
-		this.samplingRate = samplingRate;
-		// initialize_buffer(samplingRate);
+	private void initialize_buffer() {
+		buffer = new ClassifierCircularBuffer(service);
 	}
 
 	public AccelerometerClassifyListener(Context context, IntentService service) {
 		this.service = service;
-		initialize_buffer((int) samplingRate);
+		initialize_buffer();
 	}
 
 	@Override

@@ -86,7 +86,6 @@ public class Batch {
 	private void calculateBasicFeatures() {
 		
 		for (int i = 0; i < values.size(); i++) {
-			Log.d(MainActivity.AppName, "MEAN: " + values.get(i).getMean());
 			basicFeatures.add(new FeatureSet(coordinates_mapping.get(i), 
 					values.get(i).getMean(), 
 					values.get(i).getStandardDeviation(), 
@@ -103,7 +102,7 @@ public class Batch {
 	/**
 	 * Calculcates all the ratios between all the basic features of the sample
 	 */
-	public List<Double> calculateRatios() {
+	public void addRatios(List<Double> data_row) {
 		
 		List<Double> ratios = new ArrayList<Double>();
 		
@@ -127,38 +126,43 @@ public class Batch {
 				if (Double.isInfinite(ratioMinMax) || Double.isNaN(ratioMinMax)) {
 					ratioMinMax = 0.0;
 				}
-				ratios.add(ratioMean);
-				ratios.add(ratioStd); 
-				ratios.add(ratioVariance);
-				ratios.add(ratioMinMax);
+				data_row.add(ratioMean);
+				data_row.add(ratioStd); 
+				data_row.add(ratioVariance);
+				data_row.add(ratioMinMax);
 			}
 			
 		}
-		return ratios;
+	}
+	
+	public void addIntelligentRatios(List<Double> data_row) {
+		
+		data_row.add(basicFeatures.get(2).getMax() / basicFeatures.get(4).getMax());
+		data_row.add(Math.abs(basicFeatures.get(2).getMin() / basicFeatures.get(4).getMin()));
+		
 	}
 	
 	/**
 	 * Calculates correlation between all the axis used to calculate 
 	 * the features
 	 */
-	public int calculateCorrelations(Double[] data_row, int index) {
+	public void addCorrelations(List<Double> data_row) {
 		
 		for (int i = 0; i < values.size() - 1; i++) {
 			for (int j = i+1; j < values.size(); j++) {
 				
 				Double covariance = calculateCovariance(values.get(i).getValues(), values.get(j).getValues());
 				
-				data_row[index] = covariance / 
+				double correlation = covariance / 
 						(basicFeatures.get(i).getStd() * basicFeatures.get(j).getStd());
 				
-				if (Double.isNaN(data_row[index]) || Double.isInfinite(data_row[index])) {
-					data_row[index] = 0.0;
+				if (Double.isNaN(correlation) || Double.isInfinite(correlation)) {
+					correlation = 0.0;
 				}
 				
-				index++;
+				data_row.add(correlation);
 			}
 		}
-		return index;
 	}
 	
 	/**
@@ -193,7 +197,6 @@ public class Batch {
 			signalMagnitudeArea += Math.abs(values.get(0).getValues().get(i).getValue()) + 
 					Math.abs(values.get(1).getValues().get(i).getValue()) + 
 					Math.abs(values.get(2).getValues().get(i).getValue());
-			
 		}
 		
 		signalMagnitudeArea /= values.get(0).getValues().size();

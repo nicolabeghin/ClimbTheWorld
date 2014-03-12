@@ -26,8 +26,8 @@ public class SamplingClassifyService extends IntentService {
 	public static Sensor					mRotationVector;
 	private SensorManager					mSensorManager;
 	private int								notification_id	= 1;
-	private int								sensorDelay		= SensorManager.SENSOR_DELAY_NORMAL;
 	private NotificationManager				notificationManager;
+	private int 							delay = (1 / 30) * 1000;
 
 	public SamplingClassifyService() {
 		super("SamplingClassifyService");
@@ -83,8 +83,8 @@ public class SamplingClassifyService extends IntentService {
 
 	public void startAccelerometer() {
 		Log.i(MainActivity.AppName, "Registering accelerometer listener");
-		mSensorManager.registerListener(accelerometerListener, mAccelerometer, 20000); // SensorManager.SENSOR_DELAY_NORMAL
-		mSensorManager.registerListener(accelerometerListener, mRotationVector, 20000);
+		mSensorManager.registerListener(accelerometerListener, mAccelerometer, delay); // SensorManager.SENSOR_DELAY_NORMAL
+		mSensorManager.registerListener(accelerometerListener, mRotationVector, delay);
 	}
 
 	public void stopAccelerometer() {

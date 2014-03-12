@@ -46,6 +46,14 @@ public class FeatureSet {
 	public double getDifferenceMinMax() {
 		return this.maxValue - this.minValue;
 	}
+	
+	public double getMin() {
+		return minValue;
+	}
+	
+	public double getMax() {
+		return maxValue;
+	}
 
 	@Override
 	public String toString() {
